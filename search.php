@@ -1,0 +1,546 @@
+<?php
+require_once 'php/config.php';
+
+try {
+    $conn = getDBConnection();
+
+    // Fetch all doctors with their profiles
+    $stmt = $conn->prepare("
+        SELECT
+            d.*,
+            dp.bio,
+            dp.specialty,
+            dp.languages_spoken,
+            dp.consultation_fee,
+            dp.experience_years,
+            dp.total_appointments,
+            dp.total_reviews,
+            dp.average_rating,
+            dp.is_available,
+            dp.address,
+            dp.city,
+            dp.state,
+            dp.zip_code,
+            dp.profile_image,
+            (SELECT COUNT(*) FROM doctor_experiences de WHERE de.doctor_id = d.id) as experience_count,
+            (SELECT COUNT(*) FROM doctor_education ded WHERE ded.doctor_id = d.id) as education_count,
+            (SELECT COUNT(*) FROM doctor_awards da WHERE da.doctor_id = d.id) as awards_count
+        FROM doctors d
+        LEFT JOIN doctor_profiles dp ON d.id = dp.doctor_id
+        ORDER BY d.created_at DESC
+    ");
+    $stmt->execute();
+    $doctors = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
+    $stmt->close();
+
+    $conn->close();
+} catch (Exception $e) {
+    error_log("Error fetching doctors: " . $e->getMessage());
+    $doctors = [];
+}
+?>
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1" >
+		<meta name="description" content="The responsive professional Doccure template offers many features, like scheduling appointments with  top doctors, clinics, and hospitals via voice, video call & chat.">
+		<meta name="keywords" content="practo clone, doccure, doctor appointment, Practo clone html template, doctor booking template">
+		<meta name="author" content="Practo Clone HTML Template - Doctor Booking Template">
+		<meta property="og:url" content="https://doccure.dreamstechnologies.com/html/">
+		<meta property="og:type" content="website">
+		<meta property="og:title" content="Doctors Appointment HTML Website Templates | Doccure">
+		<meta property="og:description" content="The responsive professional Doccure template offers many features, like scheduling appointments with  top doctors, clinics, and hospitals via voice, video call & chat.">
+		<meta property="og:image" content="assets/img/preview-banner.jpg">
+		<meta name="twitter:card" content="summary_large_image">
+		<meta property="twitter:domain" content="https://doccure.dreamstechnologies.com/html/">
+		<meta property="twitter:url" content="https://doccure.dreamstechnologies.com/html/">
+		<meta name="twitter:title" content="Doctors Appointment HTML Website Templates | Doccure">
+		<meta name="twitter:description" content="The responsive professional Doccure template offers many features, like scheduling appointments with  top doctors, clinics, and hospitals via voice, video call & chat.">
+		<meta name="twitter:image" content="assets/img/preview-banner.jpg">
+		<title>Doccure</title>
+
+		<!-- Favicon -->
+		<link rel="shortcut icon" href="assets/img/favicon.png" type="image/x-icon">
+
+		<!-- Apple Touch Icon -->
+		<link rel="apple-touch-icon" sizes="180x180" href="assets/img/apple-touch-icon.png">
+
+		<!-- Theme Settings Js -->
+		<script src="assets/js/theme-script.js"></script>
+		
+		<!-- Bootstrap CSS -->
+		<link rel="stylesheet" href="assets/css/bootstrap.min.css">
+				
+		<!-- Fontawesome CSS -->
+		<link rel="stylesheet" href="assets/plugins/fontawesome/css/fontawesome.min.css">
+		<link rel="stylesheet" href="assets/plugins/fontawesome/css/all.min.css">
+
+		<!-- Iconsax CSS-->
+		<link rel="stylesheet" href="assets/css/iconsax.css">
+
+		<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+		<link href="https://fonts.googleapis.com/css2?family=Inter:wght@200;300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+		<!-- Feathericon CSS -->
+    	<link rel="stylesheet" href="assets/css/feather.css">
+
+    	<!-- Datepicker CSS -->
+		<link rel="stylesheet" href="assets/css/bootstrap-datetimepicker.min.css">
+
+		<!-- Owl Carousel CSS -->
+		<link rel="stylesheet" href="assets/css/owl.carousel.min.css">
+
+		<!-- Animation CSS -->
+		<link rel="stylesheet" href="assets/css/aos.css">
+		
+		<!-- Main CSS -->
+		<link rel="stylesheet" href="assets/css/custom.css">
+
+	</head>		
+	<body>
+
+		<!-- Main Wrapper -->
+		<div class="main-wrapper home-one" data-magic-cursor="hide">
+					
+			<!-- Header -->
+			<header class="header header-custom header-fixed header-one home-head-one">
+				<div class="container">
+					<nav class="navbar navbar-expand-lg header-nav">
+						<div class="navbar-header">
+							<a id="mobile_btn" href="javascript:void(0);">
+								<span class="bar-icon">
+									<span></span>
+									<span></span>
+									<span></span>
+								</span>
+							</a>
+							<a href="index.html" class="navbar-brand logo">
+								<img src="assets/img/logo.svg" class="img-fluid" alt="Logo">
+							</a>
+						</div>
+						<div class="main-menu-wrapper">
+							<div class="menu-header">
+								<a href="index.html" class="menu-logo">
+									<img src="assets/img/logo.svg" class="img-fluid" alt="Logo">
+								</a>
+								<a id="menu_close" class="menu-close" href="javascript:void(0);">
+									<i class="fas fa-times"></i>
+								</a>
+							</div>
+							<ul class="main-nav">
+								<li class="has-submenu megamenu active">
+									<a href="index.html">Home </a></li>
+								<li><a href="search.php">Doctor List</a></li>
+								<li><a href="search-2.php">Doctor List</a></li>
+								<li><a href="doctor-profile.php">Doctor Profile</a></li>
+								<li><a href="about-us.html">About Us</a></li>
+								<li><a href="contact-us.html">Contact</a></li>
+								<li><a href="blog-grid.html">Blog</a></li>
+								<li class="login-link"><a href="login.html">Login / Signup</a></li>
+							</ul>
+						</div>
+						<ul class="nav header-navbar-rht">
+							<li class="register-btn">
+								<a href="register.html" class="btn btn-dark reg-btn"><i class="isax isax-user"></i>Register</a>
+							</li>
+							<li class="register-btn">
+								<a href="login.html" class="btn btn-primary log-btn"><i class="isax isax-lock"></i>Login</a>
+							</li>
+						</ul>
+					</nav>
+				</div>
+			</header>
+			<!-- /Header -->		
+
+		<!-- Breadcrumb -->
+		<div class="breadcrumb-bar overflow-visible">
+			<div class="container">
+				<div class="row align-items-center inner-banner">
+					<div class="col-md-12 col-12 text-center">
+						<nav aria-label="breadcrumb" class="page-breadcrumb">
+							<ol class="breadcrumb">
+								<li class="breadcrumb-item"><a href="index.html"><i class="isax isax-home-15"></i></a></li>
+								<li class="breadcrumb-item">Doctor</li>
+								<li class="breadcrumb-item active">Doctor Grid Full Width</li>
+							</ol>
+							<h2 class="breadcrumb-title">Doctor Grid Full Width</h2>
+						</nav>
+					</div>
+				</div>
+				<div class="bg-primary-gradient rounded-pill doctors-search-box">
+					<div class="search-box-one rounded-pill">
+						<form action="search-2.php"> 
+							<div class="search-input search-line">
+								<i class="isax isax-hospital5 bficon"></i>
+								<div class=" mb-0">
+									<input type="text" class="form-control" placeholder="Search for Doctors, Hospitals, Clinics">
+								</div>
+							</div>
+							<div class="search-input search-map-line">
+								<i class="isax isax-location5"></i>
+								<div class=" mb-0">
+									<input type="text" class="form-control" placeholder="Location"> 
+								</div>
+							</div>
+							<div class="search-input search-calendar-line">
+								<i class="isax isax-calendar-tick5"></i>
+								<div class=" mb-0">
+									<input type="text" class="form-control datetimepicker" placeholder="Date">
+								</div>
+							</div>
+							<div class="form-search-btn">
+								<button class="btn btn-primary d-inline-flex align-items-center rounded-pill" type="submit"><i class="isax isax-search-normal-15 me-2"></i>Search</button>
+							</div>
+						</form>
+					</div>
+				</div>
+			</div>
+			<div class="breadcrumb-bg">
+				<img src="assets/img/bg/breadcrumb-bg-01.png" alt="img" class="breadcrumb-bg-01">
+				<img src="assets/img/bg/breadcrumb-bg-02.png" alt="img" class="breadcrumb-bg-02">
+				<img src="assets/img/bg/breadcrumb-icon.png" alt="img" class="breadcrumb-bg-03">
+				<img src="assets/img/bg/breadcrumb-icon.png" alt="img" class="breadcrumb-bg-04">
+			</div>
+		</div>
+		<!-- /Breadcrumb -->
+
+		<div class="content mt-5">
+			<div class="container">
+				<div class="row">
+					<div class="col-md-6">
+						<div class="mb-4">
+							<h3>Showing <span class="text-secondary">450</span> Doctors For You</h3>
+						</div>
+					</div>
+					<div class="col-md-6">
+						<div class="d-flex align-items-center justify-content-end mb-4">
+							<div class="doctor-filter-availability me-3">
+								<p>Availability</p>
+								<div class="status-toggle status-tog">
+									<input type="checkbox" id="status_6" class="check">
+									<label for="status_6" class="checktoggle">checkbox</label>
+								</div>
+							</div>
+							<a href="javascript:void(0);" class="btn btn-sm head-icon me-3" id="filter_search"><i class="isax isax-sort"></i></a>
+							<div class="dropdown header-dropdown">
+								<a class="dropdown-toggle sort-dropdown" data-bs-toggle="dropdown" href="javascript:void(0);" aria-expanded="false">
+									<span>Sort By</span>Price (Low to High)
+								</a>
+								<div class="dropdown-menu dropdown-menu-end">
+									<a href="javascript:void(0);" class="dropdown-item">
+										Price (Low to High)
+									</a>
+									<a href="javascript:void(0);" class="dropdown-item">
+										Price (High to Low)
+									</a>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div id="filter_inputs">
+					<div class="row align-items-center gy-3">
+						<div class="col-lg-9 mb-4">
+							<div class="row gx-3">
+								<div class="col-md col-sm-4 col-6">
+									<div>
+										<select class="select form-control">
+											<option>Specialities</option>
+											<option>Urology</option>
+											<option>Psychiatry</option>
+											<option>Psychiatry</option>
+											<option>Cardiology</option>
+										</select>
+									</div>
+								</div>
+								<div class="col-md col-sm-4 col-6">
+									<div>
+										<select class="select form-control">
+											<option>Hospitals</option>
+											<option>Cleveland Clinic</option>
+											<option>Apollo Hospital</option>
+											<option>Apollo Hospital</option>
+										</select>
+									</div>
+								</div>
+								<div class="col-md col-sm-4 col-6">
+									<div>
+										<select class="select form-control">
+											<option>Doctors</option>
+											<option>Dr. Michael Brown</option>
+											<option>Dr. Nicholas Tello</option>
+											<option>Dr. Harold Bryant</option>
+										</select>
+									</div>
+								</div>
+								<div class="col-md col-sm-4 col-6">
+									<div>
+										<select class="select form-control">
+											<option>Reviews</option>
+											<option>5 Star</option>
+											<option>4 Star</option>
+											<option>3 Star</option>
+										</select>
+									</div>
+								</div>
+								<div class="col-md col-sm-4 col-6">
+									<div>
+										<select class="select form-control">
+											<option>Clinic</option>
+											<option>Bright Smiles Dental Clinic</option>
+											<option>Family Care Clinic</option>
+											<option>Express Health Clinic</option>
+										</select>
+									</div>
+								</div>
+							</div>
+						</div>
+						<div class="col-lg-3 mb-4">
+							<div class="text-end">
+								<a href="#" class="fw-medium text-secondary text-decoration-underline">Clear All</a>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="row">
+					<?php if (empty($doctors)): ?>
+						<div class="col-12">
+							<div class="text-center">
+								<p>No doctors found.</p>
+							</div>
+						</div>
+					<?php else: ?>
+						<?php foreach ($doctors as $doctor): ?>
+							<div class="col-xxl-3 col-lg-4 col-md-6">
+								<div class="card">
+									<div class="card-img card-img-hover">
+										<a href="doctor-profile.php?id=<?php echo $doctor['id']; ?>">
+											<img src="<?php echo $doctor['profile_image'] ?? 'assets/img/doctors/default-doctor.jpg'; ?>" alt="<?php echo htmlspecialchars($doctor['name']); ?>">
+										</a>
+										<div class="grid-overlay-item d-flex align-items-center justify-content-between">
+											<span class="badge bg-orange">
+												<i class="fa-solid fa-star me-1"></i>
+												<?php echo number_format($doctor['average_rating'] ?? 0, 1); ?>
+											</span>
+											<a href="javascript:void(0)" class="fav-icon">
+												<i class="fa fa-heart"></i>
+											</a>
+										</div>
+									</div>
+									<div class="card-body p-0">
+										<div class="d-flex active-bar align-items-center justify-content-between p-3">
+											<a href="#" class="text-indigo fw-medium fs-14">
+												<?php echo htmlspecialchars($doctor['specialty'] ?? 'General Physician'); ?>
+											</a>
+											<span class="badge <?php echo ($doctor['is_available'] ?? false) ? 'bg-success-light' : 'bg-danger-light'; ?> d-inline-flex align-items-center">
+												<i class="fa-solid fa-circle fs-5 me-1"></i>
+												<?php echo ($doctor['is_available'] ?? false) ? 'Available' : 'Unavailable'; ?>
+											</span>
+										</div>
+										<div class="p-3 pt-0">
+											<div class="doctor-info-detail mb-3 pb-3">
+												<h3 class="mb-1">
+													<a href="doctor-profile.php?id=<?php echo $doctor['id']; ?>">
+														Dr. <?php echo htmlspecialchars($doctor['name']); ?>
+													</a>
+												</h3>
+												<div class="d-flex align-items-center">
+													<p class="d-flex align-items-center mb-0 fs-14">
+														<i class="isax isax-location me-2"></i>
+														<?php echo htmlspecialchars(($doctor['city'] ?? 'Dhaka') . ', ' . ($doctor['state'] ?? 'Bangladesh')); ?>
+													</p>
+													<i class="fa-solid fa-circle fs-5 text-primary mx-2 me-1"></i>
+													<span class="fs-14 fw-medium">30 Min</span>
+												</div>
+											</div>
+											<div class="d-flex align-items-center justify-content-between">
+												<div>
+													<p class="mb-1">Consultation Fees</p>
+													<h3 class="text-orange">
+														$<?php echo number_format($doctor['consultation_fee'] ?? 100, 0); ?>
+													</h3>
+												</div>
+												<a href="booking.html?doctor_id=<?php echo $doctor['id']; ?>" class="btn btn-md btn-dark d-inline-flex align-items-center rounded-pill">
+													<i class="isax isax-calendar-1 me-2"></i>
+													Book Now
+												</a>
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+						<?php endforeach; ?>
+					<?php endif; ?>
+					<div class="col-md-12">
+						<div class="text-center mb-4">
+							<a href="login.html" class="btn btn-md btn-primary-gradient d-inline-flex align-items-center rounded-pill">
+								<i class="isax isax-d-cube-scan5 me-2"></i>
+								Load More <?php echo max(0, count($doctors) - 12); ?> Doctors
+							</a>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<!-- Footer Section -->
+			<footer class="footer inner-footer">
+				<div class="footer-top">
+					<div class="container">
+						<div class="row">
+							<div class="col-lg-8">
+								<div class="row">
+									<div class="col-lg-3 col-md-3">
+										<div class="footer-widget footer-menu">
+											<h6 class="footer-title">Company</h6>
+											<ul>
+												<li><a href="about-us.html">About</a></li>
+												<li><a href="search.php">Features</a></li>
+												<li><a href="javascript:void(0);">Works</a></li>
+												<li><a href="javascript:void(0);">Careers</a></li>
+												<li><a href="javascript:void(0);">Locations</a></li>
+											</ul>
+										</div>
+									</div>
+									<div class="col-lg-3 col-md-3">
+										<div class="footer-widget footer-menu">
+											<h6 class="footer-title">Treatments</h6>
+											<ul>
+												<li><a href="search.php">Dental</a></li>
+												<li><a href="search.php">Cardiac</a></li>
+												<li><a href="search.php">Spinal Cord</a></li>
+												<li><a href="search.php">Hair Growth</a></li>
+												<li><a href="search.php">Anemia & Disorder</a></li>
+											</ul>
+										</div>
+									</div>
+									<div class="col-lg-3 col-md-3">
+										<div class="footer-widget footer-menu">
+											<h6 class="footer-title">Specialities</h6>
+											<ul>
+												<li><a href="search.php">Transplant</a></li>
+												<li><a href="search.php">Cardiologist</a></li>
+												<li><a href="search.php">Oncology</a></li>
+												<li><a href="search.php">Pediatrics</a></li>
+												<li><a href="search.php">Gynacology</a></li>
+											</ul>
+										</div>
+									</div>
+									<div class="col-lg-3 col-md-3">
+										<div class="footer-widget footer-menu">
+											<h6 class="footer-title">Utilites</h6>
+											<ul>
+												<li><a href="pricing.html">Pricing</a></li>
+												<li><a href="contact-us.html">Contact</a></li>
+												<li><a href="contact-us.html">Request A Quote</a></li>
+												<li><a href="javascript:void(0);">Premium Membership</a></li>
+												<li><a href="javascript:void(0);">Integrations</a></li>
+											</ul>
+										</div>
+									</div>
+								</div>
+							</div>
+							<div class="col-lg-4 col-md-7">
+								<div class="footer-widget">
+									<h6 class="footer-title">Newsletter</h6>
+									<p class="mb-2">Subscribe & Stay Updated from the Doccure</p>
+									<div class="subscribe-input">
+										<form action="#">
+											<input type="email" class="form-control" placeholder="Enter Email Address">
+											<button type="submit" class="btn btn-md btn-primary-gradient d-inline-flex align-items-center"><i class="isax isax-send-25 me-1"></i>Send</button>
+										</form>
+									</div>
+									<div class="social-icon">
+										<h6 class="mb-3">Connect With Us</h6>
+										<ul>
+											<li>
+												<a href="javascript:void(0);"><i class="fa-brands fa-facebook"></i></a>
+											</li>
+											<li>
+												<a href="javascript:void(0);"><i class="fa-brands fa-x-twitter"></i></a>
+											</li>
+											<li>
+												<a href="javascript:void(0);"><i class="fa-brands fa-instagram"></i></a>
+											</li>
+											<li>
+												<a href="javascript:void(0);"><i class="fa-brands fa-linkedin"></i></a>
+											</li>
+											<li>
+												<a href="javascript:void(0);"><i class="fa-brands fa-pinterest"></i></a>
+											</li>
+										</ul>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="footer-bg">
+					<img src="assets/img/bg/footer-bg-01.png" alt="img" class="footer-bg-01">
+					<img src="assets/img/bg/footer-bg-02.png" alt="img" class="footer-bg-02">
+					<img src="assets/img/bg/footer-bg-03.png" alt="img" class="footer-bg-03">
+					<img src="assets/img/bg/footer-bg-04.png" alt="img" class="footer-bg-04">
+					<img src="assets/img/bg/footer-bg-05.png" alt="img" class="footer-bg-05">
+				</div>
+			</div>
+			<div class="footer-bottom">
+				<div class="container">
+					<!-- Copyright -->
+					<div class="copyright">
+						<div class="copyright-text">
+							<p class="mb-0">Copyright © 2025 Doccure. All Rights Reserved</p>
+						</div>
+						<!-- Copyright Menu -->
+						<div class="copyright-menu">
+							<ul class="policy-menu">
+								<li><a href="javascript:void(0);">Legal Notice</a></li>
+								<li><a href="privacy-policy.html">Privacy Policy</a></li>
+								<li><a href="javascript:void(0);">Refund Policy</a></li>
+							</ul>
+						</div>
+						<!-- /Copyright Menu -->
+						<ul class="payment-method">
+							<li><a href="javascript:void(0);"><img src="assets/img/icons/card-01.svg" alt="Img"></a></li>
+							<li><a href="javascript:void(0);"><img src="assets/img/icons/card-02.svg" alt="Img"></a></li>
+							<li><a href="javascript:void(0);"><img src="assets/img/icons/card-03.svg" alt="Img"></a></li>
+							<li><a href="javascript:void(0);"><img src="assets/img/icons/card-04.svg" alt="Img"></a></li>
+							<li><a href="javascript:void(0);"><img src="assets/img/icons/card-05.svg" alt="Img"></a></li>
+							<li><a href="javascript:void(0);"><img src="assets/img/icons/card-06.svg" alt="Img"></a></li>
+						</ul>
+					</div>
+					<!-- /Copyright -->					
+				</div>
+			</div>
+		</footer>
+		<!-- /Footer Section -->
+
+		<!-- Cursor -->
+		<div class="mouse-cursor cursor-outer"></div>
+		<div class="mouse-cursor cursor-inner"></div>
+		<!-- /Cursor -->
+
+	</div>
+	<!-- /Main Wrapper -->
+
+	<!-- jQuery -->
+	<script src="assets/js/jquery-3.7.1.min.js"></script>
+
+	<!-- Bootstrap Bundle JS -->
+	<script src="assets/js/bootstrap.bundle.min.js"></script>
+
+	<!-- select JS -->
+	<script src="assets/plugins/select2/js/select2.min.js"></script>
+
+	<!-- Feather Icon JS -->
+	<script src="assets/js/feather.min.js"></script>
+
+	<!-- Datepicker JS -->
+	<script src="assets/js/moment.min.js"></script>
+	<script src="assets/js/bootstrap-datetimepicker.min.js"></script>
+
+	<!-- Custom JS -->
+	<script src="assets/js/script.js"></script>
+
+</body>
+
+</html>

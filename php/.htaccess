@@ -1,0 +1,23 @@
+# Security Headers
+<IfModule mod_headers.c>
+    Header set X-Content-Type-Options "nosniff"
+    Header set X-Frame-Options "SAMEORIGIN"
+    Header set X-XSS-Protection "1; mode=block"
+</IfModule>
+
+# Prevent directory listing
+Options -Indexes
+
+# Protect sensitive files
+<FilesMatch "^(config\.php|\.htaccess|\.git)">
+    Order allow,deny
+    Deny from all
+</FilesMatch>
+
+# Enable error logging (disable display in production)
+php_flag display_errors Off
+php_flag log_errors On
+
+# Set timezone
+php_value date.timezone "Asia/Dhaka"
+
