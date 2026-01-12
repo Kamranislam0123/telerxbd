@@ -1,0 +1,6 @@
+---
+deployment:
+  tasks:
+    - export DEPLOYPATH=/home/telerxb2/public_html/
+    - /bin/cp * $DEPLOYPATH
+ 
