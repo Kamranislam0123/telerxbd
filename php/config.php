@@ -12,7 +12,7 @@ define('DB_HOST', 'localhost');
 define('DB_USER', 'telerxb2_telerx');
 define('DB_PASS', '&+;*LkaHNYztJ+{E');
 define('DB_NAME', 'telerxb2_telerx_db');
->>>>>>> b470e9529e736caaf0e0bd6008668aa25f6d4cb6
+
 
 
 // Database configuration local
