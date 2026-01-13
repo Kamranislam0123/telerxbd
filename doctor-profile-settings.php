@@ -380,92 +380,92 @@ $last_name = $name_parts[1] ?? '';
 													<span>Dashboard</span>
 												</a>
 											</li>
-											<li>
+											<!-- <li>
 												<a href="doctor-request.html">
 													<i class="isax isax-clipboard-tick"></i>
 													<span>Requests</span>
 													<small class="unread-msg">2</small>
 												</a>
-											</li>
-											<li>
+											</li> -->
+											<!-- <li>
 												<a href="appointments.html">
 													<i class="isax isax-calendar-1"></i>
 													<span>Appointments</span>
 												</a>
-											</li>
-											<li>
+											</li> -->
+											<!-- <li>
 												<a href="available-timings.html">
 													<i class="isax isax-calendar-tick"></i>
 													<span>Available Timings</span>
 												</a>
-											</li>
-											<li>
+											</li> -->
+											<!-- <li>
 												<a href="my-patients.html">
 													<i class="fa-solid fa-user-injured"></i>
 													<span>My Patients</span>
 												</a>
-											</li>
-											<li>
+											</li> -->
+											<!-- <li>
 												<a href="doctor-specialities.html">
 													<i class="isax isax-clock"></i>
 													<span>Specialties & Services</span>
 												</a>
-											</li>
-											<li>
+											</li> -->
+											<!-- <li>
 												<a href="reviews.html">
 													<i class="isax isax-star-1"></i>
 													<span>Reviews</span>
 												</a>
-											</li>
-											<li>
+											</li> -->
+											<!-- <li>
 												<a href="accounts.html">
 													<i class="isax isax-profile-tick"></i>
 													<span>Accounts</span>
 												</a>
-											</li>
-											<li>
+											</li> -->
+											<!-- <li>
 												<a href="invoices.html">
 													<i class="isax isax-document-text"></i>
 													<span>Invoices</span>
 												</a>
-											</li>
-											<li>
+											</li> -->
+											<!-- <li>
 												<a href="doctor-payment.html">
 													<i class="fa-solid fa-money-bill-1"></i>
 													<span>Payout Settings</span>
 												</a>
-											</li>																																				
-											<li>
+											</li> -->																																				
+											<!-- <li>
 												<a href="chat-doctor.html">
 													<i class="isax isax-messages-1"></i>
 													<span>Message</span>
 													<small class="unread-msg">7</small>
 												</a>
-											</li>
+											</li> -->
 											<li class="active">
 												<a href="doctor-profile-settings.html">
 													<i class="isax isax-setting-2"></i>
 													<span>Profile Settings</span>
 												</a>
 											</li>
-											<li>
+											<!-- <li>
 												<a href="social-media.html">
 													<i class="fa-solid fa-shield-halved"></i>
 													<span>Social Media</span>
 												</a>
-											</li>
-											<li>
+											</li> -->
+											<!-- <li>
 												<a href="doctor-change-password.html">
 													<i class="isax isax-key"></i>
 													<span>Change Password</span>
 												</a>
-											</li>
-											<li>
+											</li> -->
+											<!-- <li>
 												<a href="login.html">
 													<i class="isax isax-logout"></i>
 													<span>Logout</span>
 												</a>
-											</li>
+											</li> -->
 										</ul>
 									</nav>
 								</div>
