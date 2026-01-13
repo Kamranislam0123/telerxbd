@@ -166,6 +166,16 @@ CREATE TABLE doctor_profiles (
     city VARCHAR(100),
     state VARCHAR(100),
     zip_code VARCHAR(20),
+    -- Additional fields for profile settings
+    gender VARCHAR(20),
+    account_number VARCHAR(100),
+    degrees VARCHAR(255),
+    currently_working VARCHAR(255),
+    department VARCHAR(255),
+    present_address TEXT,
+    bmdc_certificate VARCHAR(255),
+    nid_card VARCHAR(255),
+    degrees_certificate VARCHAR(255),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     FOREIGN KEY (doctor_id) REFERENCES doctors(id) ON DELETE CASCADE

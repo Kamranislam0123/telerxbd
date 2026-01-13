@@ -292,16 +292,16 @@ $last_name = $name_parts[1] ?? '';
 							<li class="nav-item dropdown has-arrow logged-item">
 								<a href="#" class="nav-link ps-0" data-bs-toggle="dropdown">
 									<span class="user-img">
-										<img class="rounded-circle" src="assets/img/doctors-dashboard/doctor-profile-img.jpg" width="31" alt="Darren Elder">
+										<img class="rounded-circle" src="<?php echo htmlspecialchars($doctor['profile_image']); ?>" width="31" alt="<?php echo htmlspecialchars($doctor['name']); ?>">
 									</span>
 								</a>
 								<div class="dropdown-menu dropdown-menu-end">
 									<div class="user-header">
 										<div class="avatar avatar-sm">
-											<img src="assets/img/doctors-dashboard/doctor-profile-img.jpg" alt="User Image" class="avatar-img rounded-circle">
+											<img src="<?php echo htmlspecialchars($doctor['profile_image']); ?>" alt="User Image" class="avatar-img rounded-circle">
 										</div>
 										<div class="user-text">
-											<h6>Dr Edalin Hendry</h6>
+											<h6><?php echo htmlspecialchars($doctor['name']); ?></h6>
 											<p class="text-muted mb-0">Doctor</p>
 										</div>
 									</div>
@@ -1078,6 +1078,31 @@ $last_name = $name_parts[1] ?? '';
 						if (response.success) {
 							// Show success message
 							showAlert('success', response.message || 'Profile settings updated successfully!');
+
+							// Update profile images and name dynamically
+							if (response.profile_image && response.profile_image.trim() !== '') {
+								// Update sidebar profile image
+								$('.booking-doc-img img').attr('src', response.profile_image);
+
+								// Update navigation profile image
+								$('.user-img img').attr('src', response.profile_image);
+
+								// Update dropdown avatar image
+								$('.avatar-img').attr('src', response.profile_image);
+
+								// Clear the file input
+								form.find('input[name="profile_image"]').val('');
+							}
+
+							// Update doctor name if it was changed
+							var newName = form.find('input[name="name"]').val();
+							if (newName && newName.trim() !== '') {
+								// Update sidebar doctor name
+								$('.profile-det-info h3 a').text(newName);
+
+								// Update navigation dropdown name
+								$('.user-text h6').text(newName);
+							}
 
 							// Reset form button
 							submitBtn.prop('disabled', false).html(originalText);
