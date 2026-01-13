@@ -7,7 +7,7 @@
 
 
 
-// Database configuration local database
+// Database configuration live database
 define('DB_HOST', 'localhost');
 define('DB_USER', 'telerxb2_telerx');
 define('DB_PASS', '&+;*LkaHNYztJ+{E');

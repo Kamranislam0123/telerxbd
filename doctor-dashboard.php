@@ -20,18 +20,47 @@ if (!isset($_SESSION['doctor_id']) || !isset($_SESSION['logged_in']) || $_SESSIO
 
 // Get doctor information from session
 $doctor_id = $_SESSION['doctor_id'];
-$doctor_name = $_SESSION['doctor_name'] ?? 'Doctor';
-$doctor_email = $_SESSION['doctor_email'] ?? '';
-$doctor_phone = $_SESSION['doctor_phone'] ?? '';
-$doctor_bmdc_no = $_SESSION['doctor_bmdc_no'] ?? '';
 
-// For demo purposes, set some default values if not in session
-if (empty($doctor_name) || $doctor_name === 'Doctor') {
-    $doctor_name = 'Dr. Mohammad Rahman'; // Default for demo
+try {
+    $conn = getDBConnection();
+
+    // Fetch doctor's basic information and profile
+    $stmt = $conn->prepare("
+        SELECT d.*, dp.*
+        FROM doctors d
+        LEFT JOIN doctor_profiles dp ON d.id = dp.doctor_id
+        WHERE d.id = ?
+    ");
+    $stmt->bind_param("i", $doctor_id);
+    $stmt->execute();
+    $result = $stmt->get_result();
+
+    if ($result->num_rows == 0) {
+        header('Location: login.html');
+        exit;
+    }
+
+    $doctor = $result->fetch_assoc();
+    $stmt->close();
+    $conn->close();
+
+    // Set default values if profile data is missing
+    $doctor['profile_image'] = $doctor['profile_image'] ?? 'assets/img/doctors-dashboard/doctor-profile-img.jpg';
+    $doctor['specialty'] = $doctor['specialty'] ?? 'General Medicine';
+
+    // Extract variables for template use
+    $doctor_name = $doctor['name'];
+    $doctor_email = $doctor['email'];
+    $doctor_phone = $doctor['phone'];
+    $doctor_bmdc_no = $doctor['bmdc_no'];
+    $doctor_specialty = $doctor['specialty'];
+    $doctor_profile_image = $doctor['profile_image'];
+
+} catch (Exception $e) {
+    error_log("Doctor dashboard error: " . $e->getMessage());
+    header('Location: login.html');
+    exit;
 }
-
-// Get doctor's specialty (you might want to add this to the database later)
-$doctor_specialty = 'General Medicine'; // Default, can be made dynamic later
 
 ?>
 <!DOCTYPE html>
@@ -241,13 +270,13 @@ $doctor_specialty = 'General Medicine'; // Default, can be made dynamic later
 							<li class="nav-item dropdown has-arrow logged-item">
 								<a href="#" class="nav-link ps-0" data-bs-toggle="dropdown">
 									<span class="user-img">
-										<img class="rounded-circle" src="assets/img/doctors-dashboard/doctor-profile-img.jpg" width="31" alt="Darren Elder">
+										<img class="rounded-circle" src="<?php echo htmlspecialchars($doctor_profile_image); ?>" width="31" alt="<?php echo htmlspecialchars($doctor_name); ?>">
 									</span>
 								</a>
 								<div class="dropdown-menu dropdown-menu-end">
 									<div class="user-header">
 										<div class="avatar avatar-sm">
-											<img src="assets/img/doctors-dashboard/doctor-profile-img.jpg" alt="User Image" class="avatar-img rounded-circle">
+											<img src="<?php echo htmlspecialchars($doctor_profile_image); ?>" alt="User Image" class="avatar-img rounded-circle">
 										</div>
 										<div class="user-text">
 											<h6><?php echo htmlspecialchars($doctor_name); ?></h6>
@@ -255,7 +284,7 @@ $doctor_specialty = 'General Medicine'; // Default, can be made dynamic later
 										</div>
 									</div>
 									<a class="dropdown-item" href="doctor-dashboard.php">Dashboard</a>
-									<a class="dropdown-item" href="doctor-profile-settings.html">Profile Settings</a>
+									<a class="dropdown-item" href="doctor-profile-settings.php">Profile Settings</a>
 									<a class="dropdown-item" href="login.html">Logout</a>
 								</div>
 							</li>
@@ -277,7 +306,7 @@ $doctor_specialty = 'General Medicine'; // Default, can be made dynamic later
 									<li class="breadcrumb-item" aria-current="page">Doctor</li>
 									<li class="breadcrumb-item active">Dashboard</li>
 								</ol>
-								<h2 class="breadcrumb-title">Welcome, <?php echo htmlspecialchars(explode(' ', $doctor_name)[1] ?? explode(' ', $doctor_name)[0]); ?>!</h2>
+								<h2 class="breadcrumb-title">Welcome, <?php echo htmlspecialchars($doctor_name); ?>!</h2>
 							</nav>
 						</div>
 					</div>
@@ -302,11 +331,11 @@ $doctor_specialty = 'General Medicine'; // Default, can be made dynamic later
 							<div class="profile-sidebar doctor-sidebar profile-sidebar-new">
 								<div class="widget-profile pro-widget-content">
 									<div class="profile-info-widget">
-										<a href="doctor-profile.php" class="booking-doc-img">
-											<img src="assets/img/doctors-dashboard/doctor-profile-img.jpg" alt="User Image">
+										<a href="doctor-profile.php?doctor_id=<?php echo $doctor_id; ?>" class="booking-doc-img">
+											<img src="<?php echo htmlspecialchars($doctor_profile_image); ?>" alt="User Image">
 										</a>
 										<div class="profile-det-info">
-											<h3><a href="doctor-profile.php"><?php echo htmlspecialchars($doctor_name); ?></a></h3>
+											<h3><a href="doctor-profile.php?doctor_id=<?php echo $doctor_id; ?>"><?php echo htmlspecialchars($doctor_name); ?></a></h3>
 											<div class="patient-details">
 												<h5 class="mb-0"><?php echo htmlspecialchars($doctor_specialty); ?> - BMDC: <?php echo htmlspecialchars($doctor_bmdc_no); ?></h5>
 											</div>
@@ -395,7 +424,7 @@ $doctor_specialty = 'General Medicine'; // Default, can be made dynamic later
 												</a>
 											</li>
 											<li>
-												<a href="doctor-profile-settings.html">
+												<a href="doctor-profile-settings.php">
 													<i class="isax isax-setting-2"></i>
 													<span>Profile Settings</span>
 												</a>
@@ -433,7 +462,7 @@ $doctor_specialty = 'General Medicine'; // Default, can be made dynamic later
 								<div class="col-12">
 									<div class="dashboard-welcome-card">
 										<div class="welcome-content">
-											<h3>Welcome back, <?php echo htmlspecialchars(explode(' ', $doctor_name)[0]); ?>! 👋</h3>
+											<h3>Welcome back, <?php echo htmlspecialchars($doctor_name); ?>! 👋</h3>
 											<p>Here's what's happening with your practice today.</p>
 										</div>
 									</div>
