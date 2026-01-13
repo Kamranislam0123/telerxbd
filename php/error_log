@@ -1,3 +1,5 @@
 [06-Jan-2026 09:37:04 Asia/Dhaka] Login error: Too many connections | File: /home/telerxb2/public_html/php/config.php | Line: 15
 [06-Jan-2026 09:37:12 Asia/Dhaka] Login error: Too many connections | File: /home/telerxb2/public_html/php/config.php | Line: 15
 [06-Jan-2026 09:41:08 Asia/Dhaka] Login error: Too many connections | File: /home/telerxb2/public_html/php/config.php | Line: 15
+[13-Jan-2026 16:01:03 Asia/Dhaka] PHP Warning:  mysqli::__construct(): (HY000/1045): Access denied for user 'root'@'localhost' (using password: YES) in /home/telerxb2/public_html/php/config.php on line 22
+[13-Jan-2026 16:01:03 Asia/Dhaka] Login error: Database connection failed: Access denied for user 'root'@'localhost' (using password: YES). Please check your database credentials in config.php | File: /home/telerxb2/public_html/php/config.php | Line: 26
