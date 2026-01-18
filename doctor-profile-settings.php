@@ -364,7 +364,7 @@ $last_name = $name_parts[1] ?? '';
 								</div>
 								<div class="doctor-available-head">
 									<div class="input-block input-block-new">
-										<label class="form-label">Availability <span class="text-danger">*</span></label>
+										<label class="form-label">Availability</label>
 										<select class="select form-control">
 											<option>I am Available Now</option>
 											<option>Not Available</option>
@@ -514,26 +514,26 @@ $last_name = $name_parts[1] ?? '';
 									<div class="row">
 										<div class="col-lg-6 col-md-6">
 											<div class="form-wrap">
-												<label class="form-label">Name <span class="text-danger">*</span></label>
-												<input type="text" class="form-control" name="name" value="<?php echo htmlspecialchars($doctor['name']); ?>" required>
+												<label class="form-label">Name</label>
+												<input type="text" class="form-control" name="name" value="<?php echo htmlspecialchars($doctor['name']); ?>">
 											</div>
 										</div>
 										<div class="col-lg-6 col-md-6">
 											<div class="form-wrap">
-												<label class="form-label">Email <span class="text-danger">*</span></label>
-												<input type="email" class="form-control" name="email" value="<?php echo htmlspecialchars($doctor['email']); ?>" required>
+												<label class="form-label">Email</label>
+												<input type="email" class="form-control" name="email" value="<?php echo htmlspecialchars($doctor['email']); ?>">
 											</div>
 										</div>
 										<div class="col-lg-6 col-md-6">
 											<div class="form-wrap">
-												<label class="form-label">Phone Number <span class="text-danger">*</span></label>
-												<input type="text" class="form-control" name="phone" value="<?php echo htmlspecialchars($doctor['phone']); ?>" required>
+												<label class="form-label">Phone Number</label>
+												<input type="text" class="form-control" name="phone" value="<?php echo htmlspecialchars($doctor['phone']); ?>">
 											</div>
 										</div>
 										<div class="col-lg-6 col-md-6">
 											<div class="form-wrap">
-												<label class="form-label">Gender <span class="text-danger">*</span></label>
-												<select class="form-control" name="gender" required>
+												<label class="form-label">Gender</label>
+												<select class="form-control" name="gender">
 													<option value="">Select Gender</option>
 													<option value="Male" <?php echo (isset($doctor['gender']) && $doctor['gender'] == 'Male') ? 'selected' : ''; ?>>Male</option>
 													<option value="Female" <?php echo (isset($doctor['gender']) && $doctor['gender'] == 'Female') ? 'selected' : ''; ?>>Female</option>
@@ -544,7 +544,7 @@ $last_name = $name_parts[1] ?? '';
 										<div class="col-lg-6 col-md-6">
 											<div class="form-wrap">
 												<label class="form-label">Fees (৳)</label>
-												<input type="number" class="form-control" name="consultation_fee" value="<?php echo htmlspecialchars($doctor['consultation_fee']); ?>" step="0.01" min="0">
+												<input type="number" class="form-control" name="consultation_fee" value="<?php echo htmlspecialchars($doctor['consultation_fee']); ?>">
 											</div>
 										</div>
 										<div class="col-lg-6 col-md-6">
@@ -567,8 +567,8 @@ $last_name = $name_parts[1] ?? '';
 										</div>
 										<div class="col-lg-6 col-md-6">
 											<div class="form-wrap">
-												<label class="form-label">BMDC Number <span class="text-danger">*</span></label>
-												<input type="text" class="form-control" name="bmdc_no" value="<?php echo htmlspecialchars($doctor['bmdc_no']); ?>" required>
+												<label class="form-label">BMDC Number</label>
+												<input type="text" class="form-control" name="bmdc_no" value="<?php echo htmlspecialchars($doctor['bmdc_no']); ?>">
 											</div>
 										</div>
 										<div class="col-lg-6 col-md-6">
@@ -586,7 +586,7 @@ $last_name = $name_parts[1] ?? '';
 										<div class="col-lg-6 col-md-6">
 											<div class="form-wrap">
 												<label class="form-label">Years of Experience</label>
-												<input type="number" class="form-control" name="experience_years" value="<?php echo htmlspecialchars($doctor['experience_years']); ?>" min="0" max="50">
+												<input type="number" class="form-control" name="experience_years" value="<?php echo htmlspecialchars($doctor['experience_years']); ?>">
 											</div>
 										</div>
 										<div class="col-lg-12">
