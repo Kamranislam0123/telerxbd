@@ -376,12 +376,7 @@ try {
 								<div class="detail-title">
 									<h4>Doctor Bio</h4>
 								</div>
-								<p>“Highly motivated and experienced doctor with a passion for 
-									providing excellent care to patients. Experienced in a wide variety of 
-									medical settings, with particular expertise in diagnostics, primary care and emergency 
-									medicine. Skilled in using the latest technology to streamline patient care. Committed to
-									delivering compassionate, personalized care to each and every patient.”
-								</p>
+								<p><?php echo htmlspecialchars($doctor['bio']); ?></p>
 								<a href="#" class="show-more d-flex align-items-center">See More<i class="fa-solid fa-chevron-down ms-2"></i></a>
 							</div>
 							<div class="doc-information-details" id="experience">
@@ -425,7 +420,7 @@ try {
 									</div>
 								<?php endif; ?>
 							</div>
-							<div class="doc-information-details" id="insurence">
+							<!-- <div class="doc-information-details" id="insurence">
 								<div class="detail-title slider-nav d-flex justify-content-between align-items-center">
 									<h4>Insurance  Accepted (6)</h4>
 									<div class="nav nav-container slide-1"></div>
@@ -456,8 +451,8 @@ try {
 										<span><img src="assets/img/icons/insurence-logo-04.svg" alt="Img"></span>
 									</div>
 								</div>
-							</div>
-							<div class="doc-information-details" id="speciality">
+							</div> -->
+							<!-- <div class="doc-information-details" id="speciality">
 								<div class="detail-title">
 									<h4>Speciality</h4>
 								</div>
@@ -469,8 +464,8 @@ try {
 									<li><a href="#">Tooth Bleaching</a></li>
 									<li><a href="#">Cosmetic</a></li>
 								</ul>
-							</div>
-							<div class="doc-information-details" id="services">
+							</div> -->
+							<!-- <div class="doc-information-details" id="services">
 								<div class="detail-title">
 									<h4>Services & Pricing</h4>
 								</div>
@@ -482,8 +477,8 @@ try {
 									<li><a href="#">Tooth Bleaching <span>$15</span></a></li>
 									<li><a href="#">Cosmetic <span>$10</span></a></li>
 								</ul>
-							</div>
-							<div class="doc-information-details" id="availability">
+							</div> -->
+							<!-- <div class="doc-information-details" id="availability">
 								<div class="detail-title slider-nav d-flex justify-content-between align-items-center">
 									<h4>Availability</h4>
 									<div class="nav nav-container slide-2"></div>
@@ -538,8 +533,8 @@ try {
 										</div>
 									</div>
 								</div>
-							</div>
-							<div class="doc-information-details" id="clinic">
+							</div> -->
+							<!-- <div class="doc-information-details" id="clinic">
 								<div class="detail-title">
 									<h4>Clinics & Locations</h4>
 								</div>
@@ -549,7 +544,7 @@ try {
 											<div class="clinic-info">
 												<div class="clinic-img"><img src="assets/img/clinic/clinic-11.jpg" alt="Img"></div>
 												<div class="detail-clinic">
-													<h5>Sofi’s Clinic - </h5>
+													<h5>Sofi's Clinic - </h5>
 													<span>$350 / Apponitment</span>
 													<p>2286 Sundown Lane, Old Trafford 24541, UK</p>
 												</div>
@@ -604,32 +599,32 @@ try {
 										</div>
 										<div class="col-lg-5">
 											<div class="contact-map d-flex">
-												<iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3193.7301009561315!2d-76.13077892422932!3d36.82498697224007!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x89bae976cfe9f8af%3A0xa61eac05156fbdb9!2sBeachStreet%20USA!5e0!3m2!1sen!2sin!4v1669777904208!5m2!1sen!2sin" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+												<iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3193.7301009561315!2d-76.13077892422932!3d36.82498697224007!2m3!1f0!2f0!3m2!1sen!2sin!4v1669777904208!5m2!1sen!2sin" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
 											</div>
 										</div>
 									</div>
 								</div>
-							</div>
-							<div class="doc-information-details" id="membership">
+							</div> -->
+							<!-- <div class="doc-information-details" id="membership">
 								<div class="detail-title">
 									<h4>Membership</h4>
 								</div>
 								<div class="member-ship-info">
 									<span class="mem-check"><i class="fa-solid fa-check"></i></span>
-									<p>Affiliate members include related allied health professionals- evidence based 
-										(Dietitians, Physiotherapist, Occupational therapist and Clinical Psychologist) who will 
-										team up with allopathic physicians to 
+									<p>Affiliate members include related allied health professionals- evidence based
+										(Dietitians, Physiotherapist, Occupational therapist and Clinical Psychologist) who will
+										team up with allopathic physicians to
 										support the Lifestyle Medicine movement in India through ISLM.
 									</p>
 								</div>
 								<div class="member-ship-info mb-0">
 									<span class="mem-check"><i class="fa-solid fa-check"></i></span>
-									<p>Physician members include the allopathic doctors only (MBBS, MD, MS, DM, MCH, DNB or equivalent degree) 
+									<p>Physician members include the allopathic doctors only (MBBS, MD, MS, DM, MCH, DNB or equivalent degree)
 										who hold a valid medical license as recognized by the Medical Council of India.
 									</p>
 								</div>
-							</div>
-							<div class="doc-information-details" id="awards">
+							</div> -->
+							<!-- <div class="doc-information-details" id="awards">
 								<div class="detail-title slider-nav d-flex justify-content-between align-items-center">
 									<h4>Awards</h4>
 									<div class="nav nav-container slide-3"></div>
@@ -671,8 +666,8 @@ try {
 										</div>
 									</div>
 								</div>
-							</div>
-							<div class="doc-information-details" id="bussiness_hour">
+							</div> -->
+							<!-- <div class="doc-information-details" id="bussiness_hour">
 								<div class="detail-title">
 									<h4>Business Hours</h4>
 								</div>
@@ -718,8 +713,8 @@ try {
 										</li>
 									</ul>
 								</div>
-							</div>
-							<div class="doc-information-details" id="review">
+							</div> -->
+							<!-- <div class="doc-information-details" id="review">
 								<div class="detail-title">
 									<h4>Reviews (200)</h4>
 								</div>
@@ -741,8 +736,8 @@ try {
 										</div>
 										<span class="thumb-icon"><i class="fa-regular fa-thumbs-up"></i>Yes,Recommend for Appointment</span>
 									</div>
-									<p>Thank you for this informative article! I've had a couple of hit-and-miss experiences with 
-										freelancers in the past, and I realize now that I wasn't vetting them properly. Your checklist 
+									<p>Thank you for this informative article! I've had a couple of hit-and-miss experiences with
+										freelancers in the past, and I realize now that I wasn't vetting them properly. Your checklist
 										for choosing the right freelancer is going to be my go-to from now on
 									</p>
 									<a href="#" class="reply d-flex align-items-center"><i class="fa-solid fa-reply me-2"></i>Reply</a>
@@ -765,9 +760,9 @@ try {
 										</div>
 										<span class="thumb-icon"><i class="fa-regular fa-thumbs-up"></i>Yes,Recommend for Appointment</span>
 									</div>
-									<p>As a freelancer myself, I find this article spot on! It's important for clients to 
-										understand what to look for in a freelancer and how to foster a good working relationship. 
-										The point about mutual respect 
+									<p>As a freelancer myself, I find this article spot on! It's important for clients to
+										understand what to look for in a freelancer and how to foster a good working relationship.
+										The point about mutual respect
 										and clear communication is key in my experience. Well done
 									</p>
 									<a href="#" class="reply d-flex align-items-center"><i class="fa-solid fa-reply me-2"></i>Reply</a>
@@ -837,7 +832,7 @@ try {
 									</div>
 									<!-- /Pagination -->
 								</div>
-							</div>
+							</div> -->
 						</div>
 					</div>
 
