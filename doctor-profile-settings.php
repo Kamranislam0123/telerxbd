@@ -201,7 +201,6 @@ $last_name = $name_parts[1] ?? '';
 							<ul class="main-nav">
 								<li class="has-submenu megamenu active">
 									<a href="index.html">Home </a></li>
-								<li><a href="search.php">Doctor List</a></li>
 								<li><a href="search-2.php">Doctor List</a></li>
 								<li><a href="doctor-profile.php">Doctor Profile</a></li>
 								<li><a href="about-us.html">About Us</a></li>
@@ -572,11 +571,16 @@ $last_name = $name_parts[1] ?? '';
 											</div>
 										</div>
 										<div class="col-lg-6 col-md-6">
-											<div class="form-wrap">
+										    <div class="form-wrap">
 												<label class="form-label">Department</label>
-												<input type="text" class="form-control" name="department" value="<?php echo htmlspecialchars($doctor['specialty']); ?>" placeholder="e.g., Cardiology, Pediatrics">
+													<select class="form-control" name="department">
+														<option value="">Select Department</option>
+														<option value="Dhaka" <?php echo ($doctor['specialty'] === 'Dhaka') ? 'selected' : ''; ?>>Dhaka</option>
+														<option value="Gaibandha" <?php echo ($doctor['specialty'] === 'Gaibandha') ? 'selected' : ''; ?>>Gaibandha</option>
+														<option value="Naoga" <?php echo ($doctor['specialty'] === 'Naoga') ? 'selected' : ''; ?>>Naoga</option>
+													</select>
+												</div>
 											</div>
-										</div>
 										<div class="col-lg-6 col-md-6">
 											<div class="form-wrap">
 												<label class="form-label">Present Address</label>

@@ -131,7 +131,6 @@ try {
 							<ul class="main-nav">
 								<li class="has-submenu megamenu active">
 									<a href="index.html">Home </a></li>
-								<li><a href="search.php">Doctor List</a></li>
 								<li><a href="search-2.php">Doctor List</a></li>
 								<li><a href="doctor-profile.php">Doctor Profile</a></li>
 								<li><a href="about-us.html">About Us</a></li>
