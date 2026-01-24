@@ -299,15 +299,12 @@ try {
 											<?php 
 											if (!empty($final_specialities)): 
 												$speciality_index = 2; // Starting from checkebox-sm2
-												$visible_count = 7; // Show first 7 specialities initially
 												
-												// Show all specialities from the list, regardless of doctor count
+												// Show all specialities from the list at once
 												$speciality_array = array_keys($final_specialities);
-												$visible_specialities = array_slice($speciality_array, 0, $visible_count);
-												$hidden_specialities = array_slice($speciality_array, $visible_count);
 												
-												// Display visible specialities
-												foreach ($visible_specialities as $index => $speciality):
+												// Display all specialities
+												foreach ($speciality_array as $index => $speciality):
 													$count = $final_specialities[$speciality];
 													$checkbox_id = 'checkebox-sm' . $speciality_index;
 											?>
@@ -323,34 +320,7 @@ try {
 											<?php 
 													$speciality_index++;
 												endforeach; 
-												
-												// Display hidden specialities in view-content section
-												if (!empty($hidden_specialities)):
 											?>
-											<div class="view-content">
-												<div class="viewall-one" style="display: none;">
-													<?php foreach ($hidden_specialities as $speciality): 
-														$count = $final_specialities[$speciality];
-														$checkbox_id = 'checkebox-sm' . $speciality_index;
-													?>
-													<div class="d-flex align-items-center justify-content-between mb-2">
-														<div class="form-check">
-															<input class="form-check-input speciality-filter" type="checkbox" value="<?php echo htmlspecialchars($speciality); ?>" id="<?php echo $checkbox_id; ?>" data-speciality="<?php echo htmlspecialchars($speciality); ?>">
-															<label class="form-check-label" for="<?php echo $checkbox_id; ?>">
-																<?php echo htmlspecialchars($speciality); ?>
-															</label>
-														</div>
-														<span class="filter-badge"><?php echo $count; ?></span>
-													</div>
-													<?php 
-														$speciality_index++;
-													endforeach; ?>
-												</div>
-												<div class="view-all">
-													<a href="javascript:void(0);" class="viewall-button-one text-secondary text-decoration-underline">View More</a>
-												</div>
-											</div>
-											<?php endif; ?>
 											<?php else: ?>
 											<div class="d-flex align-items-center justify-content-between mb-2">
 												<div class="form-check">
