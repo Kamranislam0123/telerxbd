@@ -33,10 +33,71 @@ try {
     $doctors = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
     $stmt->close();
 
+    // Fetch distinct specialities with counts from database
+    $stmt = $conn->prepare("
+        SELECT 
+            dp.specialty as speciality,
+            COUNT(DISTINCT d.id) as doctor_count
+        FROM doctors d
+        LEFT JOIN doctor_profiles dp ON d.id = dp.doctor_id
+        WHERE dp.specialty IS NOT NULL 
+        AND dp.specialty != ''
+        GROUP BY dp.specialty
+        ORDER BY doctor_count DESC, speciality ASC
+    ");
+    $stmt->execute();
+    $specialities_result = $stmt->get_result();
+    $specialities_with_counts = [];
+    while ($row = $specialities_result->fetch_assoc()) {
+        $specialities_with_counts[$row['speciality']] = $row['doctor_count'];
+    }
+    $stmt->close();
+
+    // Define all available specialities from doctor-profile-settings.php
+    $all_specialities = [
+        'General Physician',
+        'Pediatrician',
+        'Gynecologist',
+        'Dermatologist',
+        'ENT Specialist',
+        'Psychiatrist',
+        'Diabetologist',
+        'Cardiologist',
+        'Neurologist',
+        'Orthopedic Specialist',
+        'Urologist',
+        'Gastroenterologist',
+        'Physiotherapist',
+        'Pulmonologist',
+        'Nephrologist',
+        'Oncologist',
+        'Sexologist',
+        'Rheumatologist',
+        'Allergist/Immunologist',
+        'Ophthalmologist',
+        'Psychologist',
+        'Internal Medicine',
+        'Family Medicine',
+        'Physical Medicine'
+    ];
+
+    // Merge database specialities with predefined list, ensuring all are included
+    $final_specialities = [];
+    foreach ($all_specialities as $spec) {
+        $final_specialities[$spec] = isset($specialities_with_counts[$spec]) ? $specialities_with_counts[$spec] : 0;
+    }
+    // Also add any specialities from database that aren't in the predefined list
+    foreach ($specialities_with_counts as $spec => $count) {
+        if (!isset($final_specialities[$spec])) {
+            $final_specialities[$spec] = $count;
+        }
+    }
+
     $conn->close();
 } catch (Exception $e) {
     error_log("Error fetching doctors: " . $e->getMessage());
     $doctors = [];
+    $final_specialities = [];
 }
 ?>
 <!DOCTYPE html>
@@ -212,7 +273,7 @@ try {
 							<div class="card-header">
 								<div class="d-flex align-items-center filter-head justify-content-between">
 									<h4>Filter</h4>
-									<a href="#" class="text-secondary text-decoration-underline">Clear All</a>
+									<a href="#" class="text-secondary text-decoration-underline clear-all-filters">Clear All</a>
 								</div>
 								<div class="filter-input">
 									<div class="position-relative input-icon">
@@ -235,94 +296,72 @@ try {
 									</div>
 									<div id="collapse1" class="accordion-collapse show" aria-labelledby="heading1">
 										<div class="accordion-body pt-3">
+											<?php 
+											if (!empty($final_specialities)): 
+												$speciality_index = 2; // Starting from checkebox-sm2
+												$visible_count = 7; // Show first 7 specialities initially
+												
+												// Show all specialities from the list, regardless of doctor count
+												$speciality_array = array_keys($final_specialities);
+												$visible_specialities = array_slice($speciality_array, 0, $visible_count);
+												$hidden_specialities = array_slice($speciality_array, $visible_count);
+												
+												// Display visible specialities
+												foreach ($visible_specialities as $index => $speciality):
+													$count = $final_specialities[$speciality];
+													$checkbox_id = 'checkebox-sm' . $speciality_index;
+											?>
 											<div class="d-flex align-items-center justify-content-between mb-2">
 												<div class="form-check">
-													<input class="form-check-input" type="checkbox" value="" id="checkebox-sm2" checked="">
-													<label class="form-check-label" for="checkebox-sm2">
-														Urology
+													<input class="form-check-input speciality-filter" type="checkbox" value="<?php echo htmlspecialchars($speciality); ?>" id="<?php echo $checkbox_id; ?>" data-speciality="<?php echo htmlspecialchars($speciality); ?>">
+													<label class="form-check-label" for="<?php echo $checkbox_id; ?>">
+														<?php echo htmlspecialchars($speciality); ?>
 													</label>
 												</div>
-												<span class="filter-badge">21</span>
+												<span class="filter-badge"><?php echo $count; ?></span>
 											</div>
-											<div class="d-flex align-items-center justify-content-between mb-2">
-												<div class="form-check">
-													<input class="form-check-input" type="checkbox" value="" id="checkebox-sm3">
-													<label class="form-check-label" for="checkebox-sm3">
-														Psychiatry
-													</label>
-												</div>
-												<span class="filter-badge">21</span>
-											</div>
-											<div class="d-flex align-items-center justify-content-between mb-2">
-												<div class="form-check">
-													<input class="form-check-input" type="checkbox" value="" id="checkebox-sm4">
-													<label class="form-check-label" for="checkebox-sm4">
-														Cardiology
-													</label>
-												</div>
-												<span class="filter-badge">21</span>
-											</div>
-											<div class="d-flex align-items-center justify-content-between mb-2">
-												<div class="form-check">
-													<input class="form-check-input" type="checkbox" value="" id="checkebox-sm5">
-													<label class="form-check-label" for="checkebox-sm5">
-														Pediatrics
-													</label>
-												</div>
-												<span class="filter-badge">21</span>
-											</div>
-											<div class="d-flex align-items-center justify-content-between mb-2">
-												<div class="form-check">
-													<input class="form-check-input" type="checkbox" value="" id="checkebox-sm6">
-													<label class="form-check-label" for="checkebox-sm6">
-														Urology
-													</label>
-												</div>
-												<span class="filter-badge">21</span>
-											</div>
-											<div class="d-flex align-items-center justify-content-between mb-2">
-												<div class="form-check">
-													<input class="form-check-input" type="checkbox" value="" id="checkebox-sm7">
-													<label class="form-check-label" for="checkebox-sm7">
-														Neurology
-													</label>
-												</div>
-												<span class="filter-badge">21</span>
-											</div>
-											<div class="d-flex align-items-center justify-content-between mb-2">
-												<div class="form-check">
-													<input class="form-check-input" type="checkbox" value="" id="checkebox-sm8">
-													<label class="form-check-label" for="checkebox-sm8">
-														Pulmonology
-													</label>
-												</div>
-												<span class="filter-badge">21</span>
-											</div>
+											<?php 
+													$speciality_index++;
+												endforeach; 
+												
+												// Display hidden specialities in view-content section
+												if (!empty($hidden_specialities)):
+											?>
 											<div class="view-content">
-												<div class="viewall-one">
+												<div class="viewall-one" style="display: none;">
+													<?php foreach ($hidden_specialities as $speciality): 
+														$count = $final_specialities[$speciality];
+														$checkbox_id = 'checkebox-sm' . $speciality_index;
+													?>
 													<div class="d-flex align-items-center justify-content-between mb-2">
 														<div class="form-check">
-															<input class="form-check-input" type="checkbox" value="" id="checkebox-sm9">
-															<label class="form-check-label" for="checkebox-sm9">
-																Orthopedics
+															<input class="form-check-input speciality-filter" type="checkbox" value="<?php echo htmlspecialchars($speciality); ?>" id="<?php echo $checkbox_id; ?>" data-speciality="<?php echo htmlspecialchars($speciality); ?>">
+															<label class="form-check-label" for="<?php echo $checkbox_id; ?>">
+																<?php echo htmlspecialchars($speciality); ?>
 															</label>
 														</div>
-														<span class="filter-badge">21</span>
+														<span class="filter-badge"><?php echo $count; ?></span>
 													</div>
-													<div class="d-flex align-items-center justify-content-between mb-2">
-														<div class="form-check">
-															<input class="form-check-input" type="checkbox" value="" id="checkebox-sm10">
-															<label class="form-check-label" for="checkebox-sm10">
-																Endocrinology
-															</label>
-														</div>
-														<span class="filter-badge">21</span>
-													</div>
+													<?php 
+														$speciality_index++;
+													endforeach; ?>
 												</div>
 												<div class="view-all">
 													<a href="javascript:void(0);" class="viewall-button-one text-secondary text-decoration-underline">View More</a>
 												</div>
 											</div>
+											<?php endif; ?>
+											<?php else: ?>
+											<div class="d-flex align-items-center justify-content-between mb-2">
+												<div class="form-check">
+													<input class="form-check-input" type="checkbox" value="" id="checkebox-sm2" checked="">
+													<label class="form-check-label" for="checkebox-sm2">
+														No Specialities Available
+													</label>
+												</div>
+												<span class="filter-badge">0</span>
+											</div>
+											<?php endif; ?>
 										</div>
 									</div>
 								</div>
@@ -737,7 +776,7 @@ try {
 						<div class="row align-items-center">
 							<div class="col-md-6">
 								<div class="mb-4">
-									<h3>Showing <span class="text-secondary">450</span> Doctors For You</h3>
+									<h3>Showing <span class="text-secondary" id="doctor-count"><?php echo count($doctors); ?></span> Doctors For You</h3>
 								</div>
 							</div>
 							<div class="col-md-6">
@@ -776,7 +815,7 @@ try {
 									</div>
 								<?php else: ?>
 									<?php foreach ($doctors as $doctor): ?>
-										<div class="card doctor-list-card">
+										<div class="card doctor-list-card" data-speciality="<?php echo htmlspecialchars($doctor['specialty'] ?? 'General Physician'); ?>">
 											<div class="d-md-flex align-items-center">
 												<div class="card-img card-img-hover">
 													<a href="doctor-profile.php?id=<?php echo $doctor['id']; ?>">
@@ -1142,6 +1181,83 @@ try {
 
 	<!-- Custom JS -->
 	<script src="assets/js/script.js"></script>
+
+	<!-- Speciality Filter Script -->
+	<script>
+	$(document).ready(function() {
+		// Function to filter doctors by speciality
+		function filterDoctorsBySpeciality() {
+			var selectedSpecialities = [];
+			
+			// Get all checked speciality checkboxes
+			$('.speciality-filter:checked').each(function() {
+				var speciality = $(this).val();
+				if (speciality && speciality.trim() !== '') {
+					selectedSpecialities.push(speciality.trim());
+				}
+			});
+			
+			// If no specialities are selected, show all doctors
+			if (selectedSpecialities.length === 0) {
+				$('.doctor-list-card').fadeIn(300);
+				updateDoctorCount();
+				return;
+			}
+			
+			// Filter doctors based on selected specialities
+			$('.doctor-list-card').each(function() {
+				var doctorSpeciality = $(this).data('speciality') || 'General Physician';
+				doctorSpeciality = doctorSpeciality.trim();
+				
+				// Check if doctor's speciality matches any selected speciality
+				if (selectedSpecialities.indexOf(doctorSpeciality) !== -1) {
+					$(this).fadeIn(300);
+				} else {
+					$(this).fadeOut(300);
+				}
+			});
+			
+			updateDoctorCount();
+		}
+		
+		// Function to update the doctor count
+		function updateDoctorCount() {
+			var visibleCount = $('.doctor-list-card:visible').length;
+			$('#doctor-count').text(visibleCount);
+			
+			// Show message if no doctors match the filter
+			if (visibleCount === 0) {
+				if ($('.no-doctors-message').length === 0) {
+					$('.row .col-lg-12').append(
+						'<div class="text-center no-doctors-message mt-4">' +
+						'<p class="text-muted">No doctors found matching the selected specialities.</p>' +
+						'</div>'
+					);
+				}
+			} else {
+				$('.no-doctors-message').remove();
+			}
+		}
+		
+		// Handle speciality checkbox changes
+		$('.speciality-filter').on('change', function() {
+			filterDoctorsBySpeciality();
+		});
+		
+		// Handle "Clear All" link
+		$('.clear-all-filters').on('click', function(e) {
+			e.preventDefault();
+			// Uncheck all speciality filters
+			$('.speciality-filter').prop('checked', false);
+			// Show all doctors
+			$('.doctor-list-card').fadeIn(300);
+			updateDoctorCount();
+		});
+		
+		// Initialize - show all doctors by default
+		updateDoctorCount();
+	});
+	</script>
 
 </body>
 

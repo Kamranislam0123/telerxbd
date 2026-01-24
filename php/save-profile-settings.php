@@ -50,6 +50,7 @@ try {
             $currently_working = isset($_POST['currently_working']) ? trim($_POST['currently_working']) : '';
             $bmdc_no = isset($_POST['bmdc_no']) ? trim($_POST['bmdc_no']) : '';
             $department = isset($_POST['department']) ? trim($_POST['department']) : '';
+            $speciality = isset($_POST['speciality']) ? trim($_POST['speciality']) : '';
             $present_address = isset($_POST['present_address']) ? trim($_POST['present_address']) : '';
             $experience_years = isset($_POST['experience_years']) ? (int)$_POST['experience_years'] : 0;
             $bio = isset($_POST['bio']) ? trim($_POST['bio']) : '';
@@ -191,7 +192,7 @@ try {
                 nid_card = IF(VALUES(nid_card) != '', VALUES(nid_card), nid_card),
                 degrees_certificate = IF(VALUES(degrees_certificate) != '', VALUES(degrees_certificate), degrees_certificate)
             ");
-            $stmt->bind_param("issdissdsssssss", $doctor_id, $bio, $department, $consultation_fee, $experience_years, $profile_image, $gender, $account_number, $degrees, $currently_working, $department, $present_address, $bmdc_certificate, $nid_card, $degrees_certificate);
+            $stmt->bind_param("issdissdsssssss", $doctor_id, $bio, $speciality, $consultation_fee, $experience_years, $profile_image, $gender, $account_number, $degrees, $currently_working, $department, $present_address, $bmdc_certificate, $nid_card, $degrees_certificate);
             $stmt->execute();
             $stmt->close();
 
