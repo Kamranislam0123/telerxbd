@@ -54,7 +54,8 @@ try {
     $doctor['account_number'] = $doctor['account_number'] ?? '';
     $doctor['degrees'] = $doctor['degrees'] ?? '';
     $doctor['currently_working'] = $doctor['currently_working'] ?? '';
-    $doctor['speciality'] = $doctor['speciality'] ?? '';
+    // Map specialty from database to speciality for form (database uses 'specialty', form uses 'speciality')
+    $doctor['speciality'] = $doctor['specialty'] ?? ($doctor['speciality'] ?? '');
     $doctor['present_address'] = $doctor['present_address'] ?? '';
     $doctor['bmdc_certificate'] = $doctor['bmdc_certificate'] ?? '';
     $doctor['nid_card'] = $doctor['nid_card'] ?? '';
@@ -574,31 +575,35 @@ $last_name = $name_parts[1] ?? '';
 											<div class="form-wrap">
 												<label class="form-label">Speciality</label>
 												<select class="form-control" name="speciality">
+													<?php 
+													// Get the current selected speciality (check both specialty and speciality fields)
+													$current_speciality = !empty($doctor['speciality']) ? $doctor['speciality'] : (!empty($doctor['specialty']) ? $doctor['specialty'] : '');
+													?>
 													<option value="">Select Speciality</option>
-													<option value="General Physician" <?php echo (isset($doctor['speciality']) && $doctor['speciality'] == 'General Physician') ? 'selected' : ''; ?>>General Physician</option>
-													<option value="Pediatrician" <?php echo (isset($doctor['speciality']) && $doctor['speciality'] == 'Pediatrician') ? 'selected' : ''; ?>>Pediatrician</option>
-													<option value="Gynecologist" <?php echo (isset($doctor['speciality']) && $doctor['speciality'] == 'Gynecologist') ? 'selected' : ''; ?>>Gynecologist</option>
-													<option value="Dermatologist" <?php echo (isset($doctor['speciality']) && $doctor['speciality'] == 'Dermatologist') ? 'selected' : ''; ?>>Dermatologist</option>
-													<option value="ENT Specialist" <?php echo (isset($doctor['speciality']) && $doctor['speciality'] == 'ENT Specialist') ? 'selected' : ''; ?>>ENT Specialist</option>
-													<option value="Psychiatrist" <?php echo (isset($doctor['speciality']) && $doctor['speciality'] == 'Psychiatrist') ? 'selected' : ''; ?>>Psychiatrist</option>
-													<option value="Diabetologist" <?php echo (isset($doctor['speciality']) && $doctor['speciality'] == 'Diabetologist') ? 'selected' : ''; ?>>Diabetologist</option>
-													<option value="Cardiologist" <?php echo (isset($doctor['speciality']) && $doctor['speciality'] == 'Cardiologist') ? 'selected' : ''; ?>>Cardiologist</option>
-													<option value="Neurologist" <?php echo (isset($doctor['speciality']) && $doctor['speciality'] == 'Neurologist') ? 'selected' : ''; ?>>Neurologist</option>
-													<option value="Orthopedic Specialist" <?php echo (isset($doctor['speciality']) && $doctor['speciality'] == 'Orthopedic Specialist') ? 'selected' : ''; ?>>Orthopedic Specialist</option>
-													<option value="Urologist" <?php echo (isset($doctor['speciality']) && $doctor['speciality'] == 'Urologist') ? 'selected' : ''; ?>>Urologist</option>
-													<option value="Gastroenterologist" <?php echo (isset($doctor['speciality']) && $doctor['speciality'] == 'Gastroenterologist') ? 'selected' : ''; ?>>Gastroenterologist</option>
-													<option value="Physiotherapist" <?php echo (isset($doctor['speciality']) && $doctor['speciality'] == 'Physiotherapist') ? 'selected' : ''; ?>>Physiotherapist</option>
-													<option value="Pulmonologist" <?php echo (isset($doctor['speciality']) && $doctor['speciality'] == 'Pulmonologist') ? 'selected' : ''; ?>>Pulmonologist</option>
-													<option value="Nephrologist" <?php echo (isset($doctor['speciality']) && $doctor['speciality'] == 'Nephrologist') ? 'selected' : ''; ?>>Nephrologist</option>
-													<option value="Oncologist" <?php echo (isset($doctor['speciality']) && $doctor['speciality'] == 'Oncologist') ? 'selected' : ''; ?>>Oncologist</option>
-													<option value="Sexologist" <?php echo (isset($doctor['speciality']) && $doctor['speciality'] == 'Sexologist') ? 'selected' : ''; ?>>Sexologist</option>
-													<option value="Rheumatologist" <?php echo (isset($doctor['speciality']) && $doctor['speciality'] == 'Rheumatologist') ? 'selected' : ''; ?>>Rheumatologist</option>
-													<option value="Allergist/Immunologist" <?php echo (isset($doctor['speciality']) && $doctor['speciality'] == 'Allergist/Immunologist') ? 'selected' : ''; ?>>Allergist/Immunologist</option>
-													<option value="Ophthalmologist" <?php echo (isset($doctor['speciality']) && $doctor['speciality'] == 'Ophthalmologist') ? 'selected' : ''; ?>>Ophthalmologist</option>
-													<option value="Psychologist" <?php echo (isset($doctor['speciality']) && $doctor['speciality'] == 'Psychologist') ? 'selected' : ''; ?>>Psychologist</option>
-													<option value="Internal Medicine" <?php echo (isset($doctor['speciality']) && $doctor['speciality'] == 'Internal Medicine') ? 'selected' : ''; ?>>Internal Medicine</option>
-													<option value="Family Medicine" <?php echo (isset($doctor['speciality']) && $doctor['speciality'] == 'Family Medicine') ? 'selected' : ''; ?>>Family Medicine</option>
-													<option value="Physical Medicine" <?php echo (isset($doctor['speciality']) && $doctor['speciality'] == 'Physical Medicine') ? 'selected' : ''; ?>>Physical Medicine</option>
+													<option value="General Physician" <?php echo ($current_speciality == 'General Physician') ? 'selected' : ''; ?>>General Physician</option>
+													<option value="Pediatrician" <?php echo ($current_speciality == 'Pediatrician') ? 'selected' : ''; ?>>Pediatrician</option>
+													<option value="Gynecologist" <?php echo ($current_speciality == 'Gynecologist') ? 'selected' : ''; ?>>Gynecologist</option>
+													<option value="Dermatologist" <?php echo ($current_speciality == 'Dermatologist') ? 'selected' : ''; ?>>Dermatologist</option>
+													<option value="ENT Specialist" <?php echo ($current_speciality == 'ENT Specialist') ? 'selected' : ''; ?>>ENT Specialist</option>
+													<option value="Psychiatrist" <?php echo ($current_speciality == 'Psychiatrist') ? 'selected' : ''; ?>>Psychiatrist</option>
+													<option value="Diabetologist" <?php echo ($current_speciality == 'Diabetologist') ? 'selected' : ''; ?>>Diabetologist</option>
+													<option value="Cardiologist" <?php echo ($current_speciality == 'Cardiologist') ? 'selected' : ''; ?>>Cardiologist</option>
+													<option value="Neurologist" <?php echo ($current_speciality == 'Neurologist') ? 'selected' : ''; ?>>Neurologist</option>
+													<option value="Orthopedic Specialist" <?php echo ($current_speciality == 'Orthopedic Specialist') ? 'selected' : ''; ?>>Orthopedic Specialist</option>
+													<option value="Urologist" <?php echo ($current_speciality == 'Urologist') ? 'selected' : ''; ?>>Urologist</option>
+													<option value="Gastroenterologist" <?php echo ($current_speciality == 'Gastroenterologist') ? 'selected' : ''; ?>>Gastroenterologist</option>
+													<option value="Physiotherapist" <?php echo ($current_speciality == 'Physiotherapist') ? 'selected' : ''; ?>>Physiotherapist</option>
+													<option value="Pulmonologist" <?php echo ($current_speciality == 'Pulmonologist') ? 'selected' : ''; ?>>Pulmonologist</option>
+													<option value="Nephrologist" <?php echo ($current_speciality == 'Nephrologist') ? 'selected' : ''; ?>>Nephrologist</option>
+													<option value="Oncologist" <?php echo ($current_speciality == 'Oncologist') ? 'selected' : ''; ?>>Oncologist</option>
+													<option value="Sexologist" <?php echo ($current_speciality == 'Sexologist') ? 'selected' : ''; ?>>Sexologist</option>
+													<option value="Rheumatologist" <?php echo ($current_speciality == 'Rheumatologist') ? 'selected' : ''; ?>>Rheumatologist</option>
+													<option value="Allergist/Immunologist" <?php echo ($current_speciality == 'Allergist/Immunologist') ? 'selected' : ''; ?>>Allergist/Immunologist</option>
+													<option value="Ophthalmologist" <?php echo ($current_speciality == 'Ophthalmologist') ? 'selected' : ''; ?>>Ophthalmologist</option>
+													<option value="Psychologist" <?php echo ($current_speciality == 'Psychologist') ? 'selected' : ''; ?>>Psychologist</option>
+													<option value="Internal Medicine" <?php echo ($current_speciality == 'Internal Medicine') ? 'selected' : ''; ?>>Internal Medicine</option>
+													<option value="Family Medicine" <?php echo ($current_speciality == 'Family Medicine') ? 'selected' : ''; ?>>Family Medicine</option>
+													<option value="Physical Medicine" <?php echo ($current_speciality == 'Physical Medicine') ? 'selected' : ''; ?>>Physical Medicine</option>
 												</select>
 											</div>
 										</div>
