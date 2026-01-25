@@ -364,9 +364,26 @@
 					dataType: 'json',
 					success: function(response) {
 						if (response.success) {
+							var userType = response.user_type || 'doctor';
+							var redirectUrl = response.redirect;
+							
+							// Set redirect based on user type if not provided
+							if (!redirectUrl) {
+								switch(userType) {
+									case 'healthcare':
+										redirectUrl = 'health-worker-profile-settings.php';
+										break;
+									case 'patient':
+										redirectUrl = 'index.html';
+										break;
+									default:
+										redirectUrl = 'doctor-profile-settings.php';
+								}
+							}
+							
 							messageDiv.addClass('alert-success').html('<strong>Success!</strong> ' + response.message).fadeIn();
 							setTimeout(function() {
-								window.location.href = response.redirect || 'doctor-profile-settings.php';
+								window.location.href = redirectUrl;
 							}, 1000);
 						} else {
 							var errorMsg = response.message || 'Login failed. Please try again.';
