@@ -40,7 +40,10 @@ $email = isset($_POST['email']) ? trim($_POST['email']) : '';
 $phone = isset($_POST['phone']) ? trim($_POST['phone']) : '';
 $bmdc_no = isset($_POST['bmdc_no']) ? trim($_POST['bmdc_no']) : '';
 $nid_number = isset($_POST['nid_number']) ? trim($_POST['nid_number']) : '';
-$password = isset($_POST['password']) ? $_POST['password'] : '';
+$password = isset($_POST['password']) ? trim($_POST['password']) : '';
+
+// Debug logging (remove in production)
+error_log("Registration attempt - User type: $user_type, Name: $name, Email: $email, Phone: " . (empty($phone) ? 'empty' : 'provided') . ", NID: " . (empty($nid_number) ? 'empty' : 'provided'));
 
 // Validate user type
 $valid_user_types = ['patient', 'doctor', 'healthcare'];
@@ -53,22 +56,16 @@ if (!in_array($user_type, $valid_user_types)) {
 // Validation based on user type
 $errors = [];
 
-if (empty($name)) {
-    $errors[] = 'Name is required';
-} elseif (strlen($name) < 2) {
-    $errors[] = 'Name must be at least 2 characters';
+if (empty($name) || strlen(trim($name)) < 2) {
+    $errors[] = 'Name is required and must be at least 2 characters';
 }
 
-if (empty($email)) {
-    $errors[] = 'Email is required';
-} elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-    $errors[] = 'Invalid email format';
+if (empty($email) || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
+    $errors[] = 'Valid email address is required';
 }
 
-if (empty($password)) {
-    $errors[] = 'Password is required';
-} elseif (strlen($password) < 6) {
-    $errors[] = 'Password must be at least 6 characters';
+if (empty($password) || strlen($password) < 6) {
+    $errors[] = 'Password is required and must be at least 6 characters';
 }
 
 // User type specific validations
@@ -88,9 +85,19 @@ switch ($user_type) {
         break;
 
     case 'healthcare':
-        if (empty($nid_number)) {
+        if (empty($phone) || strlen(trim($phone)) == 0) {
+            $errors[] = 'Mobile number is required';
+        } else {
+            // Remove spaces, dashes, and other non-digit characters for validation
+            $phone_clean = preg_replace('/[^0-9]/', '', $phone);
+            if (strlen($phone_clean) < 10) {
+                $errors[] = 'Mobile number must contain at least 10 digits';
+            }
+        }
+        
+        if (empty($nid_number) || strlen(trim($nid_number)) == 0) {
             $errors[] = 'NID number is required';
-        } elseif (strlen($nid_number) < 10) {
+        } elseif (strlen(trim($nid_number)) < 10) {
             $errors[] = 'NID number must be at least 10 characters';
         }
         break;
@@ -103,15 +110,34 @@ switch ($user_type) {
 // If there are validation errors, return them
 if (!empty($errors)) {
     http_response_code(400);
-    echo json_encode(['success' => false, 'message' => 'Validation failed', 'errors' => $errors]);
+    error_log("Validation errors: " . implode(', ', $errors));
+    echo json_encode(['success' => false, 'message' => 'Validation failed. Please check the following:', 'errors' => $errors]);
     exit;
 }
 
 try {
     $conn = getDBConnection();
 
-    // Check if email already exists in any user table
-    $email_check_tables = ['patients', 'doctors', 'healthcare_providers'];
+    // Check if email already exists in any user table (only check tables that exist)
+    $email_check_tables = [];
+    
+    // Check which tables exist
+    $tables_result = $conn->query("SHOW TABLES");
+    $existing_tables = [];
+    if ($tables_result) {
+        while ($row = $tables_result->fetch_array()) {
+            $existing_tables[] = $row[0];
+        }
+    }
+    
+    // Only check tables that exist
+    $tables_to_check = ['patients', 'doctors', 'healthcare_providers'];
+    foreach ($tables_to_check as $table) {
+        if (in_array($table, $existing_tables)) {
+            $email_check_tables[] = $table;
+        }
+    }
+    
     foreach ($email_check_tables as $table) {
         $stmt = $conn->prepare("SELECT id FROM {$table} WHERE email = ?");
         $stmt->bind_param("s", $email);
@@ -163,6 +189,21 @@ try {
             break;
 
         case 'healthcare':
+            // Check if phone already exists
+            $stmt = $conn->prepare("SELECT id FROM healthcare_providers WHERE phone = ?");
+            $stmt->bind_param("s", $phone);
+            $stmt->execute();
+            $result = $stmt->get_result();
+
+            if ($result->num_rows > 0) {
+                http_response_code(409);
+                echo json_encode(['success' => false, 'message' => 'Mobile number already registered']);
+                $stmt->close();
+                $conn->close();
+                exit;
+            }
+            $stmt->close();
+            
             // Check if NID number already exists
             $stmt = $conn->prepare("SELECT id FROM healthcare_providers WHERE nid_number = ?");
             $stmt->bind_param("s", $nid_number);
@@ -205,9 +246,42 @@ try {
             break;
 
         case 'healthcare':
-            $stmt = $conn->prepare("INSERT INTO healthcare_providers (name, email, nid_number, password) VALUES (?, ?, ?, ?)");
-            $stmt->bind_param("ssss", $name, $email, $nid_number, $hashed_password);
-            $redirect_url = 'login.html';
+            // Generate TID (TeleRx ID) - Format: TEL-YYYYMMDD-XXXX (e.g., TEL-20250124-0001)
+            $date_prefix = date('Ymd');
+            $tid_counter = 1;
+            $tid = '';
+            
+            // Find the highest TID for today
+            $tid_check = $conn->query("SELECT tid FROM healthcare_providers WHERE tid LIKE 'TEL-{$date_prefix}-%' ORDER BY tid DESC LIMIT 1");
+            if ($tid_check && $tid_check->num_rows > 0) {
+                $last_tid = $tid_check->fetch_assoc()['tid'];
+                $last_counter = (int)substr($last_tid, -4);
+                $tid_counter = $last_counter + 1;
+            }
+            $tid = 'TEL-' . $date_prefix . '-' . str_pad($tid_counter, 4, '0', STR_PAD_LEFT);
+            
+            // Check if phone column exists
+            $columns_check = $conn->query("SHOW COLUMNS FROM healthcare_providers LIKE 'phone'");
+            $has_phone = $columns_check && $columns_check->num_rows > 0;
+            
+            // Check if tid column exists
+            $tid_check_col = $conn->query("SHOW COLUMNS FROM healthcare_providers LIKE 'tid'");
+            $has_tid = $tid_check_col && $tid_check_col->num_rows > 0;
+            
+            if ($has_phone && $has_tid) {
+                $stmt = $conn->prepare("INSERT INTO healthcare_providers (name, email, phone, nid_number, password, tid) VALUES (?, ?, ?, ?, ?, ?)");
+                $stmt->bind_param("ssssss", $name, $email, $phone, $nid_number, $hashed_password, $tid);
+            } elseif ($has_phone) {
+                $stmt = $conn->prepare("INSERT INTO healthcare_providers (name, email, phone, nid_number, password) VALUES (?, ?, ?, ?, ?)");
+                $stmt->bind_param("sssss", $name, $email, $phone, $nid_number, $hashed_password);
+            } elseif ($has_tid) {
+                $stmt = $conn->prepare("INSERT INTO healthcare_providers (name, email, nid_number, password, tid) VALUES (?, ?, ?, ?, ?)");
+                $stmt->bind_param("sssss", $name, $email, $nid_number, $hashed_password, $tid);
+            } else {
+                $stmt = $conn->prepare("INSERT INTO healthcare_providers (name, email, nid_number, password) VALUES (?, ?, ?, ?)");
+                $stmt->bind_param("ssss", $name, $email, $nid_number, $hashed_password);
+            }
+            $redirect_url = 'health-worker-profile-settings.php';
             break;
     }
 
@@ -234,6 +308,8 @@ try {
                 $_SESSION['healthcare_id'] = $user_id;
                 $_SESSION['healthcare_name'] = $name;
                 $_SESSION['healthcare_email'] = $email;
+                $_SESSION['healthcare_phone'] = $phone;
+                $_SESSION['logged_in'] = true;
                 $_SESSION['user_type'] = 'healthcare';
                 break;
         }

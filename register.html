@@ -237,8 +237,12 @@
 														<input type="email" class="form-control" name="email" id="health-worker-email" placeholder="Enter your email address" required>
 													</div>
 													<div class="mb-3">
+														<label class="form-label">Mobile Number</label>
+														<input type="text" class="form-control" name="phone" id="health-worker-phone" placeholder="Enter your mobile number" required>
+													</div>
+													<div class="mb-3">
 														<label class="form-label">NID Number</label>
-														<input type="text" class="form-control" name="nid_number" id="health-worker" placeholder="Enter your National ID number" required>
+														<input type="text" class="form-control" name="nid_number" id="health-worker-nid" placeholder="Enter your National ID number" required>
 													</div>
 													<div class="mb-3">
 														<div class="form-group-flex">
@@ -558,13 +562,52 @@
 				messageDiv.hide().removeClass('alert-success alert-danger');
 
 				// Get form data
+				var name = $('#health-worker-name').val().trim();
+				var email = $('#health-worker-email').val().trim();
+				var phone = $('#health-worker-phone').val().trim();
+				var nid_number = $('#health-worker-nid').val().trim();
+				var password = $('#health-worker-password').val();
+
+				// Client-side validation
+				var clientErrors = [];
+				if (!name || name.length < 2) {
+					clientErrors.push('Name must be at least 2 characters');
+				}
+				if (!email || !email.match(/^[^\s@]+@[^\s@]+\.[^\s@]+$/)) {
+					clientErrors.push('Please enter a valid email address');
+				}
+				if (!phone || phone.replace(/\D/g, '').length < 10) {
+					clientErrors.push('Mobile number must contain at least 10 digits');
+				}
+				if (!nid_number || nid_number.length < 10) {
+					clientErrors.push('NID number must be at least 10 characters');
+				}
+				if (!password || password.length < 6) {
+					clientErrors.push('Password must be at least 6 characters');
+				}
+
+				if (clientErrors.length > 0) {
+					var errorMsg = 'Please fix the following errors:<ul class="mb-0 mt-2">';
+					clientErrors.forEach(function(err) {
+						errorMsg += '<li>' + err + '</li>';
+					});
+					errorMsg += '</ul>';
+					messageDiv.addClass('alert-danger').html('<strong>Validation Error!</strong> ' + errorMsg).fadeIn();
+					submitBtn.prop('disabled', false).text('Register as Health-worker');
+					return;
+				}
+
 				var formData = {
-					user_type: 'health-worker',
-					name: $('#health-worker-name').val(),
-					email: $('#health-worker-email').val(),
-					nid_number: $('#health-worker-nid').val(),
-					password: $('#health-worker-password').val()
+					user_type: 'healthcare',
+					name: name,
+					email: email,
+					phone: phone,
+					nid_number: nid_number,
+					password: password
 				};
+
+				// Debug: Log form data (remove in production)
+				console.log('Form Data:', formData);
 
 				// Submit via AJAX
 				$.ajax({
@@ -593,8 +636,23 @@
 					},
 					error: function(xhr, status, error) {
 						var errorMsg = 'An error occurred. Please try again later.';
-						if (xhr.responseJSON && xhr.responseJSON.message) {
-							errorMsg = xhr.responseJSON.message;
+						try {
+							var response = JSON.parse(xhr.responseText);
+							if (response.message) {
+								errorMsg = response.message;
+							}
+							if (response.errors && response.errors.length > 0) {
+								errorMsg += '<ul class="mb-0 mt-2">';
+								response.errors.forEach(function(err) {
+									errorMsg += '<li>' + err + '</li>';
+								});
+								errorMsg += '</ul>';
+							}
+						} catch(e) {
+							console.error('Error parsing response:', xhr.responseText);
+							if (xhr.responseText) {
+								errorMsg += '<br><small>' + xhr.responseText.substring(0, 200) + '</small>';
+							}
 						}
 						messageDiv.addClass('alert-danger').html('<strong>Error!</strong> ' + errorMsg).fadeIn();
 						submitBtn.prop('disabled', false).text('Register as Health-worker');
