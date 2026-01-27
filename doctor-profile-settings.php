@@ -920,8 +920,8 @@ $last_name = $name_parts[1] ?? '';
 			<!-- /Page Content -->
 
 								<!-- Submit Button -->
-								<div class="modal-btn text-end">
-									<button type="submit" class="btn btn-primary prime-btn" id="saveBtn">
+								<div class="modal-btn text-end mb-4" style="padding-right: 5rem;">
+							<button type="submit" class="btn btn-primary prime-btn" id="saveBtn">
 										<span class="btn-text">Save Changes</span>
 										<div class="spinner-border spinner-border-sm ms-2 d-none" role="status">
 											<span class="visually-hidden">Loading...</span>
