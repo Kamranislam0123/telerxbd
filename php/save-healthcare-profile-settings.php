@@ -89,6 +89,19 @@ try {
                 }
             }
 
+            // Build family members JSON from POST arrays
+            $family_members = [];
+            if (!empty($_POST['family_relation']) && is_array($_POST['family_relation'])) {
+                foreach ($_POST['family_relation'] as $i => $rel) {
+                    $name = isset($_POST['family_name'][$i]) ? trim((string) $_POST['family_name'][$i]) : '';
+                    $nid  = isset($_POST['family_nid'][$i])  ? trim((string) $_POST['family_nid'][$i])  : '';
+                    if ($rel !== '' || $name !== '' || $nid !== '') {
+                        $family_members[] = ['relation' => $rel, 'name' => $name, 'nid' => $nid];
+                    }
+                }
+            }
+            $family_members_json = json_encode($family_members);
+
             // Handle degrees certificate upload
             $degrees_certificate = '';
             if (isset($_FILES['degrees_certificate']) && $_FILES['degrees_certificate']['error'] == 0) {
@@ -142,20 +155,42 @@ try {
                 $stmt->close();
             }
 
+            // Check if family_members column exists
+            $has_family_col = false;
+            $col_check = $conn->query("SHOW COLUMNS FROM healthcare_providers_profiles LIKE 'family_members'");
+            if ($col_check && $col_check->num_rows > 0) $has_family_col = true;
+
             // Update or insert healthcare profile
-            $stmt = $conn->prepare("
-                INSERT INTO healthcare_providers_profiles (healthcare_provider_id, profile_image, gender, degrees, currently_working, present_address, nid_file, degrees_certificate)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-                ON DUPLICATE KEY UPDATE
-                profile_image = IF(VALUES(profile_image) != '', VALUES(profile_image), profile_image),
-                gender = VALUES(gender),
-                degrees = VALUES(degrees),
-                currently_working = VALUES(currently_working),
-                present_address = VALUES(present_address),
-                nid_file = IF(VALUES(nid_file) != '', VALUES(nid_file), nid_file),
-                degrees_certificate = IF(VALUES(degrees_certificate) != '', VALUES(degrees_certificate), degrees_certificate)
-            ");
-            $stmt->bind_param("isssssss", $healthcare_id, $profile_image, $gender, $degrees, $currently_working, $present_address, $nid_file, $degrees_certificate);
+            if ($has_family_col) {
+                $stmt = $conn->prepare("
+                    INSERT INTO healthcare_providers_profiles (healthcare_provider_id, profile_image, gender, degrees, currently_working, present_address, nid_file, degrees_certificate, family_members)
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+                    ON DUPLICATE KEY UPDATE
+                    profile_image = IF(VALUES(profile_image) != '', VALUES(profile_image), profile_image),
+                    gender = VALUES(gender),
+                    degrees = VALUES(degrees),
+                    currently_working = VALUES(currently_working),
+                    present_address = VALUES(present_address),
+                    nid_file = IF(VALUES(nid_file) != '', VALUES(nid_file), nid_file),
+                    degrees_certificate = IF(VALUES(degrees_certificate) != '', VALUES(degrees_certificate), degrees_certificate),
+                    family_members = VALUES(family_members)
+                ");
+                $stmt->bind_param("issssssss", $healthcare_id, $profile_image, $gender, $degrees, $currently_working, $present_address, $nid_file, $degrees_certificate, $family_members_json);
+            } else {
+                $stmt = $conn->prepare("
+                    INSERT INTO healthcare_providers_profiles (healthcare_provider_id, profile_image, gender, degrees, currently_working, present_address, nid_file, degrees_certificate)
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+                    ON DUPLICATE KEY UPDATE
+                    profile_image = IF(VALUES(profile_image) != '', VALUES(profile_image), profile_image),
+                    gender = VALUES(gender),
+                    degrees = VALUES(degrees),
+                    currently_working = VALUES(currently_working),
+                    present_address = VALUES(present_address),
+                    nid_file = IF(VALUES(nid_file) != '', VALUES(nid_file), nid_file),
+                    degrees_certificate = IF(VALUES(degrees_certificate) != '', VALUES(degrees_certificate), degrees_certificate)
+                ");
+                $stmt->bind_param("isssssss", $healthcare_id, $profile_image, $gender, $degrees, $currently_working, $present_address, $nid_file, $degrees_certificate);
+            }
             $stmt->execute();
             $stmt->close();
 

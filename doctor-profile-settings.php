@@ -358,7 +358,20 @@ $last_name = $name_parts[1] ?? '';
 											<div class="patient-details">
 												<h5 class="mb-0"><?php echo htmlspecialchars($doctor['degrees'] ?: 'Doctor'); ?></h5>
 											</div>
-											<span class="badge doctor-role-badge"><i class="fa-solid fa-circle"></i><?php echo htmlspecialchars($doctor['speciality'] ?: 'Doctor'); ?></span>
+											<?php 
+											// Display multiple specialities as badges
+											$speciality_display = !empty($doctor['speciality']) ? $doctor['speciality'] : (!empty($doctor['specialty']) ? $doctor['specialty'] : '');
+											if (!empty($speciality_display)) {
+												$specialities_array = array_map('trim', explode(',', $speciality_display));
+												foreach ($specialities_array as $spec) {
+													if (!empty($spec)) {
+														echo '<span class="badge doctor-role-badge me-1 mb-1"><i class="fa-solid fa-circle"></i>' . htmlspecialchars($spec) . '</span>';
+													}
+												}
+											} else {
+												echo '<span class="badge doctor-role-badge"><i class="fa-solid fa-circle"></i>Doctor</span>';
+											}
+											?>
 										</div>
 									</div>
 								</div>
@@ -573,38 +586,35 @@ $last_name = $name_parts[1] ?? '';
 										</div>
 										<div class="col-lg-6 col-md-6">
 											<div class="form-wrap">
-												<label class="form-label">Speciality</label>
-												<select class="form-control" name="speciality">
-													<?php 
-													// Get the current selected speciality (check both specialty and speciality fields)
-													$current_speciality = !empty($doctor['speciality']) ? $doctor['speciality'] : (!empty($doctor['specialty']) ? $doctor['specialty'] : '');
-													?>
-													<option value="">Select Speciality</option>
-													<option value="General Physician" <?php echo ($current_speciality == 'General Physician') ? 'selected' : ''; ?>>General Physician</option>
-													<option value="Pediatrician" <?php echo ($current_speciality == 'Pediatrician') ? 'selected' : ''; ?>>Pediatrician</option>
-													<option value="Gynecologist" <?php echo ($current_speciality == 'Gynecologist') ? 'selected' : ''; ?>>Gynecologist</option>
-													<option value="Dermatologist" <?php echo ($current_speciality == 'Dermatologist') ? 'selected' : ''; ?>>Dermatologist</option>
-													<option value="ENT Specialist" <?php echo ($current_speciality == 'ENT Specialist') ? 'selected' : ''; ?>>ENT Specialist</option>
-													<option value="Psychiatrist" <?php echo ($current_speciality == 'Psychiatrist') ? 'selected' : ''; ?>>Psychiatrist</option>
-													<option value="Diabetologist" <?php echo ($current_speciality == 'Diabetologist') ? 'selected' : ''; ?>>Diabetologist</option>
-													<option value="Cardiologist" <?php echo ($current_speciality == 'Cardiologist') ? 'selected' : ''; ?>>Cardiologist</option>
-													<option value="Neurologist" <?php echo ($current_speciality == 'Neurologist') ? 'selected' : ''; ?>>Neurologist</option>
-													<option value="Orthopedic Specialist" <?php echo ($current_speciality == 'Orthopedic Specialist') ? 'selected' : ''; ?>>Orthopedic Specialist</option>
-													<option value="Urologist" <?php echo ($current_speciality == 'Urologist') ? 'selected' : ''; ?>>Urologist</option>
-													<option value="Gastroenterologist" <?php echo ($current_speciality == 'Gastroenterologist') ? 'selected' : ''; ?>>Gastroenterologist</option>
-													<option value="Physiotherapist" <?php echo ($current_speciality == 'Physiotherapist') ? 'selected' : ''; ?>>Physiotherapist</option>
-													<option value="Pulmonologist" <?php echo ($current_speciality == 'Pulmonologist') ? 'selected' : ''; ?>>Pulmonologist</option>
-													<option value="Nephrologist" <?php echo ($current_speciality == 'Nephrologist') ? 'selected' : ''; ?>>Nephrologist</option>
-													<option value="Oncologist" <?php echo ($current_speciality == 'Oncologist') ? 'selected' : ''; ?>>Oncologist</option>
-													<option value="Sexologist" <?php echo ($current_speciality == 'Sexologist') ? 'selected' : ''; ?>>Sexologist</option>
-													<option value="Rheumatologist" <?php echo ($current_speciality == 'Rheumatologist') ? 'selected' : ''; ?>>Rheumatologist</option>
-													<option value="Allergist/Immunologist" <?php echo ($current_speciality == 'Allergist/Immunologist') ? 'selected' : ''; ?>>Allergist/Immunologist</option>
-													<option value="Ophthalmologist" <?php echo ($current_speciality == 'Ophthalmologist') ? 'selected' : ''; ?>>Ophthalmologist</option>
-													<option value="Psychologist" <?php echo ($current_speciality == 'Psychologist') ? 'selected' : ''; ?>>Psychologist</option>
-													<option value="Internal Medicine" <?php echo ($current_speciality == 'Internal Medicine') ? 'selected' : ''; ?>>Internal Medicine</option>
-													<option value="Family Medicine" <?php echo ($current_speciality == 'Family Medicine') ? 'selected' : ''; ?>>Family Medicine</option>
-													<option value="Physical Medicine" <?php echo ($current_speciality == 'Physical Medicine') ? 'selected' : ''; ?>>Physical Medicine</option>
-												</select>
+												<label class="form-label">Speciality <small class="text-muted">(Select multiple)</small></label>
+												<?php 
+												// Get the current selected specialities (check both specialty and speciality fields)
+												$current_speciality_str = !empty($doctor['speciality']) ? $doctor['speciality'] : (!empty($doctor['specialty']) ? $doctor['specialty'] : '');
+												// Parse comma-separated specialities into an array
+												$selected_specialities = [];
+												if (!empty($current_speciality_str)) {
+													$selected_specialities = array_map('trim', explode(',', $current_speciality_str));
+												}
+												
+												// Define all available specialities
+												$all_specialities = [
+													'General Physician', 'Pediatrician', 'Gynecologist', 'Dermatologist', 'ENT Specialist',
+													'Psychiatrist', 'Diabetologist', 'Cardiologist', 'Neurologist', 'Orthopedic Specialist',
+													'Urologist', 'Gastroenterologist', 'Physiotherapist', 'Pulmonologist', 'Nephrologist',
+													'Oncologist', 'Sexologist', 'Rheumatologist', 'Allergist/Immunologist', 'Ophthalmologist',
+													'Psychologist', 'Internal Medicine', 'Family Medicine', 'Physical Medicine'
+												];
+												?>
+												<div class="speciality-checkboxes" style="max-height: 200px; overflow-y: auto; border: 1px solid #ddd; border-radius: 4px; padding: 10px; background-color: #f9f9f9;">
+													<?php foreach ($all_specialities as $spec): ?>
+														<div class="form-check mb-2">
+															<input class="form-check-input speciality-checkbox" type="checkbox" name="speciality[]" value="<?php echo htmlspecialchars($spec); ?>" id="speciality-<?php echo str_replace([' ', '/'], ['-', '-'], strtolower($spec)); ?>" <?php echo in_array($spec, $selected_specialities) ? 'checked' : ''; ?>>
+															<label class="form-check-label" for="speciality-<?php echo str_replace([' ', '/'], ['-', '-'], strtolower($spec)); ?>">
+																<?php echo htmlspecialchars($spec); ?>
+															</label>
+														</div>
+													<?php endforeach; ?>
+												</div>
 											</div>
 										</div>
 										<div class="col-lg-6 col-md-6">

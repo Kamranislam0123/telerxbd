@@ -50,7 +50,17 @@ try {
             $currently_working = isset($_POST['currently_working']) ? trim($_POST['currently_working']) : '';
             $bmdc_no = isset($_POST['bmdc_no']) ? trim($_POST['bmdc_no']) : '';
             $department = isset($_POST['department']) ? trim($_POST['department']) : '';
-            $speciality = isset($_POST['speciality']) ? trim($_POST['speciality']) : '';
+            // Handle multiple specialities (array from checkboxes)
+            $speciality = '';
+            if (isset($_POST['speciality']) && is_array($_POST['speciality'])) {
+                // Filter out empty values and trim each speciality
+                $specialities_array = array_filter(array_map('trim', $_POST['speciality']));
+                // Join with comma
+                $speciality = implode(', ', $specialities_array);
+            } elseif (isset($_POST['speciality'])) {
+                // Fallback for single speciality (if someone submits as string)
+                $speciality = trim($_POST['speciality']);
+            }
             $present_address = isset($_POST['present_address']) ? trim($_POST['present_address']) : '';
             $experience_years = isset($_POST['experience_years']) ? (int)$_POST['experience_years'] : 0;
             $bio = isset($_POST['bio']) ? trim($_POST['bio']) : '';
@@ -245,7 +255,17 @@ try {
             $last_name = isset($_POST['last_name']) ? trim($_POST['last_name']) : '';
             $display_name = isset($_POST['display_name']) ? trim($_POST['display_name']) : '';
             $designation = isset($_POST['designation']) ? trim($_POST['designation']) : '';
-            $speciality = isset($_POST['speciality']) ? trim($_POST['speciality']) : '';
+            // Handle multiple specialities (array from checkboxes)
+            $speciality = '';
+            if (isset($_POST['speciality']) && is_array($_POST['speciality'])) {
+                // Filter out empty values and trim each speciality
+                $specialities_array = array_filter(array_map('trim', $_POST['speciality']));
+                // Join with comma
+                $speciality = implode(', ', $specialities_array);
+            } elseif (isset($_POST['speciality'])) {
+                // Fallback for single speciality (if someone submits as string)
+                $speciality = trim($_POST['speciality']);
+            }
             $gender = isset($_POST['gender']) ? $_POST['gender'] : '';
             $experience = isset($_POST['experience']) ? (int)$_POST['experience'] : 0;
             $bio = isset($_POST['bio']) ? trim($_POST['bio']) : '';
