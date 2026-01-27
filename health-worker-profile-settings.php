@@ -41,26 +41,21 @@ try {
 
     $healthcare = $result->fetch_assoc();
 
-    // Generate TID if it doesn't exist
+    // Generate TID if it doesn't exist (Format: T1001, T1002, T1003...)
     if (empty($healthcare['tid'])) {
-        $date_prefix = date('Ymd');
-        $tid_counter = 1;
-        
-        // Find the highest TID for today
-        $tid_check = $conn->query("SELECT tid FROM healthcare_providers WHERE tid LIKE 'TEL-{$date_prefix}-%' ORDER BY tid DESC LIMIT 1");
-        if ($tid_check && $tid_check->num_rows > 0) {
-            $last_tid = $tid_check->fetch_assoc()['tid'];
-            $last_counter = (int)substr($last_tid, -4);
-            $tid_counter = $last_counter + 1;
+        $tid_res = $conn->query("SELECT COALESCE(MAX(CAST(SUBSTRING(tid, 2) AS UNSIGNED)), 1000) + 1 AS next_num FROM healthcare_providers WHERE tid REGEXP '^T[0-9]+\$'");
+        $next_num = 1001;
+        if ($tid_res && $row = $tid_res->fetch_assoc()) {
+            $next_num = (int) $row['next_num'];
         }
-        $tid = 'TEL-' . $date_prefix . '-' . str_pad($tid_counter, 4, '0', STR_PAD_LEFT);
-        
+        $tid = 'T' . $next_num;
+
         // Update the healthcare provider with TID
         $update_stmt = $conn->prepare("UPDATE healthcare_providers SET tid = ? WHERE id = ?");
         $update_stmt->bind_param("si", $tid, $healthcare_id);
         $update_stmt->execute();
         $update_stmt->close();
-        
+
         $healthcare['tid'] = $tid;
     }
 
@@ -327,6 +322,50 @@ try {
 									</div>
 								</div>
 
+								<!-- Family Members -->
+								<?php
+								$family_list = [];
+								if (!empty($healthcare['family_members'])) {
+									$dec = json_decode($healthcare['family_members'], true);
+									if (is_array($dec)) $family_list = $dec;
+								}
+								if (empty($family_list)) $family_list = [['relation' => '', 'name' => '', 'nid' => '']];
+								?>
+								<div class="setting-title">
+									<h5>Family Members</h5>
+								</div>
+								<div class="setting-card">
+									<div id="family-members-container">
+										<?php foreach ($family_list as $idx => $fm): ?>
+										<div class="family-member-row row align-items-end mb-2">
+											<div class="col-md-3 col-6">
+												<label class="form-label">Relation</label>
+												<select class="form-control" name="family_relation[]">
+													<option value="">Select</option>
+													<option value="Father" <?php echo (($fm['relation'] ?? '') === 'Father') ? 'selected' : ''; ?>>Father</option>
+													<option value="Mother" <?php echo (($fm['relation'] ?? '') === 'Mother') ? 'selected' : ''; ?>>Mother</option>
+													<option value="Sister" <?php echo (($fm['relation'] ?? '') === 'Sister') ? 'selected' : ''; ?>>Sister</option>
+													<option value="Wife" <?php echo (($fm['relation'] ?? '') === 'Wife') ? 'selected' : ''; ?>>Wife</option>
+												</select>
+											</div>
+											<div class="col-md-3 col-6">
+												<label class="form-label">Name</label>
+												<input type="text" class="form-control" name="family_name[]" value="<?php echo htmlspecialchars($fm['name'] ?? ''); ?>" placeholder="Name">
+											</div>
+											<div class="col-md-3 col-6">
+												<label class="form-label">NID</label>
+												<input type="text" class="form-control" name="family_nid[]" value="<?php echo htmlspecialchars($fm['nid'] ?? ''); ?>" placeholder="NID">
+											</div>
+											<div class="col-md-3 col-6 d-flex align-items-end gap-1 pb-1">
+												<button type="button" class="btn btn-outline-primary btn-sm btn-add-family" title="Add more"><i class="fa-solid fa-plus"></i></button>
+												<button type="button" class="btn btn-outline-danger btn-sm btn-remove-family" title="Remove"><i class="fa-solid fa-minus"></i></button>
+											</div>
+										</div>
+										<?php endforeach; ?>
+									</div>
+									<p class="form-text text-muted mb-0">Add your family members. Use the <i class="fa-solid fa-plus"></i> icon to add more.</p>
+								</div>
+
 								<!-- File Uploads -->
 								<div class="setting-title">
 									<h5>Document Uploads</h5>
@@ -443,6 +482,25 @@ try {
 		<!-- Profile Settings Form Handler -->
 		<script>
 		$(document).ready(function() {
+			// Family members: add row
+			$(document).on('click', '.btn-add-family', function() {
+				var $first = $('.family-member-row').first();
+				var $clone = $first.clone();
+				$clone.find('select').val('');
+				$clone.find('input[type="text"]').val('');
+				$('#family-members-container').append($clone);
+				$('.btn-remove-family').show();
+			});
+
+			// Family members: remove row (keep at least one)
+			$(document).on('click', '.btn-remove-family', function() {
+				if ($('.family-member-row').length > 1) {
+					$(this).closest('.family-member-row').remove();
+					if ($('.family-member-row').length === 1) $('.btn-remove-family').hide();
+				}
+			});
+			if ($('.family-member-row').length === 1) $('.btn-remove-family').hide();
+
 			// Handle profile settings form submissions
 			$('form[action="php/save-healthcare-profile-settings.php"]').on('submit', function(e) {
 				e.preventDefault();

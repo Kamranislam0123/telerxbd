@@ -823,7 +823,16 @@ try {
 																			<i class="isax isax-tick-circle5 text-success ms-2"></i>
 																		</h6>
 																		<p class="mb-2">
-																			<?php echo htmlspecialchars($doctor['specialty'] ?? 'Medical Doctor'); ?>
+																			<?php 
+																			// Display multiple specialities
+																			$speciality_display = $doctor['specialty'] ?? 'Medical Doctor';
+																			if (!empty($speciality_display)) {
+																				$specialities_array = array_map('trim', explode(',', $speciality_display));
+																				echo htmlspecialchars(implode(', ', $specialities_array));
+																			} else {
+																				echo 'Medical Doctor';
+																			}
+																			?>
 																		</p>
 																		<p class="d-flex align-items-center mb-0 fs-14">
 																			<i class="isax isax-location me-2"></i>
@@ -1176,11 +1185,34 @@ try {
 			
 			// Filter doctors based on selected specialities
 			$('.doctor-list-card').each(function() {
-				var doctorSpeciality = $(this).data('speciality') || 'General Physician';
-				doctorSpeciality = doctorSpeciality.trim();
+				var doctorSpecialityStr = $(this).data('speciality') || 'General Physician';
+				doctorSpecialityStr = doctorSpecialityStr.trim();
 				
-				// Check if doctor's speciality matches any selected speciality
-				if (selectedSpecialities.indexOf(doctorSpeciality) !== -1) {
+				// Split doctor's specialities by comma (handle multiple specialities)
+				var doctorSpecialities = [];
+				if (doctorSpecialityStr) {
+					doctorSpecialities = doctorSpecialityStr.split(',').map(function(s) {
+						return s.trim();
+					}).filter(function(s) {
+						return s.length > 0;
+					});
+				}
+				
+				// If doctor has no specialities, use default
+				if (doctorSpecialities.length === 0) {
+					doctorSpecialities = ['General Physician'];
+				}
+				
+				// Check if any of the doctor's specialities match any selected speciality
+				var matches = false;
+				for (var i = 0; i < doctorSpecialities.length; i++) {
+					if (selectedSpecialities.indexOf(doctorSpecialities[i]) !== -1) {
+						matches = true;
+						break;
+					}
+				}
+				
+				if (matches) {
 					$(this).fadeIn(300);
 				} else {
 					$(this).fadeOut(300);

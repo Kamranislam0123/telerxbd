@@ -246,27 +246,20 @@ try {
             break;
 
         case 'healthcare':
-            // Generate TID (TeleRx ID) - Format: TEL-YYYYMMDD-XXXX (e.g., TEL-20250124-0001)
-            $date_prefix = date('Ymd');
-            $tid_counter = 1;
-            $tid = '';
-            
-            // Find the highest TID for today
-            $tid_check = $conn->query("SELECT tid FROM healthcare_providers WHERE tid LIKE 'TEL-{$date_prefix}-%' ORDER BY tid DESC LIMIT 1");
-            if ($tid_check && $tid_check->num_rows > 0) {
-                $last_tid = $tid_check->fetch_assoc()['tid'];
-                $last_counter = (int)substr($last_tid, -4);
-                $tid_counter = $last_counter + 1;
-            }
-            $tid = 'TEL-' . $date_prefix . '-' . str_pad($tid_counter, 4, '0', STR_PAD_LEFT);
-            
-            // Check if phone column exists
+            // Check if phone and tid columns exist
             $columns_check = $conn->query("SHOW COLUMNS FROM healthcare_providers LIKE 'phone'");
             $has_phone = $columns_check && $columns_check->num_rows > 0;
-            
-            // Check if tid column exists
             $tid_check_col = $conn->query("SHOW COLUMNS FROM healthcare_providers LIKE 'tid'");
             $has_tid = $tid_check_col && $tid_check_col->num_rows > 0;
+
+            // Generate TID (TeleRx ID) - Format: T1001, T1002, T1003... (only when tid column exists)
+            $tid = 'T1001';
+            if ($has_tid) {
+                $tid_res = $conn->query("SELECT COALESCE(MAX(CAST(SUBSTRING(tid, 2) AS UNSIGNED)), 1000) + 1 AS next_num FROM healthcare_providers WHERE tid REGEXP '^T[0-9]+\$'");
+                if ($tid_res && $row = $tid_res->fetch_assoc()) {
+                    $tid = 'T' . (int) $row['next_num'];
+                }
+            }
             
             if ($has_phone && $has_tid) {
                 $stmt = $conn->prepare("INSERT INTO healthcare_providers (name, email, phone, nid_number, password, tid) VALUES (?, ?, ?, ?, ?, ?)");
