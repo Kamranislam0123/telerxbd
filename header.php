@@ -91,8 +91,8 @@
                     <ul class="main-nav">
                         <li><a href="/">Home</a></li>
                         <li><a href="search-2.php">Our Doctors</a></li>
-                        <li><a href="about-us.html">About Us</a></li>
-                        <li><a href="contact-us.html">Contact</a></li>
+                        <li><a href="about-us.php">About Us</a></li>
+                        <li><a href="contact-us.php">Contact</a></li>
                         <li><a href="blog-grid.html">Blog</a></li>
                         <li class="login-link"><a href="login.html">Login / Signup</a></li>
                     </ul>
@@ -108,4 +108,7 @@
             </nav>
         </div>
     </header>
+    <div class="header-margin"></div>
     <!-- /Header -->
+
+</body>

@@ -145,8 +145,8 @@ try {
 									<a href="index.html">Home</a>
 								</li>
 								<li><a href="search-2.php">Doctor List</a></li>
-								<li><a href="about-us.html">About Us</a></li>
-								<li><a href="contact-us.html">Contact</a></li>
+								<li><a href="about-us.php">About Us</a></li>
+								<li><a href="contact-us.php">Contact</a></li>
 								<li class="login-link"><a href="php/logout.php">Logout</a></li>
 							</ul>
 						</div>
@@ -442,7 +442,7 @@ try {
 										<div class="footer-widget footer-menu">
 											<h6 class="footer-title">Company</h6>
 											<ul>
-												<li><a href="about-us.html">About</a></li>
+												<li><a href="about-us.php">About</a></li>
 												<li><a href="search.php">Features</a></li>
 											</ul>
 										</div>
