@@ -21,3 +21,8 @@
 [27-Jan-2026 09:52:05 Asia/Dhaka] Registration attempt - User type: healthcare, Name: GOLAM, Email: g.mohammad52932@gmail.com, Phone: provided, NID: provided
 [27-Jan-2026 10:03:38 Asia/Dhaka] Profile image upload errors for doctor 15: File too large. Maximum size is 4MB.
 [27-Jan-2026 10:03:38 Asia/Dhaka] Profile image upload errors for doctor 15: File too large. Maximum size is 4MB.
+[31-Jan-2026 09:39:00 Asia/Dhaka] Registration attempt - User type: healthcare, Name: Mehedi Hassan, Email: aerialhassan@gmail.com, Phone: provided, NID: provided
+[31-Jan-2026 10:10:36 Asia/Dhaka] Registration attempt - User type: healthcare, Name: golam, Email: g.mohammad652932@gmail.com, Phone: provided, NID: provided
+[31-Jan-2026 10:13:07 Asia/Dhaka] Registration attempt - User type: patient, Name: golam, Email: g.mohammad652932@gmail.com, Phone: empty, NID: empty
+[31-Jan-2026 10:13:21 Asia/Dhaka] Registration attempt - User type: patient, Name: golam, Email: golammohammaad@gmail.com, Phone: empty, NID: empty
+[31-Jan-2026 10:14:13 Asia/Dhaka] Registration attempt - User type: patient, Name: nahid, Email: nuharat.nahid@gmail.com, Phone: empty, NID: empty
