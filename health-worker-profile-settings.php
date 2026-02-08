@@ -145,8 +145,8 @@ try {
 									<a href="index.html">Home</a>
 								</li>
 								<li><a href="search-2.php">Doctor List</a></li>
-								<li><a href="about-us.html">About Us</a></li>
-								<li><a href="contact-us.html">Contact</a></li>
+								<li><a href="about-us.php">About Us</a></li>
+								<li><a href="contact-us.php">Contact</a></li>
 								<li class="login-link"><a href="php/logout.php">Logout</a></li>
 							</ul>
 						</div>
@@ -319,6 +319,86 @@ try {
 												<input type="text" class="form-control" name="present_address" value="<?php echo htmlspecialchars($healthcare['present_address'] ?? ''); ?>" placeholder="Your current address">
 											</div>
 										</div>
+										<div class="col-lg-6 col-md-6">
+											<div class="form-wrap">
+												<label class="form-label">District</label>
+												<select class="form-control" name="district">
+													<option value="">Select District</option>
+													<option value="Bagerhat" <?php echo (isset($healthcare['district']) && $healthcare['district'] == 'Bagerhat') ? 'selected' : ''; ?>>Bagerhat</option>
+													<option value="Bandarban" <?php echo (isset($healthcare['district']) && $healthcare['district'] == 'Bandarban') ? 'selected' : ''; ?>>Bandarban</option>
+													<option value="Barguna" <?php echo (isset($healthcare['district']) && $healthcare['district'] == 'Barguna') ? 'selected' : ''; ?>>Barguna</option>
+													<option value="Barisal" <?php echo (isset($healthcare['district']) && $healthcare['district'] == 'Barisal') ? 'selected' : ''; ?>>Barisal</option>
+													<option value="Bhola" <?php echo (isset($healthcare['district']) && $healthcare['district'] == 'Bhola') ? 'selected' : ''; ?>>Bhola</option>
+													<option value="Bogra" <?php echo (isset($healthcare['district']) && $healthcare['district'] == 'Bogra') ? 'selected' : ''; ?>>Bogra</option>
+													<option value="Brahmanbaria" <?php echo (isset($healthcare['district']) && $healthcare['district'] == 'Brahmanbaria') ? 'selected' : ''; ?>>Brahmanbaria</option>
+													<option value="Chandpur" <?php echo (isset($healthcare['district']) && $healthcare['district'] == 'Chandpur') ? 'selected' : ''; ?>>Chandpur</option>
+													<option value="Chapai Nawabganj" <?php echo (isset($healthcare['district']) && $healthcare['district'] == 'Chapai Nawabganj') ? 'selected' : ''; ?>>Chapai Nawabganj</option>
+													<option value="Chattogram" <?php echo (isset($healthcare['district']) && $healthcare['district'] == 'Chattogram') ? 'selected' : ''; ?>>Chattogram</option>
+													<option value="Chuadanga" <?php echo (isset($healthcare['district']) && $healthcare['district'] == 'Chuadanga') ? 'selected' : ''; ?>>Chuadanga</option>
+													<option value="Comilla" <?php echo (isset($healthcare['district']) && $healthcare['district'] == 'Comilla') ? 'selected' : ''; ?>>Comilla</option>
+													<option value="Cox's Bazar" <?php echo (isset($healthcare['district']) && $healthcare['district'] == "Cox's Bazar") ? 'selected' : ''; ?>>Cox's Bazar</option>
+													<option value="Dhaka" <?php echo (isset($healthcare['district']) && $healthcare['district'] == 'Dhaka') ? 'selected' : ''; ?>>Dhaka</option>
+													<option value="Dinajpur" <?php echo (isset($healthcare['district']) && $healthcare['district'] == 'Dinajpur') ? 'selected' : ''; ?>>Dinajpur</option>
+													<option value="Faridpur" <?php echo (isset($healthcare['district']) && $healthcare['district'] == 'Faridpur') ? 'selected' : ''; ?>>Faridpur</option>
+													<option value="Feni" <?php echo (isset($healthcare['district']) && $healthcare['district'] == 'Feni') ? 'selected' : ''; ?>>Feni</option>
+													<option value="Gaibandha" <?php echo (isset($healthcare['district']) && $healthcare['district'] == 'Gaibandha') ? 'selected' : ''; ?>>Gaibandha</option>
+													<option value="Gazipur" <?php echo (isset($healthcare['district']) && $healthcare['district'] == 'Gazipur') ? 'selected' : ''; ?>>Gazipur</option>
+													<option value="Gopalganj" <?php echo (isset($healthcare['district']) && $healthcare['district'] == 'Gopalganj') ? 'selected' : ''; ?>>Gopalganj</option>
+													<option value="Habiganj" <?php echo (isset($healthcare['district']) && $healthcare['district'] == 'Habiganj') ? 'selected' : ''; ?>>Habiganj</option>
+													<option value="Jamalpur" <?php echo (isset($healthcare['district']) && $healthcare['district'] == 'Jamalpur') ? 'selected' : ''; ?>>Jamalpur</option>
+													<option value="Jessore" <?php echo (isset($healthcare['district']) && $healthcare['district'] == 'Jessore') ? 'selected' : ''; ?>>Jessore</option>
+													<option value="Jhalokati" <?php echo (isset($healthcare['district']) && $healthcare['district'] == 'Jhalokati') ? 'selected' : ''; ?>>Jhalokati</option>
+													<option value="Jhenaidah" <?php echo (isset($healthcare['district']) && $healthcare['district'] == 'Jhenaidah') ? 'selected' : ''; ?>>Jhenaidah</option>
+													<option value="Joypurhat" <?php echo (isset($healthcare['district']) && $healthcare['district'] == 'Joypurhat') ? 'selected' : ''; ?>>Joypurhat</option>
+													<option value="Khagrachari" <?php echo (isset($healthcare['district']) && $healthcare['district'] == 'Khagrachari') ? 'selected' : ''; ?>>Khagrachari</option>
+													<option value="Khulna" <?php echo (isset($healthcare['district']) && $healthcare['district'] == 'Khulna') ? 'selected' : ''; ?>>Khulna</option>
+													<option value="Kishoreganj" <?php echo (isset($healthcare['district']) && $healthcare['district'] == 'Kishoreganj') ? 'selected' : ''; ?>>Kishoreganj</option>
+													<option value="Kurigram" <?php echo (isset($healthcare['district']) && $healthcare['district'] == 'Kurigram') ? 'selected' : ''; ?>>Kurigram</option>
+													<option value="Kushtia" <?php echo (isset($healthcare['district']) && $healthcare['district'] == 'Kushtia') ? 'selected' : ''; ?>>Kushtia</option>
+													<option value="Lakshmipur" <?php echo (isset($healthcare['district']) && $healthcare['district'] == 'Lakshmipur') ? 'selected' : ''; ?>>Lakshmipur</option>
+													<option value="Lalmonirhat" <?php echo (isset($healthcare['district']) && $healthcare['district'] == 'Lalmonirhat') ? 'selected' : ''; ?>>Lalmonirhat</option>
+													<option value="Madaripur" <?php echo (isset($healthcare['district']) && $healthcare['district'] == 'Madaripur') ? 'selected' : ''; ?>>Madaripur</option>
+													<option value="Magura" <?php echo (isset($healthcare['district']) && $healthcare['district'] == 'Magura') ? 'selected' : ''; ?>>Magura</option>
+													<option value="Manikganj" <?php echo (isset($healthcare['district']) && $healthcare['district'] == 'Manikganj') ? 'selected' : ''; ?>>Manikganj</option>
+													<option value="Meherpur" <?php echo (isset($healthcare['district']) && $healthcare['district'] == 'Meherpur') ? 'selected' : ''; ?>>Meherpur</option>
+													<option value="Moulvibazar" <?php echo (isset($healthcare['district']) && $healthcare['district'] == 'Moulvibazar') ? 'selected' : ''; ?>>Moulvibazar</option>
+													<option value="Munshiganj" <?php echo (isset($healthcare['district']) && $healthcare['district'] == 'Munshiganj') ? 'selected' : ''; ?>>Munshiganj</option>
+													<option value="Mymensingh" <?php echo (isset($healthcare['district']) && $healthcare['district'] == 'Mymensingh') ? 'selected' : ''; ?>>Mymensingh</option>
+													<option value="Naogaon" <?php echo (isset($healthcare['district']) && $healthcare['district'] == 'Naogaon') ? 'selected' : ''; ?>>Naogaon</option>
+													<option value="Narail" <?php echo (isset($healthcare['district']) && $healthcare['district'] == 'Narail') ? 'selected' : ''; ?>>Narail</option>
+													<option value="Narayanganj" <?php echo (isset($healthcare['district']) && $healthcare['district'] == 'Narayanganj') ? 'selected' : ''; ?>>Narayanganj</option>
+													<option value="Narsingdi" <?php echo (isset($healthcare['district']) && $healthcare['district'] == 'Narsingdi') ? 'selected' : ''; ?>>Narsingdi</option>
+													<option value="Natore" <?php echo (isset($healthcare['district']) && $healthcare['district'] == 'Natore') ? 'selected' : ''; ?>>Natore</option>
+													<option value="Nawabganj" <?php echo (isset($healthcare['district']) && $healthcare['district'] == 'Nawabganj') ? 'selected' : ''; ?>>Nawabganj</option>
+													<option value="Netrakona" <?php echo (isset($healthcare['district']) && $healthcare['district'] == 'Netrakona') ? 'selected' : ''; ?>>Netrakona</option>
+													<option value="Nilphamari" <?php echo (isset($healthcare['district']) && $healthcare['district'] == 'Nilphamari') ? 'selected' : ''; ?>>Nilphamari</option>
+													<option value="Noakhali" <?php echo (isset($healthcare['district']) && $healthcare['district'] == 'Noakhali') ? 'selected' : ''; ?>>Noakhali</option>
+													<option value="Pabna" <?php echo (isset($healthcare['district']) && $healthcare['district'] == 'Pabna') ? 'selected' : ''; ?>>Pabna</option>
+													<option value="Panchagarh" <?php echo (isset($healthcare['district']) && $healthcare['district'] == 'Panchagarh') ? 'selected' : ''; ?>>Panchagarh</option>
+													<option value="Patuakhali" <?php echo (isset($healthcare['district']) && $healthcare['district'] == 'Patuakhali') ? 'selected' : ''; ?>>Patuakhali</option>
+													<option value="Pirojpur" <?php echo (isset($healthcare['district']) && $healthcare['district'] == 'Pirojpur') ? 'selected' : ''; ?>>Pirojpur</option>
+													<option value="Rajbari" <?php echo (isset($healthcare['district']) && $healthcare['district'] == 'Rajbari') ? 'selected' : ''; ?>>Rajbari</option>
+													<option value="Rajshahi" <?php echo (isset($healthcare['district']) && $healthcare['district'] == 'Rajshahi') ? 'selected' : ''; ?>>Rajshahi</option>
+													<option value="Rangamati" <?php echo (isset($healthcare['district']) && $healthcare['district'] == 'Rangamati') ? 'selected' : ''; ?>>Rangamati</option>
+													<option value="Rangpur" <?php echo (isset($healthcare['district']) && $healthcare['district'] == 'Rangpur') ? 'selected' : ''; ?>>Rangpur</option>
+													<option value="Satkhira" <?php echo (isset($healthcare['district']) && $healthcare['district'] == 'Satkhira') ? 'selected' : ''; ?>>Satkhira</option>
+													<option value="Shariatpur" <?php echo (isset($healthcare['district']) && $healthcare['district'] == 'Shariatpur') ? 'selected' : ''; ?>>Shariatpur</option>
+													<option value="Sherpur" <?php echo (isset($healthcare['district']) && $healthcare['district'] == 'Sherpur') ? 'selected' : ''; ?>>Sherpur</option>
+													<option value="Sirajganj" <?php echo (isset($healthcare['district']) && $healthcare['district'] == 'Sirajganj') ? 'selected' : ''; ?>>Sirajganj</option>
+													<option value="Sunamganj" <?php echo (isset($healthcare['district']) && $healthcare['district'] == 'Sunamganj') ? 'selected' : ''; ?>>Sunamganj</option>
+													<option value="Sylhet" <?php echo (isset($healthcare['district']) && $healthcare['district'] == 'Sylhet') ? 'selected' : ''; ?>>Sylhet</option>
+													<option value="Tangail" <?php echo (isset($healthcare['district']) && $healthcare['district'] == 'Tangail') ? 'selected' : ''; ?>>Tangail</option>
+													<option value="Thakurgaon" <?php echo (isset($healthcare['district']) && $healthcare['district'] == 'Thakurgaon') ? 'selected' : ''; ?>>Thakurgaon</option>
+												</select>
+											</div>
+										</div>
+										<div class="col-lg-6 col-md-6">
+											<div class="form-wrap">
+												<label class="form-label">NID Number</label>
+												<input type="text" class="form-control" name="nid_number" id="nid_number" value="<?php echo htmlspecialchars($healthcare['nid_number'] ?? ''); ?>" placeholder="Enter your 10, 13, or 17 digit NID number" pattern="[0-9]{10}|[0-9]{13}|[0-9]{17}" title="NID must be 10, 13, or 17 digits" required>
+												<small class="form-text text-muted">Must be 10, 13, or 17 digits</small>
+											</div>
+										</div>
 									</div>
 								</div>
 
@@ -442,7 +522,7 @@ try {
 										<div class="footer-widget footer-menu">
 											<h6 class="footer-title">Company</h6>
 											<ul>
-												<li><a href="about-us.html">About</a></li>
+												<li><a href="about-us.php">About</a></li>
 												<li><a href="search.php">Features</a></li>
 											</ul>
 										</div>
@@ -501,6 +581,22 @@ try {
 			});
 			if ($('.family-member-row').length === 1) $('.btn-remove-family').hide();
 
+			// NID number real-time validation
+			$('input[name="nid_number"]').on('input', function() {
+				var nid = $(this).val().trim();
+				var isValid = nid === '' || /^[0-9]{10}$|^[0-9]{13}$|^[0-9]{17}$/.test(nid);
+				
+				if (nid !== '' && !isValid) {
+					$(this).addClass('is-invalid');
+					if ($(this).next('.invalid-feedback').length === 0) {
+						$(this).after('<div class="invalid-feedback">NID must be 10, 13, or 17 digits</div>');
+					}
+				} else {
+					$(this).removeClass('is-invalid');
+					$(this).next('.invalid-feedback').remove();
+				}
+			});
+
 			// Handle profile settings form submissions
 			$('form[action="php/save-healthcare-profile-settings.php"]').on('submit', function(e) {
 				e.preventDefault();
@@ -508,6 +604,15 @@ try {
 				var form = $(this);
 				var submitBtn = form.find('button[type="submit"]');
 				var originalText = submitBtn.html();
+
+				// Validate NID number
+				var nidNumber = form.find('input[name="nid_number"]').val().trim();
+				if (nidNumber && !/^[0-9]{10}$|^[0-9]{13}$|^[0-9]{17}$/.test(nidNumber)) {
+					showAlert('danger', 'NID number must be exactly 10, 13, or 17 digits.');
+					submitBtn.prop('disabled', false).html(originalText);
+					form.find('input[name="nid_number"]').focus();
+					return false;
+				}
 
 				// Disable button and show loading
 				submitBtn.prop('disabled', true).html('<i class="fa fa-spinner fa-spin me-2"></i>Saving...');
