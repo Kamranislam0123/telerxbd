@@ -242,7 +242,8 @@
 													</div>
 													<div class="mb-3">
 														<label class="form-label">NID Number</label>
-														<input type="text" class="form-control" name="nid_number" id="health-worker-nid" placeholder="Enter your National ID number" required>
+														<input type="text" class="form-control" name="nid_number" id="health-worker-nid" placeholder="Enter your 10, 13, or 17 digit NID number" pattern="[0-9]{10}|[0-9]{13}|[0-9]{17}" title="NID must be 10, 13, or 17 digits" required>
+														<small class="form-text text-muted">Must be 10, 13, or 17 digits</small>
 													</div>
 													<div class="mb-3">
 														<div class="form-group-flex">
@@ -579,8 +580,8 @@
 				if (!phone || phone.replace(/\D/g, '').length < 10) {
 					clientErrors.push('Mobile number must contain at least 10 digits');
 				}
-				if (!nid_number || nid_number.length < 10) {
-					clientErrors.push('NID number must be at least 10 characters');
+				if (!nid_number || !/^[0-9]{10}$|^[0-9]{13}$|^[0-9]{17}$/.test(nid_number)) {
+					clientErrors.push('NID number must be exactly 10, 13, or 17 digits');
 				}
 				if (!password || password.length < 6) {
 					clientErrors.push('Password must be at least 6 characters');

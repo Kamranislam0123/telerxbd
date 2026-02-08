@@ -97,8 +97,8 @@ switch ($user_type) {
         
         if (empty($nid_number) || strlen(trim($nid_number)) == 0) {
             $errors[] = 'NID number is required';
-        } elseif (strlen(trim($nid_number)) < 10) {
-            $errors[] = 'NID number must be at least 10 characters';
+        } elseif (!preg_match('/^[0-9]{10}$|^[0-9]{13}$|^[0-9]{17}$/', trim($nid_number))) {
+            $errors[] = 'NID number must be exactly 10, 13, or 17 digits';
         }
         break;
 
