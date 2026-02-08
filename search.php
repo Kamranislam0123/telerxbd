@@ -134,8 +134,8 @@ try {
 								<li><a href="search.php">Doctor List</a></li>
 								<li><a href="search-2.php">Doctor List</a></li>
 								<li><a href="doctor-profile.php">Doctor Profile</a></li>
-								<li><a href="about-us.html">About Us</a></li>
-								<li><a href="contact-us.html">Contact</a></li>
+								<li><a href="about-us.php">About Us</a></li>
+								<li><a href="contact-us.php">Contact</a></li>
 								<li><a href="blog-grid.html">Blog</a></li>
 								<li class="login-link"><a href="login.html">Login / Signup</a></li>
 							</ul>
@@ -394,7 +394,7 @@ try {
 										<div class="footer-widget footer-menu">
 											<h6 class="footer-title">Company</h6>
 											<ul>
-												<li><a href="about-us.html">About</a></li>
+												<li><a href="about-us.php">About</a></li>
 												<li><a href="search.php">Features</a></li>
 												<li><a href="javascript:void(0);">Works</a></li>
 												<li><a href="javascript:void(0);">Careers</a></li>
@@ -431,8 +431,8 @@ try {
 											<h6 class="footer-title">Utilites</h6>
 											<ul>
 												<li><a href="pricing.html">Pricing</a></li>
-												<li><a href="contact-us.html">Contact</a></li>
-												<li><a href="contact-us.html">Request A Quote</a></li>
+												<li><a href="contact-us.php">Contact</a></li>
+												<li><a href="contact-us.php">Request A Quote</a></li>
 												<li><a href="javascript:void(0);">Premium Membership</a></li>
 												<li><a href="javascript:void(0);">Integrations</a></li>
 											</ul>

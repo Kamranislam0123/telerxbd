@@ -8611,6 +8611,11 @@ html.menu-opened body {
 }
 .header.home-head-one.header-fixed {
   background: #F6FAFF;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  z-index: 9999;
 }
 
 header.inner-header {
@@ -51803,7 +51808,7 @@ ul li {
 }
 
 .footer-twelve .footer-top-sec {
-  background: #3538CD;
+  background: #15558d;
   margin: 0;
   padding: 50px 0 30px;
 }
@@ -60568,6 +60573,9 @@ ul li {
 }
 .dark-mode .footer.footer-three.footer-ten .footer-contact-info .footer-address {
   border-color: #1B1B1B;
+}
+.header-margin {
+    margin-top: 60px;
 }
 
 /*# sourceMappingURL=custom.css.map */
