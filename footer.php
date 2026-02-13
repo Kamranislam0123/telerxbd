@@ -30,7 +30,7 @@
                                 <h4>TeleRx</h4>
                                 <ul>
                                     <li><a href="about-us.php">About Us</a></li>
-                                    <li><a href="blog-grid.php">Blogs</a></li>
+                                    <li><a href="blog.php">Blogs</a></li>
                                     <li><a href="javascript:void(0);">Careers</a></li>
                                     <li><a href="javascript:void(0);">Success Stories</a></li>
                                 </ul>

@@ -24,7 +24,7 @@ function isDoctorLoggedIn() {
  */
 function requireDoctorLogin() {
     if (!isDoctorLoggedIn()) {
-        header('Location: login.html');
+        header('Location: login.php');
         exit;
     }
 }

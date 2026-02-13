@@ -132,20 +132,20 @@ try {
 								<li class="has-submenu megamenu active">
 									<a href="index.html">Home </a></li>
 								<li><a href="search.php">Doctor List</a></li>
-								<li><a href="search-2.php">Doctor List</a></li>
+								<li><a href="doctors.php">Doctor List</a></li>
 								<li><a href="doctor-profile.php">Doctor Profile</a></li>
 								<li><a href="about-us.php">About Us</a></li>
 								<li><a href="contact-us.php">Contact</a></li>
-								<li><a href="blog-grid.html">Blog</a></li>
-								<li class="login-link"><a href="login.html">Login / Signup</a></li>
+								<li><a href="blog.php">Blog</a></li>
+								<li class="login-link"><a href="login.php">Login / Signup</a></li>
 							</ul>
 						</div>
 						<ul class="nav header-navbar-rht">
 							<li class="register-btn">
-								<a href="register.html" class="btn btn-dark reg-btn"><i class="isax isax-user"></i>Register</a>
+								<a href="registration.php" class="btn btn-dark reg-btn"><i class="isax isax-user"></i>Register</a>
 							</li>
 							<li class="register-btn">
-								<a href="login.html" class="btn btn-primary log-btn"><i class="isax isax-lock"></i>Login</a>
+								<a href="login.php" class="btn btn-primary log-btn"><i class="isax isax-lock"></i>Login</a>
 							</li>
 						</ul>
 					</nav>
@@ -170,7 +170,7 @@ try {
 				</div>
 				<div class="bg-primary-gradient rounded-pill doctors-search-box">
 					<div class="search-box-one rounded-pill">
-						<form action="search-2.php"> 
+						<form action="doctors.php">
 							<div class="search-input search-line">
 								<i class="isax isax-hospital5 bficon"></i>
 								<div class=" mb-0">
@@ -374,7 +374,7 @@ try {
 					<?php endif; ?>
 					<div class="col-md-12">
 						<div class="text-center mb-4">
-							<a href="login.html" class="btn btn-md btn-primary-gradient d-inline-flex align-items-center rounded-pill">
+							<a href="login.php" class="btn btn-md btn-primary-gradient d-inline-flex align-items-center rounded-pill">
 								<i class="isax isax-d-cube-scan5 me-2"></i>
 								Load More <?php echo max(0, count($doctors) - 12); ?> Doctors
 							</a>

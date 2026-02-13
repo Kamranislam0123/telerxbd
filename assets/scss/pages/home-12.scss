@@ -2092,7 +2092,7 @@ ul {
 .footer-twelve {
     .footer-top-sec {
         background: variables.$indigo;
-        @include mixins.margin-padding(0,50px 0 30px);
+        @include mixins.margin-padding(0,30px 0 30px);
         .footer-top {
             @extend %flex__center;
             @extend %flex__between;

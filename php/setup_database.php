@@ -72,8 +72,8 @@ if (empty($errors)) {
     echo "   - Errors: 0\n";
     echo "\n🎉 Database setup completed successfully!\n";
     echo "\n📋 Next Steps:\n";
-    echo "   1. Test doctor registration at: register.html\n";
-    echo "   2. Test doctor login at: login.html\n";
+    echo "   1. Test doctor registration at: registration.php\n";
+    echo "   2. Test doctor login at: login.php\n";
     echo "   3. Sample accounts:\n";
     echo "      - Doctor: dr.rahman@telerx.com / password\n";
     echo "      - Doctor: dr.begum@telerx.com / password\n";

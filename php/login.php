@@ -64,7 +64,7 @@ try {
     $user_found = false;
     $user_data = null;
     $user_type = null;
-    $redirect_url = 'login.html';
+    $redirect_url = 'login.php';
     
     // Check doctors table
     $stmt = $conn->prepare("SELECT id, name, email, phone, bmdc_no, password FROM doctors WHERE email = ?");

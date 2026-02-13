@@ -7,14 +7,14 @@
 // Include configuration
 $config_path = __DIR__ . '/php/config.php';
 if (!file_exists($config_path)) {
-    header('Location: login.html');
+    header('Location: login.php');
     exit;
 }
 require_once $config_path;
 
 // Check if health-worker is logged in
 if (!isset($_SESSION['healthcare_id']) || !isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true) {
-    header('Location: login.html');
+    header('Location: login.php');
     exit;
 }
 
@@ -35,7 +35,7 @@ try {
     $result = $stmt->get_result();
 
     if ($result->num_rows == 0) {
-        header('Location: login.html');
+        header('Location: login.php');
         exit;
     }
 
@@ -72,7 +72,7 @@ try {
 
 } catch (Exception $e) {
     error_log("Health-worker profile settings error: " . $e->getMessage());
-    header('Location: login.html');
+    header('Location: login.php');
     exit;
 }
 ?>
@@ -144,7 +144,7 @@ try {
 								<li class="has-submenu megamenu active">
 									<a href="index.html">Home</a>
 								</li>
-								<li><a href="search-2.php">Doctor List</a></li>
+								<li><a href="doctors.php">Doctor List</a></li>
 								<li><a href="about-us.php">About Us</a></li>
 								<li><a href="contact-us.php">Contact</a></li>
 								<li class="login-link"><a href="php/logout.php">Logout</a></li>
@@ -176,31 +176,28 @@ try {
 					</nav>
 				</div>
 			</header>
-			<!-- /Header -->		
+			<!-- /Header -->
 
 			<!-- Breadcrumb -->
-			<div class="breadcrumb-bar">
-				<div class="container">
-					<div class="row align-items-center inner-banner">
-						<div class="col-md-12 col-12 text-center">
-							<nav aria-label="breadcrumb" class="page-breadcrumb">
-								<ol class="breadcrumb">
-									<h3><?php echo htmlspecialchars($healthcare['name']); ?></h3>
-								</ol>
-								<h2 class="breadcrumb-title">Profile Settings</h2>
-							</nav>
-						</div>
-					</div>
-				</div>
-				<div class="breadcrumb-bg">
-					<img src="assets/img/bg/breadcrumb-bg-01.png" alt="img" class="breadcrumb-bg-01">
-					<img src="assets/img/bg/breadcrumb-bg-02.png" alt="img" class="breadcrumb-bg-02">
-					<img src="assets/img/bg/breadcrumb-icon.png" alt="img" class="breadcrumb-bg-03">
-					<img src="assets/img/bg/breadcrumb-icon.png" alt="img" class="breadcrumb-bg-04">
-				</div>
-			</div>
-			<!-- /Breadcrumb -->
-			
+            <div class="breadcrumb-bar">
+                <div class="container">
+                    <div class="row align-items-center inner-banner">
+                        <div class="col-md-12 col-12 text-center">
+                            <nav aria-label="breadcrumb" class="page-breadcrumb">
+                                <h2 class="breadcrumb-title">About TeleRx Bangladesh</h2>
+                            </nav>
+                        </div>
+                    </div>
+                </div>
+                <div class="breadcrumb-bg">
+                    <img src="assets/img/bg/breadcrumb-bg-01.png" alt="img" class="breadcrumb-bg-01">
+                    <img src="assets/img/bg/breadcrumb-bg-02.png" alt="img" class="breadcrumb-bg-02">
+                    <img src="assets/img/bg/breadcrumb-icon.png" alt="img" class="breadcrumb-bg-03">
+                    <img src="assets/img/bg/breadcrumb-icon.png" alt="img" class="breadcrumb-bg-04">
+                </div>
+            </div>
+            <!-- /Breadcrumb -->
+
 			<!-- Page Content -->
 			<div class="content doctor-content">
 				<div class="container">
@@ -431,55 +428,8 @@ try {
 			</div>		
 			<!-- /Page Content -->
 
-			<!-- Footer Section -->
-			<footer class="footer inner-footer">
-				<div class="footer-top">
-					<div class="container">
-						<div class="row">
-							<div class="col-lg-8">
-								<div class="row">
-									<div class="col-lg-3 col-md-3">
-										<div class="footer-widget footer-menu">
-											<h6 class="footer-title">Company</h6>
-											<ul>
-												<li><a href="about-us.php">About</a></li>
-												<li><a href="search.php">Features</a></li>
-											</ul>
-										</div>
-									</div>
-								</div>
-							</div>
-						</div>
-					</div>
-				</div>
-				<div class="footer-bottom">
-					<div class="container">
-						<div class="copyright">
-							<div class="copyright-text">
-								<p class="mb-0">Copyright © 2026 TeleRx Bangladesh. All Rights Reserved</p>
-							</div>
-						</div>
-					</div>
-				</div>
-			</footer>
-			<!-- /Footer Section -->
 		</div>
-		<!-- /Main Wrapper -->
-	  
-		<!-- jQuery -->
-		<script src="assets/js/jquery-3.7.1.min.js"></script>
-		
-		<!-- Bootstrap Core JS -->
-		<script src="assets/js/bootstrap.bundle.min.js"></script>
-		
-		<!-- Sticky Sidebar JS -->
-        <script src="assets/plugins/theia-sticky-sidebar/ResizeSensor.js"></script>
-        <script src="assets/plugins/theia-sticky-sidebar/theia-sticky-sidebar.js"></script>
-		
-		<!-- Custom JS -->
-		<script src="assets/js/script.js"></script>
-
-		<!-- Profile Settings Form Handler -->
+<?php include 'footer.php'; ?>
 		<script>
 		$(document).ready(function() {
 			// Family members: add row

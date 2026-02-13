@@ -230,13 +230,13 @@ try {
 
     // Insert based on user type
     $user_id = null;
-    $redirect_url = 'login.html';
+    $redirect_url = 'login.php';
 
     switch ($user_type) {
         case 'patient':
             $stmt = $conn->prepare("INSERT INTO patients (name, email, password) VALUES (?, ?, ?)");
             $stmt->bind_param("sss", $name, $email, $hashed_password);
-            $redirect_url = 'login.html';
+            $redirect_url = 'login.php';
             break;
 
         case 'doctor':
