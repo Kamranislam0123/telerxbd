@@ -26,3 +26,7 @@
 [31-Jan-2026 10:13:07 Asia/Dhaka] Registration attempt - User type: patient, Name: golam, Email: g.mohammad652932@gmail.com, Phone: empty, NID: empty
 [31-Jan-2026 10:13:21 Asia/Dhaka] Registration attempt - User type: patient, Name: golam, Email: golammohammaad@gmail.com, Phone: empty, NID: empty
 [31-Jan-2026 10:14:13 Asia/Dhaka] Registration attempt - User type: patient, Name: nahid, Email: nuharat.nahid@gmail.com, Phone: empty, NID: empty
+[14-Feb-2026 06:56:19 UTC] PHP Parse error:  syntax error, unexpected '<<' (T_SL), expecting end of file in /home/telerxb2/public_html/php/config.php on line 15
+[14-Feb-2026 06:57:32 UTC] PHP Parse error:  syntax error, unexpected '<<' (T_SL), expecting end of file in /home/telerxb2/public_html/php/config.php on line 15
+[14-Feb-2026 06:57:41 UTC] PHP Parse error:  syntax error, unexpected '<<' (T_SL), expecting end of file in /home/telerxb2/public_html/php/config.php on line 15
+[14-Feb-2026 07:04:26 UTC] PHP Parse error:  syntax error, unexpected '<<' (T_SL), expecting end of file in /home/telerxb2/public_html/php/config.php on line 15
