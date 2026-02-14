@@ -112,13 +112,13 @@ try {
             <div class="row align-items-center inner-banner">
                 <div class="col-md-12 col-12 text-center">
                     <nav aria-label="breadcrumb" class="page-breadcrumb">
-                        <h2 class="breadcrumb-title">Doctor List</h2>
+                        <h2 class="breadcrumb-title">Our Doctors</h2>
                     </nav>
                 </div>
             </div>
             <div class="bg-primary-gradient rounded-pill doctors-search-box">
                 <div class="search-box-one rounded-pill">
-                    <form action="search-2.php">
+                    <form action="doctors.php">
                         <div class="search-input search-line">
                             <i class="isax isax-hospital5 bficon"></i>
                             <div class=" mb-0">
@@ -660,7 +660,7 @@ try {
                                     </div>
                                 </div>
                                 <a href="doctor-grid.html" class="btn btn-sm head-icon me-2"><i class="isax isax-grid-7"></i></a>
-                                <a href="search-2.php" class="btn btn-sm head-icon active me-2"><i class="isax isax-row-vertical"></i></a>
+                                <a href="doctors.php" class="btn btn-sm head-icon active me-2"><i class="isax isax-row-vertical"></i></a>
                                 <a href="map-list.html" class="btn btn-sm head-icon"><i class="isax isax-location"></i></a>
                             </div>
                         </div>

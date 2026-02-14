@@ -1,6 +1,7 @@
 <?php
 session_start();
-include 'header.php';?>
+include 'header.php';
+?>
 
 <!-- Home Banner -->
 <section class="banner-section banner-sec-one">
@@ -36,7 +37,7 @@ include 'header.php';?>
                     </div>
                     <h1 class="display-5">Discover Health: Find Your Trusted <span class="banner-icon"><img src="assets/img/icons/video.svg" alt="img"></span> <span class="text-gradient">Doctors</span> Today</h1>
                     <div class="search-box-one aos" data-aos="fade-up">
-                        <form action="search-2.php">
+                        <form action="doctors.php">
                             <div class="search-input search-line">
                                 <i class="isax isax-hospital5 bficon"></i>
                                 <div class=" mb-0">

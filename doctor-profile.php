@@ -1,4 +1,6 @@
 <?php
+include 'header.php';
+
 /**
  * Doctor Profile - TeleRx Bangladesh
  * Dynamic doctor profile page showing detailed information
@@ -7,7 +9,7 @@
 // Include configuration
 $config_path = __DIR__ . '/php/config.php';
 if (!file_exists($config_path)) {
-    header('Location: login.html');
+    header('Location: login.php');
     exit;
 }
 require_once $config_path;
@@ -16,7 +18,7 @@ require_once $config_path;
 $profile_doctor_id = isset($_GET['id']) ? (int)$_GET['id'] : (isset($_SESSION['doctor_id']) ? $_SESSION['doctor_id'] : null);
 
 if (!$profile_doctor_id) {
-    header('Location: login.html');
+    header('Location: login.php');
     exit;
 }
 
@@ -199,20 +201,20 @@ try {
 							<ul class="main-nav">
 								<li class="has-submenu megamenu active">
 									<a href="index.html">Home </a></li>
-								<li><a href="search-2.php">Doctor List</a></li>
+								<li><a href="doctors.php">Doctor List</a></li>
 								<li><a href="doctor-profile.php">Doctor Profile</a></li>
 								<li><a href="about-us.php">About Us</a></li>
 								<li><a href="contact-us.php">Contact</a></li>
-								<li><a href="blog-grid.html">Blog</a></li>
-								<li class="login-link"><a href="login.html">Login / Signup</a></li>
+								<li><a href="blog.php">Blog</a></li>
+								<li class="login-link"><a href="login.php">Login / Signup</a></li>
 							</ul>
 						</div>
 						<ul class="nav header-navbar-rht">
 							<li class="register-btn">
-								<a href="register.html" class="btn btn-dark reg-btn"><i class="isax isax-user"></i>Register</a>
+								<a href="registration.php" class="btn btn-dark reg-btn"><i class="isax isax-user"></i>Register</a>
 							</li>
 							<li class="register-btn">
-								<a href="login.html" class="btn btn-primary log-btn"><i class="isax isax-lock"></i>Login</a>
+								<a href="login.php" class="btn btn-primary log-btn"><i class="isax isax-lock"></i>Login</a>
 							</li>
 						</ul>
 					</nav>
