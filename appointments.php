@@ -1,373 +1,149 @@
-<!DOCTYPE html> 
+<?php
+/**
+ * Doctor Profile Settings - TeleRx Bangladesh
+ * Dynamic profile settings page with all forms in tabs
+ */
+
+// Include configuration
+$config_path = __DIR__ . '/php/config.php';
+if (!file_exists($config_path)) {
+    header('Location: login.php');
+    exit;
+}
+require_once $config_path;
+
+// Check if doctor is logged in
+if (!isset($_SESSION['doctor_id']) || !isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true) {
+    header('Location: login.php');
+    exit;
+}
+
+$doctor_id = $_SESSION['doctor_id'];
+
+try {
+    $conn = getDBConnection();
+
+    // Fetch doctor's basic information and profile
+    $stmt = $conn->prepare("
+        SELECT d.*, dp.*
+        FROM doctors d
+        LEFT JOIN doctor_profiles dp ON d.id = dp.doctor_id
+        WHERE d.id = ?
+    ");
+    $stmt->bind_param("i", $doctor_id);
+    $stmt->execute();
+    $result = $stmt->get_result();
+
+    if ($result->num_rows == 0) {
+        header('Location: login.php');
+        exit;
+    }
+
+    $doctor = $result->fetch_assoc();
+
+    // Set default values if profile data is missing
+    $doctor['bio'] = $doctor['bio'] ?? '';
+    $doctor['specialty'] = $doctor['specialty'] ?? '';
+    $doctor['languages_spoken'] = $doctor['languages_spoken'] ?? '';
+    $doctor['consultation_fee'] = $doctor['consultation_fee'] ?? '';
+    $doctor['experience_years'] = $doctor['experience_years'] ?? '';
+    $doctor['profile_image'] = $doctor['profile_image'] ?? 'assets/img/doctors-dashboard/doctor-profile-img.jpg';
+
+    // Set default values for new doctor table fields
+    $doctor['gender'] = $doctor['gender'] ?? '';
+    $doctor['account_number'] = $doctor['account_number'] ?? '';
+    $doctor['degrees'] = $doctor['degrees'] ?? '';
+    $doctor['currently_working'] = $doctor['currently_working'] ?? '';
+    // Map specialty from database to speciality for form (database uses 'specialty', form uses 'speciality')
+    $doctor['speciality'] = $doctor['specialty'] ?? ($doctor['speciality'] ?? '');
+    $doctor['present_address'] = $doctor['present_address'] ?? '';
+    $doctor['bmdc_certificate'] = $doctor['bmdc_certificate'] ?? '';
+    $doctor['nid_card'] = $doctor['nid_card'] ?? '';
+    $doctor['degrees_certificate'] = $doctor['degrees_certificate'] ?? '';
+
+    // Fetch doctor's experiences
+    $stmt = $conn->prepare("SELECT * FROM doctor_experiences WHERE doctor_id = ? ORDER BY start_date DESC");
+    $stmt->bind_param("i", $doctor_id);
+    $stmt->execute();
+    $experiences = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
+
+    // Fetch doctor's education
+    $stmt = $conn->prepare("SELECT * FROM doctor_education WHERE doctor_id = ? ORDER BY year_of_completion DESC");
+    $stmt->bind_param("i", $doctor_id);
+    $stmt->execute();
+    $education = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
+
+    // Fetch doctor's awards
+    $stmt = $conn->prepare("SELECT * FROM doctor_awards WHERE doctor_id = ? ORDER BY award_year DESC");
+    $stmt->bind_param("i", $doctor_id);
+    $stmt->execute();
+    $awards = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
+
+    // Fetch doctor's insurances
+    $stmt = $conn->prepare("SELECT * FROM doctor_insurances WHERE doctor_id = ? ORDER BY created_at DESC");
+    $stmt->bind_param("i", $doctor_id);
+    $stmt->execute();
+    $insurances = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
+
+    // Fetch doctor's clinics
+    $stmt = $conn->prepare("SELECT * FROM doctor_clinics WHERE doctor_id = ? ORDER BY created_at DESC");
+    $stmt->bind_param("i", $doctor_id);
+    $stmt->execute();
+    $clinics = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
+
+    $stmt->close();
+    $conn->close();
+
+} catch (Exception $e) {
+    error_log("Doctor profile settings error: " . $e->getMessage());
+    header('Location: login.php');
+    exit;
+}
+
+// Split name for form fields
+$name_parts = explode(' ', $doctor['name']);
+$first_name = $name_parts[0] ?? '';
+$last_name = $name_parts[1] ?? '';
+
+include 'header.php';
+?>
+
+<!DOCTYPE html>
 <html lang="en">
-	<head>
-		
-		<meta charset="utf-8">
-		<title>Doccure</title>
-		<meta name="viewport" content="width=device-width, initial-scale=1.0">
-		<meta name="description" content="The responsive professional Doccure template offers many features, like scheduling appointments with  top doctors, clinics, and hospitals via voice, video call & chat.">
-		<meta name="keywords" content="practo clone, doccure, doctor appointment, Practo clone html template, doctor booking template">
-		<meta name="author" content="Practo Clone HTML Template - Doctor Booking Template">
-		<meta property="og:url" content="https://doccure.dreamstechnologies.com/html/">
-		<meta property="og:type" content="website">
-		<meta property="og:title" content="Doctors Appointment HTML Website Templates | Doccure">
-		<meta property="og:description" content="The responsive professional Doccure template offers many features, like scheduling appointments with  top doctors, clinics, and hospitals via voice, video call & chat.">
-		<meta property="og:image" content="assets/img/preview-banner.jpg">
-		<meta name="twitter:card" content="summary_large_image">
-		<meta property="twitter:domain" content="https://doccure.dreamstechnologies.com/html/">
-		<meta property="twitter:url" content="https://doccure.dreamstechnologies.com/html/">
-		<meta name="twitter:title" content="Doctors Appointment HTML Website Templates | Doccure">
-		<meta name="twitter:description" content="The responsive professional Doccure template offers many features, like scheduling appointments with  top doctors, clinics, and hospitals via voice, video call & chat.">
-		<meta name="twitter:image" content="assets/img/preview-banner.jpg">	
-		
-		<!-- Favicon -->
-		<link rel="shortcut icon" href="assets/img/favicon.png" type="image/x-icon">
 
-		<!-- Apple Touch Icon -->
-		<link rel="apple-touch-icon" sizes="180x180" href="assets/img/apple-touch-icon.png">
+<body>
+            <!-- Breadcrumb -->
+            <div class="breadcrumb-bar">
+                <div class="container">
+                    <div class="row align-items-center inner-banner">
+                        <div class="col-md-12 col-12 text-center">
+                            <nav aria-label="breadcrumb" class="page-breadcrumb">
+                                <ol class="breadcrumb">
+                                    <h3><a href="doctor-profile.php?doctor_id=<?php echo $doctor_id; ?>"><?php echo htmlspecialchars($doctor['name']); ?></a></h3>
+                                </ol>
+                                <h2 class="breadcrumb-title">Profile Settings</h2>
+                            </nav>
+                        </div>
+                    </div>
+                </div>
+                <div class="breadcrumb-bg">
+                    <img src="assets/img/bg/breadcrumb-bg-01.png" alt="img" class="breadcrumb-bg-01">
+                    <img src="assets/img/bg/breadcrumb-bg-02.png" alt="img" class="breadcrumb-bg-02">
+                    <img src="assets/img/bg/breadcrumb-icon.png" alt="img" class="breadcrumb-bg-03">
+                    <img src="assets/img/bg/breadcrumb-icon.png" alt="img" class="breadcrumb-bg-04">
+                </div>
+            </div>
+            <!-- /Breadcrumb -->
 
-		<!-- Theme Settings Js -->
-		<script src="assets/js/theme-script.js"></script>
-		
-		<!-- Bootstrap CSS -->
-		<link rel="stylesheet" href="assets/css/bootstrap.min.css">
-				
-		<!-- Fontawesome CSS -->
-		<link rel="stylesheet" href="assets/plugins/fontawesome/css/fontawesome.min.css">
-		<link rel="stylesheet" href="assets/plugins/fontawesome/css/all.min.css">
+            <!-- Page Content -->
+            <div class="content doctor-content">
+                <div class="container">
+                    <div class="row">
+                        <?php
+                        $current_page = 'appointments.php';
+                        include 'doctor-leftside-menu.php';
+                        ?>
 
-		<!-- Iconsax CSS-->
-		<link rel="stylesheet" href="assets/css/iconsax.css">
-		
-        <!-- select CSS -->
-		<link rel="stylesheet" href="assets/plugins/select2/css/select2.min.css">
-
-		<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-		<link href="https://fonts.googleapis.com/css2?family=Inter:wght@200;300;400;500;600;700;800;900&display=swap" rel="stylesheet">
-
-		<!-- Feathericon CSS -->
-    	<link rel="stylesheet" href="assets/css/feather.css">
-
-    	<!-- Datepicker CSS -->
-		<link rel="stylesheet" href="assets/css/bootstrap-datetimepicker.min.css">
-
-		<!-- Owl Carousel CSS -->
-		<link rel="stylesheet" href="assets/css/owl.carousel.min.css">
-
-		<!-- Animation CSS -->
-		<link rel="stylesheet" href="assets/css/aos.css">
-		
-		<!-- Main CSS -->
-		<link rel="stylesheet" href="assets/css/custom.css">
-
-	</head>		
-	<body>
-
-		<!-- Main Wrapper -->
-		<div class="main-wrapper home-one">
-					
-			<!-- Header -->
-			<header class="header header-custom header-fixed header-one home-head-one">
-				<div class="container">
-					<nav class="navbar navbar-expand-lg header-nav">
-						<div class="navbar-header">
-							<a id="mobile_btn" href="javascript:void(0);">
-								<span class="bar-icon">
-									<span></span>
-									<span></span>
-									<span></span>
-								</span>
-							</a>
-							<a href="index.html" class="navbar-brand logo">
-								<img src="assets/img/logo.svg" class="img-fluid" alt="Logo">
-							</a>
-						</div>
-						<div class="main-menu-wrapper">
-							<div class="menu-header">
-								<a href="index.html" class="menu-logo">
-									<img src="assets/img/logo.svg" class="img-fluid" alt="Logo">
-								</a>
-								<a id="menu_close" class="menu-close" href="javascript:void(0);">
-									<i class="fas fa-times"></i>
-								</a>
-							</div>
-							<ul class="main-nav">
-								<li class="has-submenu megamenu active">
-									<a href="index.html">Home </a></li>
-								<li><a href="search.php">Doctor List</a></li>
-								<li><a href="search-2.php">Doctor List</a></li>
-								<li><a href="doctor-profile.php">Doctor Profile</a></li>
-								<li><a href="about-us.php">About Us</a></li>
-								<li><a href="contact-us.php">Contact</a></li>
-								<li><a href="blog-grid.html">Blog</a></li>
-								<li class="login-link"><a href="login.html">Login / Signup</a></li>
-							</ul>
-						</div>
-						<ul class="nav header-navbar-rht">
-							<!-- Notifications -->
-							<li class="nav-item dropdown noti-nav me-3 pe-0">
-								<a href="#" class="dropdown-toggle active-dot active-dot-danger nav-link p-0" data-bs-toggle="dropdown">
-									<i class="isax isax-notification-bing"></i>
-								</a>
-								<div class="dropdown-menu notifications dropdown-menu-end ">
-									<div class="topnav-dropdown-header">
-										<span class="notification-title">Notifications</span>
-									</div>
-									<div class="noti-content">
-										<ul class="notification-list">
-											<li class="notification-message">
-												<a href="#">
-													<div class="notify-block d-flex">
-														<span class="avatar">
-															<img class="avatar-img" alt="Ruby perin" src="assets/img/clients/client-01.jpg">
-														</span>
-														<div class="media-body">
-															<h6>Travis Tremble <span class="notification-time">18.30 PM</span></h6>
-															<p class="noti-details">Sent a amount of $210 for his Appointment  <span class="noti-title">Dr.Ruby perin </span></p>
-														</div>
-													</div>
-												</a>
-											</li>
-											<li class="notification-message">
-												<a href="#">
-													<div class="notify-block d-flex">
-														<span class="avatar">
-															<img class="avatar-img" alt="Hendry Watt" src="assets/img/clients/client-02.jpg">
-														</span>
-														<div class="media-body">
-															<h6>Travis Tremble <span class="notification-time">12 Min Ago</span></h6>
-															<p class="noti-details"> has booked her appointment to  <span class="noti-title">Dr. Hendry Watt</span></p>
-														</div>
-													</div>
-												</a>
-											</li>
-											<li class="notification-message">
-												<a href="#">
-													<div class="notify-block d-flex">
-														<div class="avatar">
-															<img class="avatar-img" alt="Maria Dyen" src="assets/img/clients/client-03.jpg">
-														</div>
-														<div class="media-body">
-															<h6>Travis Tremble <span class="notification-time">6 Min Ago</span></h6>
-															<p class="noti-details"> Sent a amount  $210 for his Appointment   <span class="noti-title">Dr.Maria Dyen</span></p>
-														</div>
-													</div>
-												</a>
-											</li>
-											<li class="notification-message">
-												<a href="#">
-													<div class="notify-block d-flex">
-														<div class="avatar avatar-sm">
-															<img class="avatar-img" alt="client-image" src="assets/img/clients/client-04.jpg">
-														</div>
-														<div class="media-body">
-															<h6>Travis Tremble <span class="notification-time">8.30 AM</span></h6>
-															<p class="noti-details"> Send a message to his doctor</p>
-														</div>
-													</div>
-												</a>
-											</li>
-										</ul>
-									</div>
-								</div>
-							</li>
-							<!-- /Notifications -->
-
-							<!-- Messages -->
-							<li class="nav-item noti-nav me-3 pe-0">
-								<a href="chat-doctor.html" class="dropdown-toggle nav-link active-dot active-dot-success p-0">
-									<i class="isax isax-message-2"></i>
-								</a>
-							</li>
-							<!-- /Messages -->
-
-							<!-- User Menu -->
-							<li class="nav-item dropdown has-arrow logged-item">
-								<a href="#" class="nav-link ps-0" data-bs-toggle="dropdown">
-									<span class="user-img">
-										<img class="rounded-circle" src="assets/img/doctors-dashboard/doctor-profile-img.jpg" width="31" alt="Darren Elder">
-									</span>
-								</a>
-								<div class="dropdown-menu dropdown-menu-end">
-									<div class="user-header">
-										<div class="avatar avatar-sm">
-											<img src="assets/img/doctors-dashboard/doctor-profile-img.jpg" alt="User Image" class="avatar-img rounded-circle">
-										</div>
-										<div class="user-text">
-											<h6>Dr Edalin Hendry</h6>
-											<p class="text-muted mb-0">Doctor</p>
-										</div>
-									</div>
-									<a class="dropdown-item" href="doctor-dashboard.html">Dashboard</a>
-									<a class="dropdown-item" href="doctor-profile-settings.html">Profile Settings</a>
-									<a class="dropdown-item" href="login.html">Logout</a>
-								</div>
-							</li>
-							<!-- /User Menu -->
-						</ul>
-					</nav>
-				</div>
-			</header>
-			<!-- /Header -->		
-
-			<!-- Breadcrumb -->
-			<div class="breadcrumb-bar">
-				<div class="container">
-					<div class="row align-items-center inner-banner">
-						<div class="col-md-12 col-12 text-center">
-							<nav aria-label="breadcrumb" class="page-breadcrumb">
-								<ol class="breadcrumb">
-									<li class="breadcrumb-item"><a href="index.html"><i class="isax isax-home-15"></i></a></li>
-									<li class="breadcrumb-item" aria-current="page">Doctor</li>
-									<li class="breadcrumb-item active">Appointments</li>
-								</ol>
-								<h2 class="breadcrumb-title">Appointments</h2>
-							</nav>
-						</div>
-					</div>
-				</div>
-				<div class="breadcrumb-bg">
-					<img src="assets/img/bg/breadcrumb-bg-01.png" alt="img" class="breadcrumb-bg-01">
-					<img src="assets/img/bg/breadcrumb-bg-02.png" alt="img" class="breadcrumb-bg-02">
-					<img src="assets/img/bg/breadcrumb-icon.png" alt="img" class="breadcrumb-bg-03">
-					<img src="assets/img/bg/breadcrumb-icon.png" alt="img" class="breadcrumb-bg-04">
-				</div>
-			</div>
-			<!-- /Breadcrumb -->
-			
-			<!-- Page Content -->
-			<div class="content">
-				<div class="container">
-
-					<div class="row">
-						<div class="col-lg-4 col-xl-3 theiaStickySidebar">
-							
-							<!-- Profile Sidebar -->
-							<div class="profile-sidebar doctor-sidebar profile-sidebar-new">
-								<div class="widget-profile pro-widget-content">
-									<div class="profile-info-widget">
-										<a href="doctor-profile.php" class="booking-doc-img">
-											<img src="assets/img/doctors-dashboard/doctor-profile-img.jpg" alt="User Image">
-										</a>
-										<div class="profile-det-info">
-											<h3><a href="doctor-profile.php">Dr Edalin Hendry</a></h3>
-											<div class="patient-details">
-												<h5 class="mb-0">BDS, MDS - Oral & Maxillofacial Surgery</h5>
-											</div>
-											<span class="badge doctor-role-badge"><i class="fa-solid fa-circle"></i>Dentist</span>
-										</div>
-									</div>
-								</div>
-								<div class="doctor-available-head">
-									<div class="input-block input-block-new">
-										<label class="form-label">Availability <span class="text-danger">*</span></label>
-										<select class="select form-control">
-											<option>I am Available Now</option>
-											<option>Not Available</option>
-										</select>
-									</div>
-								</div>
-								<div class="dashboard-widget">
-									<nav class="dashboard-menu">
-										<ul>
-											<li>
-												<a href="doctor-dashboard.html">
-													<i class="isax isax-category-2"></i>
-													<span>Dashboard</span>
-												</a>
-											</li>
-											<li>
-												<a href="doctor-request.html">
-													<i class="isax isax-clipboard-tick"></i>
-													<span>Requests</span>
-													<small class="unread-msg">2</small>
-												</a>
-											</li>
-											<li class="active">
-												<a href="appointments.html">
-													<i class="isax isax-calendar-1"></i>
-													<span>Appointments</span>
-												</a>
-											</li>
-											<li>
-												<a href="available-timings.html">
-													<i class="isax isax-calendar-tick"></i>
-													<span>Available Timings</span>
-												</a>
-											</li>
-											<li>
-												<a href="my-patients.html">
-													<i class="fa-solid fa-user-injured"></i>
-													<span>My Patients</span>
-												</a>
-											</li>
-											<li>
-												<a href="doctor-specialities.html">
-													<i class="isax isax-clock"></i>
-													<span>Specialties & Services</span>
-												</a>
-											</li>
-											<li>
-												<a href="reviews.html">
-													<i class="isax isax-star-1"></i>
-													<span>Reviews</span>
-												</a>
-											</li>
-											<li>
-												<a href="accounts.html">
-													<i class="isax isax-profile-tick"></i>
-													<span>Accounts</span>
-												</a>
-											</li>
-											<li>
-												<a href="invoices.html">
-													<i class="isax isax-document-text"></i>
-													<span>Invoices</span>
-												</a>
-											</li>
-											<li>
-												<a href="doctor-payment.html">
-													<i class="fa-solid fa-money-bill-1"></i>
-													<span>Payout Settings</span>
-												</a>
-											</li>																																				
-											<li>
-												<a href="chat-doctor.html">
-													<i class="isax isax-messages-1"></i>
-													<span>Message</span>
-													<small class="unread-msg">7</small>
-												</a>
-											</li>
-											<li>
-												<a href="doctor-profile-settings.html">
-													<i class="isax isax-setting-2"></i>
-													<span>Profile Settings</span>
-												</a>
-											</li>
-											<li>
-												<a href="social-media.html">
-													<i class="fa-solid fa-shield-halved"></i>
-													<span>Social Media</span>
-												</a>
-											</li>
-											<li>
-												<a href="doctor-change-password.html">
-													<i class="isax isax-key"></i>
-													<span>Change Password</span>
-												</a>
-											</li>
-											<li>
-												<a href="login.html">
-													<i class="isax isax-logout"></i>
-													<span>Logout</span>
-												</a>
-											</li>
-										</ul>
-									</nav>
-								</div>
-							</div>
-							<!-- /Profile Sidebar -->
-							
 						</div>
 						
 						<div class="col-lg-8 col-xl-9">

@@ -5382,7 +5382,7 @@ a.bg-danger:focus, a.bg-danger:hover, button.bg-danger:focus, button.bg-danger:h
 /****** UTILS ******/
 .breadcrumb-bar {
   background-color: #F9FBFF;
-  padding: 108px 0 40px;
+  padding: 70px 0 30px;
   position: relative;
   z-index: 1;
   overflow: hidden;
@@ -6351,7 +6351,7 @@ th.table-head-days {
 /****** UTILS ******/
 .content {
   min-height: 200px;
-  padding: 60px 0 36px;
+  padding: 30px 0 30px;
 }
 @media (max-width: 991.98px) {
   .content {
@@ -13826,10 +13826,10 @@ header.inner-header .header-nav .header-navbar-rht li.noti-nav > a i {
 
 .banner-section {
   background: #F6FAFF;
-  padding: 100px 0 30px;
+  padding: 50px 0 0px;
   position: relative;
   overflow: hidden;
-  z-index: 1;
+  z-index: 0;
 }
 .banner-section::after {
   content: "";
@@ -45722,7 +45722,7 @@ ul.benifits-col li i {
 }
 .doctor-content.content {
   margin: 0;
-  padding: 60px 0;
+  padding: 30px 0;
 }
 @media (max-width: 991.98px) {
   .doctor-content.content {
@@ -46598,7 +46598,7 @@ ul.benifits-col li i {
 
 .about-section {
   background-color: #FFF;
-  padding: 60px 0;
+  padding: 30px 0 30px;
 }
 .about-section .about-img-info {
   padding-right: 30px;
@@ -48883,7 +48883,7 @@ input:checked + .tog-slider:before {
 
 /****** UTILS ******/
 .contact-section {
-  padding: 60px 0 40px;
+  padding: 30px 0 30px;
 }
 @media (max-width: 991.98px) {
   .contact-section {
@@ -51809,8 +51809,8 @@ ul li {
 
 .footer-twelve .footer-top-sec {
   background: #15558d;
-  margin: 0;
-  padding: 50px 0 30px;
+  margin: 30px 0 0px;
+  padding: 30px 0 30px;
 }
 .footer-twelve .footer-top-sec .footer-top {
   margin: 0 0 24px;
@@ -57442,7 +57442,7 @@ ul li {
 /****** UTILS ******/
 .doctors-search-box {
   max-width: 855px;
-  margin: 20px auto -80px;
+  margin: 20px auto 0px;
   padding: 2px;
 }
 @media (max-width: 767.98px) {
