@@ -62,6 +62,7 @@ try {
                 $speciality = trim($_POST['speciality']);
             }
             $present_address = isset($_POST['present_address']) ? trim($_POST['present_address']) : '';
+            $district = isset($_POST['district']) ? trim($_POST['district']) : '';
             $experience_years = isset($_POST['experience_years']) ? (int)$_POST['experience_years'] : 0;
             $bio = isset($_POST['bio']) ? trim($_POST['bio']) : '';
 
@@ -184,8 +185,8 @@ try {
 
             // Update or insert doctor profile
             $stmt = $conn->prepare("
-                INSERT INTO doctor_profiles (doctor_id, bio, specialty, consultation_fee, experience_years, profile_image, gender, account_number, degrees, currently_working, department, present_address, bmdc_certificate, nid_card, degrees_certificate)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                INSERT INTO doctor_profiles (doctor_id, bio, specialty, consultation_fee, experience_years, profile_image, gender, account_number, degrees, currently_working, department, present_address, district, bmdc_certificate, nid_card, degrees_certificate)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 ON DUPLICATE KEY UPDATE
                 bio = VALUES(bio),
                 specialty = VALUES(specialty),
@@ -198,11 +199,12 @@ try {
                 currently_working = VALUES(currently_working),
                 department = VALUES(department),
                 present_address = VALUES(present_address),
+                district = VALUES(district),
                 bmdc_certificate = IF(VALUES(bmdc_certificate) != '', VALUES(bmdc_certificate), bmdc_certificate),
                 nid_card = IF(VALUES(nid_card) != '', VALUES(nid_card), nid_card),
                 degrees_certificate = IF(VALUES(degrees_certificate) != '', VALUES(degrees_certificate), degrees_certificate)
             ");
-            $stmt->bind_param("issdissdsssssss", $doctor_id, $bio, $speciality, $consultation_fee, $experience_years, $profile_image, $gender, $account_number, $degrees, $currently_working, $department, $present_address, $bmdc_certificate, $nid_card, $degrees_certificate);
+            $stmt->bind_param("issdissdssssssss", $doctor_id, $bio, $speciality, $consultation_fee, $experience_years, $profile_image, $gender, $account_number, $degrees, $currently_working, $department, $present_address, $district, $bmdc_certificate, $nid_card, $degrees_certificate);
             $stmt->execute();
             $stmt->close();
 
