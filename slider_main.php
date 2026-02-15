@@ -8,22 +8,22 @@
 $slides = [
         [
                 'image' => 'assets/img/slider-home/slide1.jpg', // আপনার ইমেজ পাথ দিন
-                'title' => 'Old-age Home Care',
-                'description' => 'We care beyond distance.'
+                'title' => 'Welfare Project',
+                'description' => 'TeleRx Bangladesh provides free medical treatment, medicines, and health camps for underprivileged communities. We ensure healthcare reaches those who need it most.'
         ],
         [
-                'image' => 'assets/images/slide2.jpg',
+                'image' => 'assets/img/slider-home/slide2.jpg',
                 'title' => 'Global Care',
-                'description' => 'Want to take treatment to foreign country?'
+                'description' => 'Planning treatment abroad? TeleRx Bangladesh offers complete guidance – from hospital selection to visa support and travel arrangements. Safe, smooth, and stress-free.'
         ],
         [
-                'image' => 'assets/images/slide3.jpg',
-                'title' => 'Cost Effective',
-                'description' => 'Cost Effective and quality treatment with TeleRx Bangladesh.'
+                'image' => 'assets/img/slider-home/slide3.jpg',
+                'title' => 'Old-age Care',
+                'description' => 'Professional nursing care for the elderly – either at home or in partner old-age homes. Health monitoring, medication, and emotional support by TeleRx Bangladesh.'
         ],
         [
-                'image' => 'assets/images/slide4.jpg',
-                'title' => 'Patient First',
+                'image' => 'assets/img/slider-home/slide4.jpg',
+                'title' => 'Emergency Health Support',
                 'description' => 'We take care our patient not with medicine but also with heart.'
         ]
 ];
@@ -42,7 +42,7 @@ $slides = [
                                 <div class="slide-content">
                                     <h2 class="slide-title"><?php echo htmlspecialchars($slide['title']); ?></h2>
                                     <p class="slide-description"><?php echo htmlspecialchars($slide['description']); ?></p>
-                                    <a href="#" class="slide-btn">Know More<i class="fas fa-arrow-right"></i></a>
+                                    <a href="about-us.php" class="slide-btn">Know More<i class="fas fa-arrow-right"></i></a>
                                 </div>
                             </div>
                         <?php endforeach; ?>
@@ -73,8 +73,8 @@ $slides = [
     }
 
     .slider-section {
-        padding: 60px 0;
-        background: linear-gradient(135deg, #f5f7fa 0%, #e9eef5 100%);
+        padding: 30px 0;
+        background: color (FFFFFF 0%);
         font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     }
 
@@ -147,7 +147,7 @@ $slides = [
         font-size: 2.5rem;
         font-weight: 700;
         margin-bottom: 20px;
-        color: #1e2a41;
+        color: #15558d;
         line-height: 1.2;
         position: relative;
         animation: slideInRight 0.7s ease;
@@ -156,11 +156,11 @@ $slides = [
     .slide-title::after {
         content: '';
         position: absolute;
-        bottom: -10px;
+        bottom: -15px;
         left: 0;
-        width: 80px;
-        height: 4px;
-        background: linear-gradient(90deg, #007bff, #00d4ff);
+        width: 100px;
+        height: 3px;
+        background: linear-gradient(90deg, #15558d, #0c77c9);
         border-radius: 2px;
     }
 
@@ -168,7 +168,7 @@ $slides = [
         font-size: 1.1rem;
         line-height: 1.6;
         color: #4a5568;
-        margin: 30px 0 25px;
+        margin: 25px 0 25px;
         animation: slideInRight 0.9s ease;
     }
 
@@ -177,7 +177,7 @@ $slides = [
         align-items: center;
         gap: 10px;
         padding: 12px 30px;
-        background: linear-gradient(90deg, #007bff, #00bfff);
+        background: linear-gradient(90deg, #15558d, #0c77c9);
         color: white;
         text-decoration: none;
         border-radius: 50px;
@@ -225,7 +225,7 @@ $slides = [
     }
 
     .slider-btn:hover {
-        background: #007bff;
+        background: #15558d;
         color: white;
         box-shadow: 0 8px 20px rgba(0, 123, 255, 0.4);
     }
@@ -252,7 +252,7 @@ $slides = [
     .dot {
         width: 12px;
         height: 12px;
-        background: rgba(255, 255, 255, 0.6);
+        background: rgba(12, 119, 201, 0.2);
         border-radius: 50%;
         cursor: pointer;
         transition: all 0.3s ease;
@@ -260,7 +260,7 @@ $slides = [
     }
 
     .dot.active {
-        background: #007bff;
+        background: #15558d;
         transform: scale(1.3);
         border-color: white;
     }
