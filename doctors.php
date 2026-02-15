@@ -36,25 +36,18 @@ try {
     $doctors = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
     $stmt->close();
 
-    // Fetch distinct specialities with counts from database
-    $stmt = $conn->prepare("
-        SELECT 
-            dp.specialty as speciality,
-            COUNT(DISTINCT d.id) as doctor_count
-        FROM doctors d
-        LEFT JOIN doctor_profiles dp ON d.id = dp.doctor_id
-        WHERE dp.specialty IS NOT NULL 
-        AND dp.specialty != ''
-        GROUP BY dp.specialty
-        ORDER BY doctor_count DESC, speciality ASC
-    ");
-    $stmt->execute();
-    $specialities_result = $stmt->get_result();
+    // Build specialities with counts from doctors (split comma-separated specialties so each counts separately)
     $specialities_with_counts = [];
-    while ($row = $specialities_result->fetch_assoc()) {
-        $specialities_with_counts[$row['speciality']] = $row['doctor_count'];
+    foreach ($doctors as $d) {
+        $spec_str = $d['specialty'] ?? '';
+        if ($spec_str === '') continue;
+        $specs = array_map('trim', explode(',', $spec_str));
+        foreach ($specs as $spec) {
+            if ($spec !== '') {
+                $specialities_with_counts[$spec] = ($specialities_with_counts[$spec] ?? 0) + 1;
+            }
+        }
     }
-    $stmt->close();
 
     // Define all available specialities from doctor-profile-settings.php
     $all_specialities = [
@@ -819,28 +812,28 @@ try {
 				return;
 			}
 			
-			// Filter doctors based on selected specialities
+			// Filter doctors based on selected specialities (doctor can have multiple comma-separated specialties)
 			$('.doctor-list-card').each(function() {
 				var doctorSpecialityStr = $(this).data('speciality') || '';
 				doctorSpecialityStr = $.trim(doctorSpecialityStr);
 				
-				console.log('Checking doctor with speciality:', doctorSpecialityStr);
-				
-				// If doctor speciality is empty, skip or use default
 				if (doctorSpecialityStr === '' || doctorSpecialityStr === 'null') {
 					doctorSpecialityStr = 'General Physician';
 				}
 				
-				// Check if doctor's speciality matches any selected speciality
+				// Split doctor's specialties (e.g. "Cardiologist, Dermatologist" -> ["Cardiologist", "Dermatologist"])
+				var doctorSpecialities = doctorSpecialityStr.split(',').map(function(s) { return $.trim(s); }).filter(function(s) { return s !== ''; });
+				if (doctorSpecialities.length === 0) doctorSpecialities = ['General Physician'];
+				
+				// Show if any of the doctor's specialties matches any selected filter
 				var matches = false;
 				for (var i = 0; i < selectedSpecialities.length; i++) {
-					if (doctorSpecialityStr === selectedSpecialities[i]) {
+					if (doctorSpecialities.indexOf(selectedSpecialities[i]) !== -1) {
 						matches = true;
 						break;
 					}
 				}
 				
-				// Show or hide the doctor card
 				if (matches) {
 					$(this).stop(true, true).show();
 				} else {
