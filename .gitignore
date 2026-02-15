@@ -1,3 +1,5 @@
 assets/img/doctors/
 .htaccess
 php/config.php
+error_log
+php/error_log

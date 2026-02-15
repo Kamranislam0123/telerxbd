@@ -12,12 +12,19 @@ define('DB_NAME', 'telerxb2_telerx_db');
 
 
 // Database configuration local
+<<<<<<< HEAD
 // define('DB_HOST', 'localhost');
 // define('DB_USER', 'root');
 // define('DB_PASS', '123');
 // define('DB_NAME', 'telerx_db');
 
 
+=======
+define('DB_HOST', 'localhost');
+define('DB_USER', 'root');
+define('DB_PASS', '123');
+define('DB_NAME', 'telerx_db');
+>>>>>>> e091f63a4c74a38b833ba6c53b402bfd10aa6cb6
 
 
 // Create database connection

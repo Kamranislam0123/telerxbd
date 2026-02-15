@@ -57,6 +57,7 @@ try {
     // Map specialty from database to speciality for form (database uses 'specialty', form uses 'speciality')
     $doctor['speciality'] = $doctor['specialty'] ?? ($doctor['speciality'] ?? '');
     $doctor['present_address'] = $doctor['present_address'] ?? '';
+    $doctor['district'] = $doctor['district'] ?? '';
     $doctor['bmdc_certificate'] = $doctor['bmdc_certificate'] ?? '';
     $doctor['nid_card'] = $doctor['nid_card'] ?? '';
     $doctor['degrees_certificate'] = $doctor['degrees_certificate'] ?? '';
@@ -269,7 +270,80 @@ include 'header.php';
                                 <div class="col-lg-6 col-md-6">
                                     <div class="form-wrap">
                                         <label class="form-label">Present Address</label>
-                                        <input type="text" class="form-control" name="present_address" value="<?php echo htmlspecialchars($doctor['address'] ?? ''); ?>" placeholder="Your current address">
+                                        <input type="text" class="form-control" name="present_address" value="<?php echo htmlspecialchars($doctor['address'] ?? $doctor['present_address'] ?? ''); ?>" placeholder="Your current address">
+                                    </div>
+                                </div>
+                                <div class="col-lg-6 col-md-6">
+                                    <div class="form-wrap">
+                                        <label class="form-label">District</label>
+                                        <select class="form-control" name="district">
+                                            <option value="">Select District</option>
+                                            <option value="Bagerhat" <?php echo (isset($doctor['district']) && $doctor['district'] == 'Bagerhat') ? 'selected' : ''; ?>>Bagerhat</option>
+                                            <option value="Bandarban" <?php echo (isset($doctor['district']) && $doctor['district'] == 'Bandarban') ? 'selected' : ''; ?>>Bandarban</option>
+                                            <option value="Barguna" <?php echo (isset($doctor['district']) && $doctor['district'] == 'Barguna') ? 'selected' : ''; ?>>Barguna</option>
+                                            <option value="Barisal" <?php echo (isset($doctor['district']) && $doctor['district'] == 'Barisal') ? 'selected' : ''; ?>>Barisal</option>
+                                            <option value="Bhola" <?php echo (isset($doctor['district']) && $doctor['district'] == 'Bhola') ? 'selected' : ''; ?>>Bhola</option>
+                                            <option value="Bogra" <?php echo (isset($doctor['district']) && $doctor['district'] == 'Bogra') ? 'selected' : ''; ?>>Bogra</option>
+                                            <option value="Brahmanbaria" <?php echo (isset($doctor['district']) && $doctor['district'] == 'Brahmanbaria') ? 'selected' : ''; ?>>Brahmanbaria</option>
+                                            <option value="Chandpur" <?php echo (isset($doctor['district']) && $doctor['district'] == 'Chandpur') ? 'selected' : ''; ?>>Chandpur</option>
+                                            <option value="Chapai Nawabganj" <?php echo (isset($doctor['district']) && $doctor['district'] == 'Chapai Nawabganj') ? 'selected' : ''; ?>>Chapai Nawabganj</option>
+                                            <option value="Chattogram" <?php echo (isset($doctor['district']) && $doctor['district'] == 'Chattogram') ? 'selected' : ''; ?>>Chattogram</option>
+                                            <option value="Chuadanga" <?php echo (isset($doctor['district']) && $doctor['district'] == 'Chuadanga') ? 'selected' : ''; ?>>Chuadanga</option>
+                                            <option value="Comilla" <?php echo (isset($doctor['district']) && $doctor['district'] == 'Comilla') ? 'selected' : ''; ?>>Comilla</option>
+                                            <option value="Cox's Bazar" <?php echo (isset($doctor['district']) && $doctor['district'] == "Cox's Bazar") ? 'selected' : ''; ?>>Cox's Bazar</option>
+                                            <option value="Dhaka" <?php echo (isset($doctor['district']) && $doctor['district'] == 'Dhaka') ? 'selected' : ''; ?>>Dhaka</option>
+                                            <option value="Dinajpur" <?php echo (isset($doctor['district']) && $doctor['district'] == 'Dinajpur') ? 'selected' : ''; ?>>Dinajpur</option>
+                                            <option value="Faridpur" <?php echo (isset($doctor['district']) && $doctor['district'] == 'Faridpur') ? 'selected' : ''; ?>>Faridpur</option>
+                                            <option value="Feni" <?php echo (isset($doctor['district']) && $doctor['district'] == 'Feni') ? 'selected' : ''; ?>>Feni</option>
+                                            <option value="Gaibandha" <?php echo (isset($doctor['district']) && $doctor['district'] == 'Gaibandha') ? 'selected' : ''; ?>>Gaibandha</option>
+                                            <option value="Gazipur" <?php echo (isset($doctor['district']) && $doctor['district'] == 'Gazipur') ? 'selected' : ''; ?>>Gazipur</option>
+                                            <option value="Gopalganj" <?php echo (isset($doctor['district']) && $doctor['district'] == 'Gopalganj') ? 'selected' : ''; ?>>Gopalganj</option>
+                                            <option value="Habiganj" <?php echo (isset($doctor['district']) && $doctor['district'] == 'Habiganj') ? 'selected' : ''; ?>>Habiganj</option>
+                                            <option value="Jamalpur" <?php echo (isset($doctor['district']) && $doctor['district'] == 'Jamalpur') ? 'selected' : ''; ?>>Jamalpur</option>
+                                            <option value="Jessore" <?php echo (isset($doctor['district']) && $doctor['district'] == 'Jessore') ? 'selected' : ''; ?>>Jessore</option>
+                                            <option value="Jhalokati" <?php echo (isset($doctor['district']) && $doctor['district'] == 'Jhalokati') ? 'selected' : ''; ?>>Jhalokati</option>
+                                            <option value="Jhenaidah" <?php echo (isset($doctor['district']) && $doctor['district'] == 'Jhenaidah') ? 'selected' : ''; ?>>Jhenaidah</option>
+                                            <option value="Joypurhat" <?php echo (isset($doctor['district']) && $doctor['district'] == 'Joypurhat') ? 'selected' : ''; ?>>Joypurhat</option>
+                                            <option value="Khagrachari" <?php echo (isset($doctor['district']) && $doctor['district'] == 'Khagrachari') ? 'selected' : ''; ?>>Khagrachari</option>
+                                            <option value="Khulna" <?php echo (isset($doctor['district']) && $doctor['district'] == 'Khulna') ? 'selected' : ''; ?>>Khulna</option>
+                                            <option value="Kishoreganj" <?php echo (isset($doctor['district']) && $doctor['district'] == 'Kishoreganj') ? 'selected' : ''; ?>>Kishoreganj</option>
+                                            <option value="Kurigram" <?php echo (isset($doctor['district']) && $doctor['district'] == 'Kurigram') ? 'selected' : ''; ?>>Kurigram</option>
+                                            <option value="Kushtia" <?php echo (isset($doctor['district']) && $doctor['district'] == 'Kushtia') ? 'selected' : ''; ?>>Kushtia</option>
+                                            <option value="Lakshmipur" <?php echo (isset($doctor['district']) && $doctor['district'] == 'Lakshmipur') ? 'selected' : ''; ?>>Lakshmipur</option>
+                                            <option value="Lalmonirhat" <?php echo (isset($doctor['district']) && $doctor['district'] == 'Lalmonirhat') ? 'selected' : ''; ?>>Lalmonirhat</option>
+                                            <option value="Madaripur" <?php echo (isset($doctor['district']) && $doctor['district'] == 'Madaripur') ? 'selected' : ''; ?>>Madaripur</option>
+                                            <option value="Magura" <?php echo (isset($doctor['district']) && $doctor['district'] == 'Magura') ? 'selected' : ''; ?>>Magura</option>
+                                            <option value="Manikganj" <?php echo (isset($doctor['district']) && $doctor['district'] == 'Manikganj') ? 'selected' : ''; ?>>Manikganj</option>
+                                            <option value="Meherpur" <?php echo (isset($doctor['district']) && $doctor['district'] == 'Meherpur') ? 'selected' : ''; ?>>Meherpur</option>
+                                            <option value="Moulvibazar" <?php echo (isset($doctor['district']) && $doctor['district'] == 'Moulvibazar') ? 'selected' : ''; ?>>Moulvibazar</option>
+                                            <option value="Munshiganj" <?php echo (isset($doctor['district']) && $doctor['district'] == 'Munshiganj') ? 'selected' : ''; ?>>Munshiganj</option>
+                                            <option value="Mymensingh" <?php echo (isset($doctor['district']) && $doctor['district'] == 'Mymensingh') ? 'selected' : ''; ?>>Mymensingh</option>
+                                            <option value="Naogaon" <?php echo (isset($doctor['district']) && $doctor['district'] == 'Naogaon') ? 'selected' : ''; ?>>Naogaon</option>
+                                            <option value="Narail" <?php echo (isset($doctor['district']) && $doctor['district'] == 'Narail') ? 'selected' : ''; ?>>Narail</option>
+                                            <option value="Narayanganj" <?php echo (isset($doctor['district']) && $doctor['district'] == 'Narayanganj') ? 'selected' : ''; ?>>Narayanganj</option>
+                                            <option value="Narsingdi" <?php echo (isset($doctor['district']) && $doctor['district'] == 'Narsingdi') ? 'selected' : ''; ?>>Narsingdi</option>
+                                            <option value="Natore" <?php echo (isset($doctor['district']) && $doctor['district'] == 'Natore') ? 'selected' : ''; ?>>Natore</option>
+                                            <option value="Nawabganj" <?php echo (isset($doctor['district']) && $doctor['district'] == 'Nawabganj') ? 'selected' : ''; ?>>Nawabganj</option>
+                                            <option value="Netrakona" <?php echo (isset($doctor['district']) && $doctor['district'] == 'Netrakona') ? 'selected' : ''; ?>>Netrakona</option>
+                                            <option value="Nilphamari" <?php echo (isset($doctor['district']) && $doctor['district'] == 'Nilphamari') ? 'selected' : ''; ?>>Nilphamari</option>
+                                            <option value="Noakhali" <?php echo (isset($doctor['district']) && $doctor['district'] == 'Noakhali') ? 'selected' : ''; ?>>Noakhali</option>
+                                            <option value="Pabna" <?php echo (isset($doctor['district']) && $doctor['district'] == 'Pabna') ? 'selected' : ''; ?>>Pabna</option>
+                                            <option value="Panchagarh" <?php echo (isset($doctor['district']) && $doctor['district'] == 'Panchagarh') ? 'selected' : ''; ?>>Panchagarh</option>
+                                            <option value="Patuakhali" <?php echo (isset($doctor['district']) && $doctor['district'] == 'Patuakhali') ? 'selected' : ''; ?>>Patuakhali</option>
+                                            <option value="Pirojpur" <?php echo (isset($doctor['district']) && $doctor['district'] == 'Pirojpur') ? 'selected' : ''; ?>>Pirojpur</option>
+                                            <option value="Rajbari" <?php echo (isset($doctor['district']) && $doctor['district'] == 'Rajbari') ? 'selected' : ''; ?>>Rajbari</option>
+                                            <option value="Rajshahi" <?php echo (isset($doctor['district']) && $doctor['district'] == 'Rajshahi') ? 'selected' : ''; ?>>Rajshahi</option>
+                                            <option value="Rangamati" <?php echo (isset($doctor['district']) && $doctor['district'] == 'Rangamati') ? 'selected' : ''; ?>>Rangamati</option>
+                                            <option value="Rangpur" <?php echo (isset($doctor['district']) && $doctor['district'] == 'Rangpur') ? 'selected' : ''; ?>>Rangpur</option>
+                                            <option value="Satkhira" <?php echo (isset($doctor['district']) && $doctor['district'] == 'Satkhira') ? 'selected' : ''; ?>>Satkhira</option>
+                                            <option value="Shariatpur" <?php echo (isset($doctor['district']) && $doctor['district'] == 'Shariatpur') ? 'selected' : ''; ?>>Shariatpur</option>
+                                            <option value="Sherpur" <?php echo (isset($doctor['district']) && $doctor['district'] == 'Sherpur') ? 'selected' : ''; ?>>Sherpur</option>
+                                            <option value="Sirajganj" <?php echo (isset($doctor['district']) && $doctor['district'] == 'Sirajganj') ? 'selected' : ''; ?>>Sirajganj</option>
+                                            <option value="Sunamganj" <?php echo (isset($doctor['district']) && $doctor['district'] == 'Sunamganj') ? 'selected' : ''; ?>>Sunamganj</option>
+                                            <option value="Sylhet" <?php echo (isset($doctor['district']) && $doctor['district'] == 'Sylhet') ? 'selected' : ''; ?>>Sylhet</option>
+                                            <option value="Tangail" <?php echo (isset($doctor['district']) && $doctor['district'] == 'Tangail') ? 'selected' : ''; ?>>Tangail</option>
+                                            <option value="Thakurgaon" <?php echo (isset($doctor['district']) && $doctor['district'] == 'Thakurgaon') ? 'selected' : ''; ?>>Thakurgaon</option>
+                                        </select>
                                     </div>
                                 </div>
                                 <div class="col-lg-6 col-md-6">

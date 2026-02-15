@@ -23,6 +23,7 @@ try {
             dp.city,
             dp.state,
             dp.zip_code,
+            dp.district,
             dp.profile_image,
             (SELECT COUNT(*) FROM doctor_experiences de WHERE de.doctor_id = d.id) as experience_count,
             (SELECT COUNT(*) FROM doctor_education ded WHERE ded.doctor_id = d.id) as education_count,
@@ -312,7 +313,7 @@ try {
                                     </div>
                                 </div>
                             </div>
-                            <div class="accordion-item border-bottom">
+                            <!-- <div class="accordion-item border-bottom">
                                 <div class="accordion-header" id="heading4">
                                     <div class="accordion-button" data-bs-toggle="collapse" data-bs-target="#collapse4" aria-controls="collapse4" role="button">
                                         <div class="d-flex align-items-center w-100">
@@ -331,7 +332,7 @@ try {
                                         <p class="mb-0">Range : $200 - $5695</p>
                                     </div>
                                 </div>
-                            </div>
+                            </div> -->
                             <div class="accordion-item border-bottom">
                                 <div class="accordion-header" id="heading5">
                                     <div class="accordion-button" data-bs-toggle="collapse" data-bs-target="#collapse5" aria-controls="collapse5" role="button">
@@ -387,7 +388,7 @@ try {
                                     </div>
                                 </div>
                             </div>
-                            <div class="accordion-item border-bottom">
+                            <!-- <div class="accordion-item border-bottom">
                                 <div class="accordion-header" id="heading6">
                                     <div class="accordion-button" data-bs-toggle="collapse" data-bs-target="#collapse6" aria-controls="collapse6" role="button">
                                         <div class="d-flex align-items-center w-100">
@@ -449,8 +450,8 @@ try {
                                         </div>
                                     </div>
                                 </div>
-                            </div>
-                            <div class="accordion-item border-bottom">
+                            </div> -->
+                            <!-- <div class="accordion-item border-bottom">
                                 <div class="accordion-header" id="heading7">
                                     <div class="accordion-button" data-bs-toggle="collapse" data-bs-target="#collapse7" aria-controls="collapse7" role="button">
                                         <div class="d-flex align-items-center w-100">
@@ -497,8 +498,8 @@ try {
                                         </div>
                                     </div>
                                 </div>
-                            </div>
-                            <div class="accordion-item border-bottom">
+                            </div> -->
+                            <!-- <div class="accordion-item border-bottom">
                                 <div class="accordion-header" id="heading8">
                                     <div class="accordion-button" data-bs-toggle="collapse" data-bs-target="#collapse8" aria-controls="collapse8" role="button">
                                         <div class="d-flex align-items-center w-100">
@@ -545,12 +546,12 @@ try {
                                         </div>
                                     </div>
                                 </div>
-                            </div>
+                            </div> -->
                             <div class="accordion-item">
                                 <div class="accordion-header" id="heading9">
                                     <div class="accordion-button" data-bs-toggle="collapse" data-bs-target="#collapse9" aria-controls="collapse9" role="button">
                                         <div class="d-flex align-items-center w-100">
-                                            <h5>Languages</h5>
+                                            <h5>Reviews</h5>
                                             <div class="ms-auto">
                                                 <span><i class="fas fa-chevron-down"></i></span>
                                             </div>
@@ -659,7 +660,7 @@ try {
                                         </a>
                                     </div>
                                 </div>
-                                <a href="doctor-grid.html" class="btn btn-sm head-icon me-2"><i class="isax isax-grid-7"></i></a>
+                                <!-- <a href="doctor-grid.html" class="btn btn-sm head-icon me-2"><i class="isax isax-grid-7"></i></a> -->
                                 <a href="doctors.php" class="btn btn-sm head-icon active me-2"><i class="isax isax-row-vertical"></i></a>
                                 <a href="map-list.html" class="btn btn-sm head-icon"><i class="isax isax-location"></i></a>
                             </div>
@@ -724,7 +725,11 @@ try {
                                                                     </p>
                                                                     <p class="d-flex align-items-center mb-0 fs-14">
                                                                         <i class="isax isax-location me-2"></i>
-                                                                        <?php echo htmlspecialchars(($doctor['city'] ?? 'Dhaka') . ', ' . ($doctor['state'] ?? 'Bangladesh')); ?>
+                                                                        <?php
+                                                                        $location_parts = array_filter([$doctor['district'] ?? '', $doctor['city'] ?? '', $doctor['state'] ?? '']);
+                                                                        $location_display = !empty($location_parts) ? implode(', ', $location_parts) : 'Dhaka, Bangladesh';
+                                                                        echo htmlspecialchars($location_display);
+                                                                        ?>
                                                                         <a href="#" class="text-primary text-decoration-underline ms-2">Get Direction</a>
                                                                     </p>
                                                                 </div>
@@ -772,6 +777,8 @@ try {
 </body>
 </html>
 
+<?php include 'footer.php'; ?>
+
     <!-- select JS -->
     <script src="assets/plugins/select2/js/select2.min.js"></script>
 
@@ -786,60 +793,58 @@ try {
 
     <!-- Speciality Filter Script -->
     <script>
-
 	$(document).ready(function() {
+		console.log('Filter script initialized');
+		console.log('Doctor cards found:', $('.doctor-list-card').length);
+		console.log('Speciality filters found:', $('.speciality-filter').length);
+		
 		// Function to filter doctors by speciality
 		function filterDoctorsBySpeciality() {
 			var selectedSpecialities = [];
 			
 			// Get all checked speciality checkboxes
 			$('.speciality-filter:checked').each(function() {
-				var speciality = $(this).val();
-				if (speciality && speciality.trim() !== '') {
-					selectedSpecialities.push(speciality.trim());
+				var speciality = $.trim($(this).val());
+				if (speciality !== '') {
+					selectedSpecialities.push(speciality);
 				}
 			});
 			
+			console.log('Selected specialities:', selectedSpecialities);
+			
 			// If no specialities are selected, show all doctors
 			if (selectedSpecialities.length === 0) {
-				$('.doctor-list-card').fadeIn(300);
+				$('.doctor-list-card').stop(true, true).show();
 				updateDoctorCount();
 				return;
 			}
 			
 			// Filter doctors based on selected specialities
 			$('.doctor-list-card').each(function() {
-				var doctorSpecialityStr = $(this).data('speciality') || 'General Physician';
-				doctorSpecialityStr = doctorSpecialityStr.trim();
+				var doctorSpecialityStr = $(this).data('speciality') || '';
+				doctorSpecialityStr = $.trim(doctorSpecialityStr);
 				
-				// Split doctor's specialities by comma (handle multiple specialities)
-				var doctorSpecialities = [];
-				if (doctorSpecialityStr) {
-					doctorSpecialities = doctorSpecialityStr.split(',').map(function(s) {
-						return s.trim();
-					}).filter(function(s) {
-						return s.length > 0;
-					});
+				console.log('Checking doctor with speciality:', doctorSpecialityStr);
+				
+				// If doctor speciality is empty, skip or use default
+				if (doctorSpecialityStr === '' || doctorSpecialityStr === 'null') {
+					doctorSpecialityStr = 'General Physician';
 				}
 				
-				// If doctor has no specialities, use default
-				if (doctorSpecialities.length === 0) {
-					doctorSpecialities = ['General Physician'];
-				}
-				
-				// Check if any of the doctor's specialities match any selected speciality
+				// Check if doctor's speciality matches any selected speciality
 				var matches = false;
-				for (var i = 0; i < doctorSpecialities.length; i++) {
-					if (selectedSpecialities.indexOf(doctorSpecialities[i]) !== -1) {
+				for (var i = 0; i < selectedSpecialities.length; i++) {
+					if (doctorSpecialityStr === selectedSpecialities[i]) {
 						matches = true;
 						break;
 					}
 				}
 				
+				// Show or hide the doctor card
 				if (matches) {
-					$(this).fadeIn(300);
+					$(this).stop(true, true).show();
 				} else {
-					$(this).fadeOut(300);
+					$(this).stop(true, true).hide();
 				}
 			});
 			
@@ -854,7 +859,7 @@ try {
 			// Show message if no doctors match the filter
 			if (visibleCount === 0) {
 				if ($('.no-doctors-message').length === 0) {
-					$('.row .col-lg-12').append(
+					$('.col-lg-12').append(
 						'<div class="text-center no-doctors-message mt-4">' +
 						'<p class="text-muted">No doctors found matching the selected specialities.</p>' +
 						'</div>'
@@ -866,17 +871,18 @@ try {
 		}
 		
 		// Handle speciality checkbox changes
-		$('.speciality-filter').on('change', function() {
+		$(document).on('change', '.speciality-filter', function() {
+			console.log('Checkbox changed:', $(this).val(), 'Checked:', $(this).is(':checked'));
 			filterDoctorsBySpeciality();
 		});
 		
 		// Handle "Clear All" link
-		$('.clear-all-filters').on('click', function(e) {
+		$(document).on('click', '.clear-all-filters', function(e) {
 			e.preventDefault();
 			// Uncheck all speciality filters
 			$('.speciality-filter').prop('checked', false);
 			// Show all doctors
-			$('.doctor-list-card').fadeIn(300);
+			$('.doctor-list-card').stop(true, true).show();
 			updateDoctorCount();
 		});
 		
@@ -884,5 +890,3 @@ try {
 		updateDoctorCount();
 	});
 	</script>
-
-<?php include 'footer.php'; ?>
