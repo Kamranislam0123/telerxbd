@@ -110,3 +110,5 @@
 [14-Feb-2026 19:00:36 Asia/Dhaka] PHP Warning:  Cannot modify header information - headers already sent by (output started at /home/telerxb2/public_html/header.php:8) in /home/telerxb2/public_html/doctor-profile.php on line 21
 [15-Feb-2026 07:10:14 UTC] PHP Parse error:  syntax error, unexpected '<<' (T_SL), expecting end of file in /home/telerxb2/public_html/php/config.php on line 15
 [15-Feb-2026 07:10:17 UTC] PHP Parse error:  syntax error, unexpected '<<' (T_SL), expecting end of file in /home/telerxb2/public_html/php/config.php on line 15
+[15-Feb-2026 13:25:06 Asia/Dhaka] PHP Warning:  mysqli::__construct(): (08004/1040): Too many connections in /home/telerxb2/public_html/php/config.php on line 26
+[15-Feb-2026 13:25:06 Asia/Dhaka] Error fetching doctors: Database connection failed: Too many connections. Please check your database credentials in config.php
