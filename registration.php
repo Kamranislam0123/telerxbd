@@ -61,8 +61,8 @@ include 'header.php';?>
 
                                 <!-- Patient Registration Tab -->
                                 <div class="tab-pane fade show active" id="patient" role="tabpanel" aria-labelledby="patient-tab">
-                                    <div id="patient-message" class="alert" style="display: none;"></div>
-                                    <form id="patient-register-form">
+                                    <div id="patient-message" class="alert alert-dismissible fade" role="alert" style="display: none; margin-top: 15px; min-height: 50px;"></div>
+                                    <form id="patient-register-form" method="POST" action="#" onsubmit="return false;">
                                         <div class="mb-3">
                                             <label class="form-label">Full Name</label>
                                             <input type="text" class="form-control" name="name" id="patient-name" placeholder="Enter your full name" required>
@@ -70,6 +70,11 @@ include 'header.php';?>
                                         <div class="mb-3">
                                             <label class="form-label">Email Address</label>
                                             <input type="email" class="form-control" name="email" id="patient-email" placeholder="Enter your email address" required>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label">Mobile Number</label>
+                                            <input type="text" class="form-control" name="phone" id="patient-phone" placeholder="Enter your mobile number (e.g., 01712345678)" required>
+                                            <small class="form-text text-muted">You can login with email or mobile number</small>
                                         </div>
                                         <div class="mb-3">
                                             <div class="form-group-flex">
@@ -81,7 +86,7 @@ include 'header.php';?>
                                             </div>
                                         </div>
                                         <div class="mb-3">
-                                            <button class="btn btn-primary-gradient w-100" type="submit" id="patient-register-btn">Register as Patient</button>
+                                            <button class="btn btn-primary-gradient w-100" type="button" id="patient-register-btn">Register as Patient</button>
                                         </div>
                                     </form>
                                 </div>
@@ -177,34 +182,49 @@ include 'header.php';?>
     <script>
     $(document).ready(function() {
         // Initialize phone input for doctor registration
-        var doctorPhoneInput = document.querySelector("#doctor-phone");
-        if (doctorPhoneInput) {
-            window.intlTelInput(doctorPhoneInput, {
-                initialCountry: "bd",
-                separateDialCode: true,
-                utilsScript: "assets/plugins/intltelinput/js/utils.js"
-            });
+        try {
+            var doctorPhoneInput = document.querySelector("#doctor-phone");
+            if (doctorPhoneInput && typeof window.intlTelInput !== 'undefined' && window.intlTelInput) {
+                window.intlTelInput(doctorPhoneInput, {
+                    initialCountry: "bd",
+                    separateDialCode: true,
+                    utilsScript: "assets/plugins/intltelinput/js/utils.js"
+                });
+            }
+        } catch(e) {
+            // Silently ignore - intlTelInput is optional
         }
 
         // Patient Registration Form Handler
-        $('#patient-register-form').on('submit', function(e) {
+        $('#patient-register-btn').on('click', function(e) {
             e.preventDefault();
-
-            var form = $(this);
-            var submitBtn = $('#patient-register-btn');
+            e.stopPropagation();
+            
+            var submitBtn = $(this);
             var messageDiv = $('#patient-message');
+
+            // Reset and show message div
+            messageDiv.removeClass('alert-success alert-danger');
+            messageDiv.html('<i class="fa fa-spinner fa-spin"></i> Processing registration...').show();
 
             // Disable submit button
             submitBtn.prop('disabled', true).text('Processing...');
-            messageDiv.hide().removeClass('alert-success alert-danger');
 
             // Get form data
             var formData = {
                 user_type: 'patient',
                 name: $('#patient-name').val(),
                 email: $('#patient-email').val(),
+                phone: $('#patient-phone').val(),
                 password: $('#patient-password').val()
             };
+
+            // Validate form data
+            if (!formData.name || !formData.email || !formData.phone || !formData.password) {
+                messageDiv.addClass('alert-danger').html('<strong>Error!</strong> Please fill in all required fields.');
+                submitBtn.prop('disabled', false).text('Register as Patient');
+                return;
+            }
 
             // Submit via AJAX
             $.ajax({
@@ -212,31 +232,55 @@ include 'header.php';?>
                 type: 'POST',
                 data: formData,
                 dataType: 'json',
+                timeout: 10000,
                 success: function(response) {
-                    if (response.success) {
-                        messageDiv.addClass('alert-success').html('<strong>Success!</strong> ' + response.message).fadeIn();
+                    if (response && response.success) {
+                        messageDiv.removeClass('alert-danger').addClass('alert-success');
+                        messageDiv.html('<strong>Success!</strong> ' + (response.message || 'Registration successful!'));
                         setTimeout(function() {
-                            window.location.href = response.redirect || 'login.html';
+                            window.location.href = response.redirect || 'login.php';
                         }, 1500);
                     } else {
-                        var errorMsg = response.message || 'Registration failed. Please try again.';
-                        if (response.errors && response.errors.length > 0) {
+                        var errorMsg = (response && response.message) ? response.message : 'Registration failed. Please try again.';
+                        if (response && response.errors && response.errors.length > 0) {
                             errorMsg += '<ul class="mb-0 mt-2">';
                             response.errors.forEach(function(error) {
                                 errorMsg += '<li>' + error + '</li>';
                             });
                             errorMsg += '</ul>';
                         }
-                        messageDiv.addClass('alert-danger').html('<strong>Error!</strong> ' + errorMsg).fadeIn();
+                        messageDiv.removeClass('alert-success').addClass('alert-danger');
+                        messageDiv.html('<strong>Error!</strong> ' + errorMsg);
                         submitBtn.prop('disabled', false).text('Register as Patient');
                     }
                 },
                 error: function(xhr, status, error) {
                     var errorMsg = 'An error occurred. Please try again later.';
-                    if (xhr.responseJSON && xhr.responseJSON.message) {
-                        errorMsg = xhr.responseJSON.message;
+                    
+                    if (status === 'timeout') {
+                        errorMsg = 'Request timed out. Please check your internet connection and try again.';
+                    } else {
+                        try {
+                            if (xhr.responseText) {
+                                var response = JSON.parse(xhr.responseText);
+                                if (response.message) {
+                                    errorMsg = response.message;
+                                }
+                                if (response.errors && response.errors.length > 0) {
+                                    errorMsg += '<ul class="mb-0 mt-2">';
+                                    response.errors.forEach(function(err) {
+                                        errorMsg += '<li>' + err + '</li>';
+                                    });
+                                    errorMsg += '</ul>';
+                                }
+                            }
+                        } catch(e) {
+                            errorMsg = 'Connection error. Please try again.';
+                        }
                     }
-                    messageDiv.addClass('alert-danger').html('<strong>Error!</strong> ' + errorMsg).fadeIn();
+                    
+                    messageDiv.removeClass('alert-success').addClass('alert-danger');
+                    messageDiv.html('<strong>Error!</strong> ' + errorMsg);
                     submitBtn.prop('disabled', false).text('Register as Patient');
                 }
             });
@@ -357,8 +401,6 @@ include 'header.php';?>
                 password: password
             };
 
-            // Debug: Log form data (remove in production)
-            console.log('Form Data:', formData);
 
             // Submit via AJAX
             $.ajax({
@@ -370,7 +412,7 @@ include 'header.php';?>
                     if (response.success) {
                         messageDiv.addClass('alert-success').html('<strong>Success!</strong> ' + response.message).fadeIn();
                         setTimeout(function() {
-                            window.location.href = response.redirect || 'login.html';
+                            window.location.href = response.redirect || 'login.php';
                         }, 1500);
                     } else {
                         var errorMsg = response.message || 'Registration failed. Please try again.';
@@ -400,7 +442,6 @@ include 'header.php';?>
                             errorMsg += '</ul>';
                         }
                     } catch(e) {
-                        console.error('Error parsing response:', xhr.responseText);
                         if (xhr.responseText) {
                             errorMsg += '<br><small>' + xhr.responseText.substring(0, 200) + '</small>';
                         }

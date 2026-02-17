@@ -42,8 +42,6 @@ $bmdc_no = isset($_POST['bmdc_no']) ? trim($_POST['bmdc_no']) : '';
 $nid_number = isset($_POST['nid_number']) ? trim($_POST['nid_number']) : '';
 $password = isset($_POST['password']) ? trim($_POST['password']) : '';
 
-// Debug logging (remove in production)
-error_log("Registration attempt - User type: $user_type, Name: $name, Email: $email, Phone: " . (empty($phone) ? 'empty' : 'provided') . ", NID: " . (empty($nid_number) ? 'empty' : 'provided'));
 
 // Validate user type
 $valid_user_types = ['patient', 'doctor', 'healthcare'];
@@ -103,14 +101,22 @@ switch ($user_type) {
         break;
 
     case 'patient':
-        // No additional validations for patients
+        // Validate mobile number for patients
+        if (empty($phone) || strlen(trim($phone)) == 0) {
+            $errors[] = 'Mobile number is required';
+        } else {
+            // Remove spaces, dashes, and other non-digit characters for validation
+            $phone_clean = preg_replace('/[^0-9]/', '', $phone);
+            if (strlen($phone_clean) < 10) {
+                $errors[] = 'Mobile number must contain at least 10 digits';
+            }
+        }
         break;
 }
 
 // If there are validation errors, return them
 if (!empty($errors)) {
     http_response_code(400);
-    error_log("Validation errors: " . implode(', ', $errors));
     echo json_encode(['success' => false, 'message' => 'Validation failed. Please check the following:', 'errors' => $errors]);
     exit;
 }
@@ -221,7 +227,31 @@ try {
             break;
 
         case 'patient':
-            // No additional duplicate checks for patients
+            // Check if phone already exists
+            if (!empty($phone)) {
+                $phone_clean = preg_replace('/[^0-9]/', '', $phone);
+                
+                // Check if phone column exists
+                $columns_check = $conn->query("SHOW COLUMNS FROM patients LIKE 'phone'");
+                $has_phone = $columns_check && $columns_check->num_rows > 0;
+                
+                if ($has_phone && !empty($phone_clean)) {
+                    $stmt = $conn->prepare("SELECT id FROM patients WHERE phone = ? OR phone LIKE ?");
+                    $phone_pattern = '%' . $phone_clean . '%';
+                    $stmt->bind_param("ss", $phone_clean, $phone_pattern);
+                    $stmt->execute();
+                    $result = $stmt->get_result();
+
+                    if ($result->num_rows > 0) {
+                        http_response_code(409);
+                        echo json_encode(['success' => false, 'message' => 'Mobile number already registered']);
+                        $stmt->close();
+                        $conn->close();
+                        exit;
+                    }
+                    $stmt->close();
+                }
+            }
             break;
     }
 
@@ -234,8 +264,36 @@ try {
 
     switch ($user_type) {
         case 'patient':
-            $stmt = $conn->prepare("INSERT INTO patients (name, email, password) VALUES (?, ?, ?)");
-            $stmt->bind_param("sss", $name, $email, $hashed_password);
+            // Check if patients table exists
+            $table_check = $conn->query("SHOW TABLES LIKE 'patients'");
+            if (!$table_check || $table_check->num_rows == 0) {
+                throw new Exception("Patients table does not exist. Please run the database migration script first.");
+            }
+            
+            // Clean phone number (remove non-digits)
+            $phone_clean = !empty($phone) ? preg_replace('/[^0-9]/', '', $phone) : '';
+            
+            // Check if phone column exists in patients table
+            $columns_check = $conn->query("SHOW COLUMNS FROM patients LIKE 'phone'");
+            $has_phone = $columns_check && $columns_check->num_rows > 0;
+            
+            if ($has_phone && !empty($phone_clean)) {
+                $stmt = $conn->prepare("INSERT INTO patients (name, email, phone, password) VALUES (?, ?, ?, ?)");
+                if (!$stmt) {
+                    throw new Exception("Failed to prepare INSERT statement: " . $conn->error);
+                }
+                $stmt->bind_param("ssss", $name, $email, $phone_clean, $hashed_password);
+            } else {
+                // Fallback if phone column doesn't exist (but phone is still required, so this shouldn't happen)
+                if (empty($phone_clean)) {
+                    throw new Exception("Phone number is required but phone column may not exist in database. Please update your database schema.");
+                }
+                $stmt = $conn->prepare("INSERT INTO patients (name, email, password) VALUES (?, ?, ?)");
+                if (!$stmt) {
+                    throw new Exception("Failed to prepare INSERT statement: " . $conn->error);
+                }
+                $stmt->bind_param("sss", $name, $email, $hashed_password);
+            }
             $redirect_url = 'login.php';
             break;
 
@@ -278,6 +336,11 @@ try {
             break;
     }
 
+    // Check if statement was prepared successfully
+    if (!$stmt) {
+        throw new Exception("Failed to prepare statement: " . $conn->error);
+    }
+
     if ($stmt->execute()) {
         $user_id = $conn->insert_id;
 
@@ -287,7 +350,9 @@ try {
                 $_SESSION['patient_id'] = $user_id;
                 $_SESSION['patient_name'] = $name;
                 $_SESSION['patient_email'] = $email;
+                $_SESSION['patient_phone'] = isset($phone_clean) ? $phone_clean : '';
                 $_SESSION['user_type'] = 'patient';
+                $_SESSION['logged_in'] = true;
                 break;
 
             case 'doctor':
@@ -295,6 +360,7 @@ try {
                 $_SESSION['doctor_name'] = $name;
                 $_SESSION['doctor_email'] = $email;
                 $_SESSION['user_type'] = 'doctor';
+                $_SESSION['logged_in'] = true;
                 break;
 
             case 'healthcare':
@@ -307,8 +373,6 @@ try {
                 break;
         }
 
-        $_SESSION['logged_in'] = true;
-
         http_response_code(201);
         echo json_encode([
             'success' => true,
@@ -318,15 +382,21 @@ try {
             'redirect' => $redirect_url
         ]);
     } else {
-        throw new Exception("Registration failed: " . $stmt->error);
+        $error_msg = $stmt->error ? $stmt->error : $conn->error;
+        throw new Exception("Registration failed: " . $error_msg);
     }
 
     $stmt->close();
     $conn->close();
     
 } catch (Exception $e) {
+    ob_clean();
     http_response_code(500);
-    echo json_encode(['success' => false, 'message' => 'Registration failed. Please try again later.', 'error' => $e->getMessage()]);
+    error_log("Registration error: " . $e->getMessage());
+    echo json_encode([
+        'success' => false, 
+        'message' => 'Registration failed. Please try again later.'
+    ]);
 }
 ?>
 

@@ -41,8 +41,8 @@ include 'header.php';?>
 										<div id="login-message" class="alert" style="display: none;"></div>
 										<form id="doctor-login-form" method="POST">
 											<div class="mb-3">
-												<label class="form-label">E-mail</label>
-												<input type="email" class="form-control" name="email" id="login-email" required>
+												<label class="form-label">E-mail or Mobile</label>
+												<input type="text" class="form-control" name="email" id="login-email" placeholder="Enter email or mobile number" required>
 											</div>
 											<div class="mb-3">
 												<div class="form-group-flex">
@@ -137,7 +137,7 @@ include 'header.php';?>
 										redirectUrl = 'health-worker-profile-settings.php';
 										break;
 									case 'patient':
-										redirectUrl = 'index.html';
+										redirectUrl = 'patient-dashboard.php';
 										break;
 									default:
 										redirectUrl = 'doctor-profile-settings.php';
