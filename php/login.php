@@ -34,22 +34,24 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 }
 
 // Get and sanitize input data
-$email = isset($_POST['email']) ? trim($_POST['email']) : '';
+$email_or_mobile = isset($_POST['email']) ? trim($_POST['email']) : '';
 $password = isset($_POST['password']) ? $_POST['password'] : '';
 $remember_me = isset($_POST['remember_me']) ? true : false;
 
 // Validation
 $errors = [];
 
-if (empty($email)) {
-    $errors[] = 'Email is required';
-} elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-    $errors[] = 'Invalid email format';
+if (empty($email_or_mobile)) {
+    $errors[] = 'Email or mobile number is required';
 }
 
 if (empty($password)) {
     $errors[] = 'Password is required';
 }
+
+// Determine if input is email or mobile
+$is_email = filter_var($email_or_mobile, FILTER_VALIDATE_EMAIL);
+$is_mobile = preg_match('/^[0-9+\-\s()]+$/', $email_or_mobile) && strlen(preg_replace('/[^0-9]/', '', $email_or_mobile)) >= 10;
 
 // If there are validation errors, return them
 if (!empty($errors)) {
@@ -66,25 +68,27 @@ try {
     $user_type = null;
     $redirect_url = 'login.php';
     
-    // Check doctors table
-    $stmt = $conn->prepare("SELECT id, name, email, phone, bmdc_no, password FROM doctors WHERE email = ?");
-    $stmt->bind_param("s", $email);
-    $stmt->execute();
-    $result = $stmt->get_result();
-    
-    if ($result->num_rows > 0) {
-        $user_data = $result->fetch_assoc();
-        if (password_verify($password, $user_data['password'])) {
-            $user_type = 'doctor';
-            $user_found = true;
+    // Check doctors table (email only)
+    if ($is_email) {
+        $stmt = $conn->prepare("SELECT id, name, email, phone, bmdc_no, password FROM doctors WHERE email = ?");
+        $stmt->bind_param("s", $email_or_mobile);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        
+        if ($result->num_rows > 0) {
+            $user_data = $result->fetch_assoc();
+            if (password_verify($password, $user_data['password'])) {
+                $user_type = 'doctor';
+                $user_found = true;
+            }
         }
+        $stmt->close();
     }
-    $stmt->close();
     
-    // If not found in doctors, check healthcare_providers
-    if (!$user_found) {
+    // If not found in doctors, check healthcare_providers (email only)
+    if (!$user_found && $is_email) {
         $stmt = $conn->prepare("SELECT id, name, email, phone, nid_number, tid, password FROM healthcare_providers WHERE email = ?");
-        $stmt->bind_param("s", $email);
+        $stmt->bind_param("s", $email_or_mobile);
         $stmt->execute();
         $result = $stmt->get_result();
         
@@ -98,24 +102,44 @@ try {
         $stmt->close();
     }
     
-    // If not found, check patients table (if it exists)
+    // Check patients table - support both email and mobile
     if (!$user_found) {
         try {
-            $stmt = $conn->prepare("SELECT id, name, email, password FROM patients WHERE email = ?");
-            $stmt->bind_param("s", $email);
-            $stmt->execute();
-            $result = $stmt->get_result();
-            
-            if ($result->num_rows > 0) {
-                $user_data = $result->fetch_assoc();
-                if (password_verify($password, $user_data['password'])) {
-                    $user_type = 'patient';
-                    $user_found = true;
+            $stmt = null;
+            if ($is_email) {
+                // Login with email
+                $stmt = $conn->prepare("SELECT id, name, email, password FROM patients WHERE email = ?");
+                $stmt->bind_param("s", $email_or_mobile);
+            } elseif ($is_mobile) {
+                // Login with mobile - check if phone column exists
+                $mobile_clean = preg_replace('/[^0-9]/', '', $email_or_mobile);
+                // Try with phone column first, fallback to email if phone doesn't exist
+                try {
+                    $stmt = $conn->prepare("SELECT id, name, email, password FROM patients WHERE phone = ? OR phone LIKE ?");
+                    $mobile_pattern = '%' . $mobile_clean . '%';
+                    $stmt->bind_param("ss", $mobile_clean, $mobile_pattern);
+                } catch (Exception $e) {
+                    // Phone column doesn't exist, skip mobile login for patients
+                    $stmt = null;
                 }
             }
-            $stmt->close();
+            
+            if ($stmt) {
+                $stmt->execute();
+                $result = $stmt->get_result();
+                
+                if ($result->num_rows > 0) {
+                    $user_data = $result->fetch_assoc();
+                    if (password_verify($password, $user_data['password'])) {
+                        $user_type = 'patient';
+                        $user_found = true;
+                    }
+                }
+                $stmt->close();
+            }
         } catch (Exception $e) {
-            // Patients table doesn't exist, skip
+            // Patients table or phone column doesn't exist, skip
+            error_log("Patient login error: " . $e->getMessage());
         }
     }
     
@@ -174,7 +198,7 @@ try {
             $_SESSION['patient_id'] = $user_data['id'];
             $_SESSION['patient_name'] = $user_data['name'];
             $_SESSION['patient_email'] = $user_data['email'];
-            $redirect_url = 'index.html';
+            $redirect_url = 'patient-dashboard.php';
             break;
     }
     
