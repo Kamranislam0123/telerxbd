@@ -554,62 +554,22 @@ try {
             <ul class="owl-carousel partners-slider d-flex">
                 <li>
                     <a href="javascript:void(0);">
-                        <img class="img-fluid" src="assets/img/partners/partners-1.svg" alt="partners">
+                        <img class="img-fluid" src="assets/img/partners/brac.jpg" alt="partners">
                     </a>
                 </li>
                 <li>
                     <a href="javascript:void(0);">
-                        <img class="img-fluid" src="assets/img/partners/partners-2.svg" alt="partners">
+                        <img class="img-fluid" src="assets/img/partners/dhaam.jpg" alt="partners">
                     </a>
                 </li>
                 <li>
                     <a href="javascript:void(0);">
-                        <img class="img-fluid" src="assets/img/partners/partners-3.svg" alt="partners">
+                        <img class="img-fluid" src="assets/img/partners/labaid.jpg" alt="partners">
                     </a>
                 </li>
                 <li>
                     <a href="javascript:void(0);">
-                        <img class="img-fluid" src="assets/img/partners/partners-4.svg" alt="partners">
-                    </a>
-                </li>
-                <li>
-                    <a href="javascript:void(0);">
-                        <img class="img-fluid" src="assets/img/partners/partners-5.svg" alt="partners">
-                    </a>
-                </li>
-                <li>
-                    <a href="javascript:void(0);">
-                        <img class="img-fluid" src="assets/img/partners/partners-6.svg" alt="partners">
-                    </a>
-                </li>
-                <li>
-                    <a href="javascript:void(0);">
-                        <img class="img-fluid" src="assets/img/partners/partners-1.svg" alt="partners">
-                    </a>
-                </li>
-                <li>
-                    <a href="javascript:void(0);">
-                        <img class="img-fluid" src="assets/img/partners/partners-2.svg" alt="partners">
-                    </a>
-                </li>
-                <li>
-                    <a href="javascript:void(0);">
-                        <img class="img-fluid" src="assets/img/partners/partners-3.svg" alt="partners">
-                    </a>
-                </li>
-                <li>
-                    <a href="javascript:void(0);">
-                        <img class="img-fluid" src="assets/img/partners/partners-4.svg" alt="partners">
-                    </a>
-                </li>
-                <li>
-                    <a href="javascript:void(0);">
-                        <img class="img-fluid" src="assets/img/partners/partners-5.svg" alt="partners">
-                    </a>
-                </li>
-                <li>
-                    <a href="javascript:void(0);">
-                        <img class="img-fluid" src="assets/img/partners/partners-6.svg" alt="partners">
+                        <img class="img-fluid" src="assets/img/partners/rangm.jpg" alt="partners">
                     </a>
                 </li>
              </ul>
