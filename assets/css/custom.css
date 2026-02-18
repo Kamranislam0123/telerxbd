@@ -58584,7 +58584,7 @@ ul li {
 }
 
 .bookus-sec {
-  padding-top: 60px;
+  padding-top: 0px;
 }
 @media (max-width: 991.98px) {
   .bookus-sec {
@@ -58911,13 +58911,12 @@ ul li {
 
 .info-section {
   position: relative;
-  bottom: -40px;
-  z-index: 9;
-  margin-top: -40px;
+  bottom: 0px;
+  margin-top: 0px;
 }
 
 .contact-info {
-  background: linear-gradient(90.08deg, #15558d 0.09%, #0c77c9 70.28%);
+  background: linear-gradient(90.08deg, #08971b 0.09%, #12b554 70.28%);
   padding: 60px;
   border-radius: 30px;
 }

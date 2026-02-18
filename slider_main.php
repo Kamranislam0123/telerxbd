@@ -12,11 +12,6 @@ $slides = [
                 'description' => 'TeleRx Bangladesh provides free medical treatment, medicines, and health camps for underprivileged communities. We ensure healthcare reaches those who need it most.'
         ],
         [
-                'image' => 'assets/img/slider-home/slide2.jpg',
-                'title' => 'Global Care',
-                'description' => 'Planning treatment abroad? TeleRx Bangladesh offers complete guidance – from hospital selection to visa support and travel arrangements. Safe, smooth, and stress-free.'
-        ],
-        [
                 'image' => 'assets/img/slider-home/slide3.jpg',
                 'title' => 'Old-age Care',
                 'description' => 'Professional nursing care for the elderly – either at home or in partner old-age homes. Health monitoring, medication, and emotional support by TeleRx Bangladesh.'
@@ -144,10 +139,10 @@ $slides = [
     }
 
     .slide-title {
-        font-size: 2.5rem;
+        font-size: 32px;
         font-weight: 700;
         margin-bottom: 20px;
-        color: #15558d;
+        color: #012047;
         line-height: 1.2;
         position: relative;
         animation: slideInRight 0.7s ease;
