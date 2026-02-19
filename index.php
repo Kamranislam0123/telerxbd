@@ -17,6 +17,7 @@ try {
             dp.total_reviews,
             dp.average_rating,
             dp.is_available,
+            dp.district,
             dp.city,
             dp.state,
             dp.profile_image
@@ -175,8 +176,13 @@ try {
                                 </div>
                                 <div class="doc-pro-location">
                                     <p><i class="isax isax-location"></i> <?php 
-                                        $location_parts = array_filter([$doctor['city'] ?? '', $doctor['state'] ?? '']);
-                                        echo !empty($location_parts) ? htmlspecialchars(implode(', ', $location_parts)) : 'Location not specified';
+                                        $location_parts = array_filter([
+                                            $doctor['district'] ?? '', 
+                                            $doctor['city'] ?? '', 
+                                            $doctor['state'] ?? ''
+                                        ]);
+                                        $location_display = !empty($location_parts) ? implode(', ', $location_parts) : 'Dhaka, Bangladesh';
+                                        echo htmlspecialchars($location_display);
                                     ?></p>
                                     <span class="badge <?php echo ($doctor['is_available'] == 1) ? 'badge-success' : 'badge-danger'; ?> doc-badge">
                                         <i class="fa-solid fa-circle"></i><?php echo ($doctor['is_available'] == 1) ? 'Available' : 'Unavailable'; ?>
