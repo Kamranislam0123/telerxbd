@@ -14340,7 +14340,7 @@ header.inner-header .header-nav .header-navbar-rht li.noti-nav > a i {
 }
 
 .section-header-one {
-  margin-bottom: 40px;
+  margin-bottom: 30px;
 }
 .section-header-one h2 {
   font-size: 32px;
@@ -14431,7 +14431,7 @@ header.inner-header .header-nav .header-navbar-rht li.noti-nav > a i {
 .doctors-section {
   background: #F6FAFF;
   margin: 0;
-  padding: 60px 0;
+  padding: 60px 0px 30px 0px;
   position: relative;
   overflow: hidden;
   z-index: 1;
@@ -32049,7 +32049,7 @@ span.refund {
   }
 }
 .main-wrapper.home-ten .need-to-know-section {
-  padding: 60px 0 56px;
+  padding: 60px 0 30px;
   position: relative;
   color: #012047;
 }
@@ -51821,7 +51821,7 @@ ul li {
 
 .footer-twelve .footer-top-sec {
   background: #15558d;
-  margin: 30px 0 0px;
+  margin: 0px 0 0px;
   padding: 30px 0 30px;
 }
 .footer-twelve .footer-top-sec .footer-top {

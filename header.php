@@ -104,10 +104,10 @@ $current_page = basename($_SERVER['PHP_SELF']);
                                 <a href="doctors.php">Our Doctors</a>
                             </li>
                             <li class="<?php echo ($current_page == 'globalcare.php') ? 'active' : ''; ?>">
-                                <a href="doctors.php">Global Care</a>
+                                <a href="global-care.php">Global Care</a>
                             </li>
                             <li class="<?php echo ($current_page == 'welfare.php') ? 'active' : ''; ?>">
-                                <a href="doctors.php">Welfare</a>
+                                <a href="welfare.php">Welfare</a>
                             </li>
                             <li class="<?php echo ($current_page == 'about-us.php') ? 'active' : ''; ?>">
                                 <a href="about-us.php">About Us</a>

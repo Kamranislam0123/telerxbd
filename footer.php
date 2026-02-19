@@ -74,7 +74,7 @@
                     <div class="row">
                         <div class="col-md-12">
                             <div class="copyright-text">
-                                <p class="mb-0"> Copyright © {year} TeleRx Bangladesh | All Rights Reserved</p>
+                                <p class="mb-0"> <p>Copyright &copy; <script type="text/javascript">document.write(new Date().getFullYear());</script> TeleRx Bangladesh | All Rights Reserved</p>
                             </div>
                         </div>
                     </div>

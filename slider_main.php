@@ -27,6 +27,13 @@ $slides = [
     <div class="container">
         <div class="row">
             <div class="col-md-12 aos" data-aos="fade-up">
+                <div class="section-header-one section-header-slider text-center">
+                    <h2 class="section-title">TeleRx at a Glance</h2>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12 aos" data-aos="fade-up">
                 <div class="slider-wrapper">
                     <div class="slider-container" id="sliderContainer">
                         <?php foreach ($slides as $index => $slide): ?>
@@ -68,7 +75,7 @@ $slides = [
     }
 
     .slider-section {
-        padding: 30px 0;
+        padding: 60px 0;
         background: color (FFFFFF 0%);
         font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     }
@@ -98,8 +105,9 @@ $slides = [
         flex: 0 0 100%;
         display: flex;
         align-items: center;
+        margin-top: 0px;
         padding: 40px;
-        gap: 40px;
+        gap: 5px;
         background: rgba(255, 255, 255, 0.8);
         backdrop-filter: blur(10px);
         transition: opacity 0.5s ease;
@@ -236,7 +244,7 @@ $slides = [
     /* Dots */
     .slider-dots {
         position: absolute;
-        bottom: 20px;
+        bottom: 0px;
         left: 50%;
         transform: translateX(-50%);
         display: flex;
