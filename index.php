@@ -1,6 +1,41 @@
 <?php
 session_start();
 include 'header.php';
+
+// Fetch doctors for the slider section
+$doctors_slider = [];
+try {
+    require_once 'php/config.php';
+    $conn = getDBConnection();
+    
+    // Fetch doctors with their profiles, limit to 8 for slider
+    $stmt = $conn->prepare("
+        SELECT
+            d.*,
+            dp.specialty,
+            dp.consultation_fee,
+            dp.total_reviews,
+            dp.average_rating,
+            dp.is_available,
+            dp.district,
+            dp.city,
+            dp.state,
+            dp.profile_image
+        FROM doctors d
+        LEFT JOIN doctor_profiles dp ON d.id = dp.doctor_id
+        WHERE (dp.is_available = 1 OR dp.is_available IS NULL)
+        ORDER BY COALESCE(dp.average_rating, 0) DESC, COALESCE(dp.total_reviews, 0) DESC, d.created_at DESC
+        LIMIT 8
+    ");
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $doctors_slider = $result->fetch_all(MYSQLI_ASSOC);
+    $stmt->close();
+    $conn->close();
+} catch (Exception $e) {
+    error_log("Error fetching doctors for slider: " . $e->getMessage());
+    $doctors_slider = [];
+}
 ?>
 <!-- Home Banner -->
 <section class="banner-section banner-sec-one">
@@ -101,183 +136,73 @@ include 'header.php';
 <section class="doctors-section">
     <div class="container">
         <div class="row">
-            <div class="col-md-12 aos" data-aos="fade-up">
-                <div class="section-header-one section-header-slider text-center">
+            <div class="col-md-6 aos" data-aos="fade-up">
+                <div class="section-header-one section-header-slider">
                     <h2 class="section-title">Find Best Doctors</h2>
                 </div>
+            </div>
+            <div class="col-md-6 aos" data-aos="fade-up">
+                <div class="owl-nav slide-nav-2 text-end nav-control"></div>
             </div>
         </div>
         <div class="owl-carousel doctor-slider-one owl-theme aos" data-aos="fade-up">
 
-            <!-- Doctor Item -->
-            <div class="item">
-                <div class="doctor-profile-widget doc-item">
-                    <div class="doc-pro-img">
-                        <a href="doctor-profile.php">
-                            <div class="doctor-profile-img">
-                                <img src="assets/img/doctors/doctor-03.jpg" class="img-fluid" alt="Ruby Perrin">
+            <?php if (!empty($doctors_slider)): ?>
+                <?php foreach ($doctors_slider as $doctor): ?>
+                    <!-- Doctor Item -->
+                    <div class="item">
+                        <div class="doctor-profile-widget doc-item">
+                            <div class="doc-pro-img">
+                                <a href="doctor-profile.php?id=<?php echo $doctor['id']; ?>">
+                                    <div class="doctor-profile-img">
+                                        <img src="<?php echo htmlspecialchars($doctor['profile_image'] ?? 'assets/img/doctors/default-doctor.jpg'); ?>" class="img-fluid" alt="<?php echo htmlspecialchars($doctor['name']); ?>">
+                                    </div>
+                                </a>
+                                <div class="doctor-amount">
+                                    <span>$<?php echo number_format($doctor['consultation_fee'] ?? 0, 0); ?></span>
+                                </div>
                             </div>
-                        </a>
-                        <div class="doctor-amount">
-                            <span>$200</span>
+                            <div class="doc-content">
+                                <div class="doc-pro-info">
+                                    <div class="doc-pro-name">
+                                        <a href="doctor-profile.php?id=<?php echo $doctor['id']; ?>"><?php echo htmlspecialchars($doctor['name']); ?></a>
+                                        <p><?php echo htmlspecialchars($doctor['specialty'] ?? 'General Physician'); ?></p>
+                                    </div>
+                                    <div class="reviews-ratings">
+                                        <p>
+                                            <span><i class="fas fa-star"></i> <?php echo number_format($doctor['average_rating'] ?? 0, 1); ?></span> (<?php echo $doctor['total_reviews'] ?? 0; ?>)
+                                        </p>
+                                    </div>
+                                </div>
+                                <div class="doc-pro-location">
+                                    <p><i class="isax isax-location"></i> <?php 
+                                        $location_parts = array_filter([
+                                            $doctor['district'] ?? '', 
+                                            $doctor['city'] ?? '', 
+                                            $doctor['state'] ?? ''
+                                        ]);
+                                        $location_display = !empty($location_parts) ? implode(', ', $location_parts) : 'Dhaka, Bangladesh';
+                                        echo htmlspecialchars($location_display);
+                                    ?></p>
+                                    <span class="badge <?php echo ($doctor['is_available'] == 1) ? 'badge-success' : 'badge-danger'; ?> doc-badge">
+                                        <i class="fa-solid fa-circle"></i><?php echo ($doctor['is_available'] == 1) ? 'Available' : 'Unavailable'; ?>
+                                    </span>
+                                </div>
+                            </div>
                         </div>
                     </div>
-                    <div class="doc-content">
-                        <div class="doc-pro-info">
-                            <div class="doc-pro-name">
-                                <a href="doctor-profile.php">Dr. Downer</a>
-                                <p>Orthopedic</p>
-                            </div>
-                            <div class="reviews-ratings">
-                                <p>
-                                    <span><i class="fas fa-star"></i> 4.5</span> (35)
-                                </p>
-                            </div>
-                        </div>
-                        <div class="doc-pro-location">
-                            <p><i class="isax isax-location"></i> Newyork, USA</p>
-                            <span class="badge badge-success doc-badge"><i class="fa-solid fa-circle"></i>Available</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <!-- /Doctor Item -->
-
-            <!-- Doctor Item -->
-            <div class="item">
-                <div class="doctor-profile-widget doc-item">
-                    <div class="doc-pro-img">
-                        <a href="doctor-profile.php">
-                            <div class="doctor-profile-img">
-                                <img src="assets/img/doctors/doctor-02.jpg" class="img-fluid" alt="Paul Richard">
-                            </div>
-                        </a>
-                        <div class="doctor-amount">
-                            <span>$300</span>
-                        </div>
-                    </div>
-                    <div class="doc-content">
-                        <div class="doc-pro-info">
-                            <div class="doc-pro-name">
-                                <a href="doctor-profile.php">Dr. John Doe</a>
-                                <p>Dentist</p>
-                            </div>
-                            <div class="reviews-ratings">
-                                <p>
-                                    <span><i class="fas fa-star"></i> 4.3</span> (45)
-                                </p>
-                            </div>
-                        </div>
-                        <div class="doc-pro-location">
-                            <p><i class="isax isax-location"></i> Austin, TX</p>
-                            <span class="badge badge-success doc-badge"><i class="fa-solid fa-circle"></i>Available</span>
+                    <!-- /Doctor Item -->
+                <?php endforeach; ?>
+            <?php else: ?>
+                <!-- Fallback: Show message if no doctors found -->
+                <div class="item">
+                    <div class="doctor-profile-widget doc-item">
+                        <div class="doc-content text-center py-5">
+                            <p class="text-muted">No doctors available at the moment.</p>
                         </div>
                     </div>
                 </div>
-            </div>
-            <!-- /Doctor Item -->
-
-            <!-- Doctor Item -->
-            <div class="item">
-                <div class="doctor-profile-widget doc-item">
-                    <div class="doc-pro-img">
-                        <a href="doctor-profile.php">
-                            <div class="doctor-profile-img">
-                                <img src="assets/img/doctors/doctor-04.jpg" class="img-fluid" alt="Darren Elder">
-                            </div>
-                        </a>
-                        <div class="doctor-amount">
-                            <span>$100</span>
-                        </div>
-                    </div>
-                    <div class="doc-content">
-                        <div class="doc-pro-info">
-                            <div class="doc-pro-name">
-                                <a href="doctor-profile.php">Dr. Aviles</a>
-                                <p>Neurology</p>
-                            </div>
-                            <div class="reviews-ratings">
-                                <p>
-                                    <span><i class="fas fa-star"></i> 4.0</span> (20)
-                                </p>
-                            </div>
-                        </div>
-                        <div class="doc-pro-location">
-                            <p><i class="isax isax-location"></i> Newyork, USA</p>
-                            <span class="badge badge-danger doc-badge"><i class="fa-solid fa-circle"></i>Unavailable</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <!-- /Doctor Item -->
-
-            <!-- Doctor Item -->
-            <div class="item">
-                <div class="doctor-profile-widget doc-item">
-                    <div class="doc-pro-img">
-                        <a href="doctor-profile.php">
-                            <div class="doctor-profile-img">
-                                <img src="assets/img/doctors/doctor-05.jpg" class="img-fluid" alt="Sofia Brient">
-                            </div>
-                        </a>
-                        <div class="doctor-amount">
-                            <span>$250</span>
-                        </div>
-                    </div>
-                    <div class="doc-content">
-                        <div class="doc-pro-info">
-                            <div class="doc-pro-name">
-                                <a href="doctor-profile.php">Dr. Palmore</a>
-                                <p>Immunologist</p>
-                            </div>
-                            <div class="reviews-ratings">
-                                <p>
-                                    <span><i class="fas fa-star"></i> 4.5</span> (35)
-                                </p>
-                            </div>
-                        </div>
-                        <div class="doc-pro-location">
-                            <p><i class="isax isax-location"></i> Waipahu, HI</p>
-                            <span class="badge badge-success doc-badge"><i class="fa-solid fa-circle"></i>Available</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <!-- /Doctor Item -->
-
-            <!-- Doctor Item -->
-            <div class="item">
-                <div class="doctor-profile-widget doc-item">
-                    <div class="doc-pro-img">
-                        <a href="doctor-profile.php">
-                            <div class="doctor-profile-img">
-                                <img src="assets/img/doctors/doctor-01.jpg" class="img-fluid" alt="John Doe">
-                            </div>
-                        </a>
-                        <div class="doctor-amount">
-                            <span>$880</span>
-                        </div>
-                    </div>
-                    <div class="doc-content">
-                        <div class="doc-pro-info">
-                            <div class="doc-pro-name">
-                                <a href="doctor-profile.php">Dr. Paul Richard</a>
-                                <p>Dentist</p>
-                            </div>
-                            <div class="reviews-ratings">
-                                <p>
-                                    <span><i class="fas fa-star"></i> 4.4</span> (50)
-                                </p>
-                            </div>
-                        </div>
-                        <div class="doc-pro-location">
-                            <p><i class="isax isax-location"></i> California, USA</p>
-                            <span class="badge badge-success doc-badge"><i class="fa-solid fa-circle"></i>Available</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <!-- /Doctor Item -->
+            <?php endif; ?>
 
         </div>
     </div>
