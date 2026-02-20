@@ -103,14 +103,17 @@ $current_page = basename($_SERVER['PHP_SELF']);
                             <li class="<?php echo ($current_page == 'doctors.php') ? 'active' : ''; ?>">
                                 <a href="doctors.php">Our Doctors</a>
                             </li>
+                            <li class="<?php echo ($current_page == 'globalcare.php') ? 'active' : ''; ?>">
+                                <a href="global-care.php">Global Care</a>
+                            </li>
+                            <li class="<?php echo ($current_page == 'welfare.php') ? 'active' : ''; ?>">
+                                <a href="welfare.php">Welfare</a>
+                            </li>
                             <li class="<?php echo ($current_page == 'about-us.php') ? 'active' : ''; ?>">
                                 <a href="about-us.php">About Us</a>
                             </li>
                             <li class="<?php echo ($current_page == 'contact-us.php') ? 'active' : ''; ?>">
                                 <a href="contact-us.php">Contact</a>
-                            </li>
-                            <li class="<?php echo ($current_page == 'blog.php') ? 'active' : ''; ?>">
-                                <a href="blog.php">Blog</a>
                             </li>
                             <!-- Mobile view login/signup link -->
                             <li class="login-link">

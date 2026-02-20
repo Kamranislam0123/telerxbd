@@ -12,11 +12,6 @@ $slides = [
                 'description' => 'TeleRx Bangladesh provides free medical treatment, medicines, and health camps for underprivileged communities. We ensure healthcare reaches those who need it most.'
         ],
         [
-                'image' => 'assets/img/slider-home/slide2.jpg',
-                'title' => 'Global Care',
-                'description' => 'Planning treatment abroad? TeleRx Bangladesh offers complete guidance – from hospital selection to visa support and travel arrangements. Safe, smooth, and stress-free.'
-        ],
-        [
                 'image' => 'assets/img/slider-home/slide3.jpg',
                 'title' => 'Old-age Care',
                 'description' => 'Professional nursing care for the elderly – either at home or in partner old-age homes. Health monitoring, medication, and emotional support by TeleRx Bangladesh.'
@@ -30,6 +25,13 @@ $slides = [
 ?>
 <section class="slider-section">
     <div class="container">
+        <div class="row">
+            <div class="col-md-12 aos" data-aos="fade-up">
+                <div class="section-header-one section-header-slider text-center">
+                    <h2 class="section-title">TeleRx at a Glance</h2>
+                </div>
+            </div>
+        </div>
         <div class="row">
             <div class="col-md-12 aos" data-aos="fade-up">
                 <div class="slider-wrapper">
@@ -73,7 +75,7 @@ $slides = [
     }
 
     .slider-section {
-        padding: 30px 0;
+        padding: 60px 0;
         background: color (FFFFFF 0%);
         font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     }
@@ -103,8 +105,9 @@ $slides = [
         flex: 0 0 100%;
         display: flex;
         align-items: center;
+        margin-top: 0px;
         padding: 40px;
-        gap: 40px;
+        gap: 5px;
         background: rgba(255, 255, 255, 0.8);
         backdrop-filter: blur(10px);
         transition: opacity 0.5s ease;
@@ -144,10 +147,10 @@ $slides = [
     }
 
     .slide-title {
-        font-size: 2.5rem;
+        font-size: 32px;
         font-weight: 700;
         margin-bottom: 20px;
-        color: #15558d;
+        color: #012047;
         line-height: 1.2;
         position: relative;
         animation: slideInRight 0.7s ease;
@@ -241,7 +244,7 @@ $slides = [
     /* Dots */
     .slider-dots {
         position: absolute;
-        bottom: 20px;
+        bottom: 0px;
         left: 50%;
         transform: translateX(-50%);
         display: flex;
