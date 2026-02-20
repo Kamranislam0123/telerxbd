@@ -115,9 +115,6 @@ $current_page = basename($_SERVER['PHP_SELF']);
                             <li class="<?php echo ($current_page == 'contact-us.php') ? 'active' : ''; ?>">
                                 <a href="contact-us.php">Contact</a>
                             </li>
-                            <li class="<?php echo ($current_page == 'blog.php') ? 'active' : ''; ?>">
-                                <a href="blog.php">Blog</a>
-                            </li>
                             <!-- Mobile view login/signup link -->
                             <li class="login-link">
                                 <?php if(isset($_SESSION['logged_in']) && $_SESSION['logged_in'] === true): ?>
