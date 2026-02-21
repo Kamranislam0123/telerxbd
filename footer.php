@@ -107,6 +107,9 @@
     <script src="assets/js/moment.min.js"></script>
     <script src="assets/js/bootstrap-datetimepicker.min.js"></script>
 
+    <!-- select JS -->
+    <script src="assets/plugins/select2/js/select2.min.js"></script>
+
     <!-- Owl Carousel JS -->
     <script src="assets/js/owl.carousel.min.js"></script>
 
