@@ -12,10 +12,20 @@
 
 
 // Database configuration local
+// define('DB_HOST', 'localhost');
+// define('DB_USER', 'root');
+// define('DB_PASS', '');
+// define('DB_NAME', 'telerx_db');
+
+// Database configuration local kamran
+
 define('DB_HOST', 'localhost');
 define('DB_USER', 'root');
-define('DB_PASS', '');
+define('DB_PASS', '123');
 define('DB_NAME', 'telerx_db');
+
+
+
 
 
 // Create database connection
