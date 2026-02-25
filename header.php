@@ -73,6 +73,7 @@ $current_page = basename($_SERVER['PHP_SELF']);
 
     <!-- Main CSS -->
     <link rel="stylesheet" href="assets/css/custom.css">
+    
 </head>
 <body>
     <!-- Main Wrapper -->
@@ -104,30 +105,30 @@ $current_page = basename($_SERVER['PHP_SELF']);
                             </a>
                         </div>
                         <ul class="main-nav">
-                            <li class="<?php echo ($current_page == 'index.php') ? 'active' : ''; ?>">
+                            <li class="<?php echo ($current_page == 'index') ? 'active' : ''; ?>">
                                 <a href="/">Home</a>
                             </li>
-                            <li class="<?php echo ($current_page == 'doctors.php') ? 'active' : ''; ?>">
-                                <a href="doctors.php">Our Doctors</a>
+                            <li class="<?php echo ($current_page == 'doctors') ? 'active' : ''; ?>">
+                                <a href="doctors">Our Doctors</a>
                             </li>
-                            <li class="<?php echo ($current_page == 'globalcare.php') ? 'active' : ''; ?>">
-                                <a href="global-care.php">Global Care</a>
+                            <li class="<?php echo ($current_page == 'globalcare') ? 'active' : ''; ?>">
+                                <a href="global-care">Global Care</a>
                             </li>
-                            <li class="<?php echo ($current_page == 'welfare.php') ? 'active' : ''; ?>">
-                                <a href="welfare.php">Welfare</a>
+                            <li class="<?php echo ($current_page == 'welfare') ? 'active' : ''; ?>">
+                                <a href="welfare">TeleRx Welfare</a>
                             </li>
-                            <li class="<?php echo ($current_page == 'about-us.php') ? 'active' : ''; ?>">
-                                <a href="about-us.php">About Us</a>
+                            <li class="<?php echo ($current_page == 'about-us') ? 'active' : ''; ?>">
+                                <a href="about-us">About Us</a>
                             </li>
-                            <li class="<?php echo ($current_page == 'contact-us.php') ? 'active' : ''; ?>">
-                                <a href="contact-us.php">Contact</a>
+                            <li class="<?php echo ($current_page == 'contact-us') ? 'active' : ''; ?>">
+                                <a href="contact-us">Contact</a>
                             </li>
                             <!-- Mobile view login/signup link -->
                             <li class="login-link">
                                 <?php if(isset($_SESSION['logged_in']) && $_SESSION['logged_in'] === true): ?>
-                                    <a href="logout.php">Logout</a>
+                                    <a href="logout">Logout</a>
                                 <?php else: ?>
-                                    <a href="login.php">Login / Signup</a>
+                                    <a href="login">Login / Signup</a>
                                 <?php endif; ?>
                             </li>
                         </ul>
@@ -194,28 +195,28 @@ $current_page = basename($_SERVER['PHP_SELF']);
                                     </div>
 
                                     <?php if($_SESSION['user_type'] == 'doctor'): ?>
-                                        <a class="dropdown-item" href="doctor-dashboard.php">Dashboard</a>
-                                        <a class="dropdown-item" href="doctor-profile-settings.php">Profile Settings</a>
+                                        <a class="dropdown-item" href="doctor-dashboard">Dashboard</a>
+                                        <a class="dropdown-item" href="doctor-profile-settings">Profile Settings</a>
                                     <?php elseif($_SESSION['user_type'] == 'healthcare'): ?>
-                                        <a class="dropdown-item" href="health-worker-dashboard.php">Dashboard</a>
-                                        <a class="dropdown-item" href="health-worker-profile-settings.php">Profile Settings</a>
+                                        <a class="dropdown-item" href="health-worker-dashboard">Dashboard</a>
+                                        <a class="dropdown-item" href="health-worker-profile-settings">Profile Settings</a>
                                     <?php elseif($_SESSION['user_type'] == 'patient'): ?>
-                                        <a class="dropdown-item" href="patient-dashboard.php">Dashboard</a>
-                                        <a class="dropdown-item" href="patient-profile-settings.php">Profile Settings</a>
+                                        <a class="dropdown-item" href="patient-dashboard">Dashboard</a>
+                                        <a class="dropdown-item" href="patient-profile-settings">Profile Settings</a>
                                     <?php endif; ?>
 
-                                    <a class="dropdown-item" href="php/logout.php">Logout</a>
+                                    <a class="dropdown-item" href="php/logout">Logout</a>
                                 </div>
                             </li>
                         <?php else: ?>
                             <!-- Guest/Non-logged in menu -->
                             <li class="register-btn">
-                                <a href="registration.php" class="btn btn-dark reg-btn">
+                                <a href="registration" class="btn btn-dark reg-btn">
                                     <i class="isax isax-user"></i>Register
                                 </a>
                             </li>
                             <li class="register-btn">
-                                <a href="login.php" class="btn btn-primary log-btn">
+                                <a href="login" class="btn btn-primary log-btn">
                                     <i class="isax isax-lock"></i>Login
                                 </a>
                             </li>
