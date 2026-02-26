@@ -2,28 +2,6 @@
 session_start();
 include 'header.php';?>
 
-<head>
-<body>
-    <!-- Breadcrumb -->
-    <div class="breadcrumb-bar">
-        <div class="container">
-            <div class="row align-items-center inner-banner">
-                <div class="col-md-12 col-12 text-center">
-                    <nav aria-label="breadcrumb" class="page-breadcrumb">
-                        <h2 class="breadcrumb-title">About TeleRx Bangladesh</h2>
-                    </nav>
-                </div>
-            </div>
-        </div>
-        <div class="breadcrumb-bg">
-            <img src="assets/img/bg/breadcrumb-bg-01.png" alt="img" class="breadcrumb-bg-01">
-            <img src="assets/img/bg/breadcrumb-bg-02.png" alt="img" class="breadcrumb-bg-02">
-            <img src="assets/img/bg/breadcrumb-icon.png" alt="img" class="breadcrumb-bg-03">
-            <img src="assets/img/bg/breadcrumb-icon.png" alt="img" class="breadcrumb-bg-04">
-        </div>
-    </div>
-    <!-- /Breadcrumb -->
-
     <!-- About Us -->
     <section class="about-section">
         <div class="container">
@@ -577,6 +555,5 @@ include 'header.php';?>
         </div>
     </section>
     <!-- /FAQ Section -->
-</body>
-</html>
+
 <?php include 'footer.php'; ?>

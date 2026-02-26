@@ -46610,7 +46610,7 @@ ul.benifits-col li i {
 
 .about-section {
   background-color: #FFF;
-  padding: 30px 0 30px;
+  padding: 60px 0 30px;
 }
 .about-section .about-img-info {
   padding-right: 30px;
@@ -48895,7 +48895,7 @@ input:checked + .tog-slider:before {
 
 /****** UTILS ******/
 .contact-section {
-  padding: 90px 0 30px;
+  padding: 80px 0 30px;
 }
 @media (max-width: 991.98px) {
   .contact-section {
