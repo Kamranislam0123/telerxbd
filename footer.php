@@ -127,5 +127,17 @@
 
     <!-- Custom JS -->
     <script src="assets/js/script.js"></script>
+
+    <!-- Sticky Sidebar JS -->
+    <script src="assets/plugins/theia-sticky-sidebar/ResizeSensor.js"></script>
+    <script src="assets/plugins/theia-sticky-sidebar/theia-sticky-sidebar.js"></script>
+
+    <!-- Apexchart JS -->
+    <script src="assets/plugins/apex/apexcharts.min.js"></script>
+    <script src="assets/plugins/apex/chart-data.js"></script>
+    
+    <!-- Circle Progress JS -->
+    <script src="assets/js/circle-progress.min.js"></script>
+
 </body>
 </head>
