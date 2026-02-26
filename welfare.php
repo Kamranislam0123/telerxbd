@@ -76,9 +76,9 @@ $bkash_number = "01933-890894 (Personal)";
         
         /* Title Styles */
         .welfare-title {
-            font-size: 4.5rem;
+            font-size: 56px;
             font-weight: 800;
-            margin: 50px;
+            margin: 30px;
             color: white;
             text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
             animation: fadeInDown 1s ease;
@@ -102,8 +102,8 @@ $bkash_number = "01933-890894 (Personal)";
         }
         
         .welfare-tagline {
-            font-size: 2.5rem;
-            margin-bottom: 60px;
+            font-size: 32px;
+            margin-bottom: 30px;
             opacity: 0.9;
             color: #fff;
             text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);

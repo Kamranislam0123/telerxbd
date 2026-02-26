@@ -163,7 +163,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 <input type="text" name="phone" placeholder="Mobile Number *" required>
 <input type="email" name="email" placeholder="Email (Optional)">
 
-<label>Attach File (Optional - PDF/JPG/PNG, Max 5MB each)</label>
+<label style="font-size: 13px;">Attach File (Optional - PDF/JPG/PNG, Max 5MB each)</label>
 <input type="file" name="attachment[]" multiple>
 
 <textarea name="description" rows="5" placeholder="Description *" required></textarea>
