@@ -10,11 +10,9 @@ define('DB_USER', 'telerxb2_telerx');
 define('DB_PASS', '&+;*LkaHNYztJ+{E');
 define('DB_NAME', 'telerxb2_telerx_db');
 
+
+
 // Database configuration local kamran
-
-<<<<<<< HEAD
-// Database configuration local
-
 
 // define('DB_HOST', 'localhost');
 // define('DB_USER', 'root');
@@ -22,18 +20,15 @@ define('DB_NAME', 'telerxb2_telerx_db');
 // define('DB_NAME', 'telerx_db');
 
 
+// Database configuration local mehedi
 
 // define('DB_HOST', 'localhost');
 // define('DB_USER', 'root');
 // define('DB_PASS', '');
 // define('DB_NAME', 'telerx_db');
 
-=======
-define('DB_HOST', 'localhost');
-define('DB_USER', 'root');
-define('DB_PASS', '');
-define('DB_NAME', 'telerx_db');
->>>>>>> 27610f44325803057cd517884b7080b441dec22d
+
+
 
 // Create database connection
 function getDBConnection() {
