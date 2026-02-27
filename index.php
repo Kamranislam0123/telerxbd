@@ -354,4 +354,6 @@ try {
 
 <?php include 'testimonial.php'; ?>
 
+<?php include 'footer-banner.php'; ?>
+
 <?php include 'footer.php'; ?>
