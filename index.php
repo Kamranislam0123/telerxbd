@@ -328,22 +328,22 @@ try {
             <ul class="owl-carousel partners-slider d-flex">
                 <li>
                     <a href="javascript:void(0);">
-                        <img class="img-fluid" src="assets/img/partners/brac.jpg" alt="partners">
+                        <img class="img-fluid" src="assets/img/partners/rac.jpg" alt="partners">
                     </a>
                 </li>
                 <li>
                     <a href="javascript:void(0);">
-                        <img class="img-fluid" src="assets/img/partners/dhaam.jpg" alt="partners">
+                        <img class="img-fluid" src="assets/img/partners/haam.jpg" alt="partners">
                     </a>
                 </li>
                 <li>
                     <a href="javascript:void(0);">
-                        <img class="img-fluid" src="assets/img/partners/labaid.jpg" alt="partners">
+                        <img class="img-fluid" src="assets/img/partners/abaid.jpg" alt="partners">
                     </a>
                 </li>
                 <li>
                     <a href="javascript:void(0);">
-                        <img class="img-fluid" src="assets/img/partners/rangm.jpg" alt="partners">
+                        <img class="img-fluid" src="assets/img/partners/angm.jpg" alt="partners">
                     </a>
                 </li>
              </ul>

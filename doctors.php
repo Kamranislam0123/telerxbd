@@ -96,9 +96,34 @@ try {
     $final_specialities = [];
 }
 ?>
+    <style>                               
+        /* Specialities filter with scroll */
+        .specialities-scroll {
+            max-height: 265px; /* ৬টি আইটেম দেখানোর জন্য প্রায় */
+            overflow-y: auto;
+            padding-right: 10px;
+        }
 
-<head>
-<body>
+        /* Scrollbar styling (optional) */
+        .specialities-scroll::-webkit-scrollbar {
+            width: 7px;
+        }
+
+        .specialities-scroll::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+
+        .specialities-scroll::-webkit-scrollbar-thumb {
+            background: #0c77c9;
+            border-radius: 10px;
+        }
+
+        .specialities-scroll::-webkit-scrollbar-thumb:hover {
+            background: #15558d;
+        }
+        
+    </style>
 
     <!-- Breadcrumb -->
     <div class="breadcrumb-bar overflow-visible">
@@ -106,7 +131,7 @@ try {
             <div class="row align-items-center inner-banner">
                 <div class="col-md-12 col-12 text-center">
                     <nav aria-label="breadcrumb" class="page-breadcrumb">
-                        <h2 class="breadcrumb-title">Our Doctors</h2>
+                        <h2 class="breadcrumb-title">Search Doctors</h2>
                     </nav>
                 </div>
             </div>
@@ -116,7 +141,7 @@ try {
                         <div class="search-input search-line">
                             <i class="isax isax-hospital5 bficon"></i>
                             <div class=" mb-0">
-                                <input type="text" class="form-control" placeholder="Search for Doctors, Hospitals, Clinics">
+                                <input type="text" class="form-control" placeholder="Search for Doctors">
                             </div>
                         </div>
                         <div class="search-input search-map-line">
@@ -154,14 +179,8 @@ try {
                     <div class="card filter-lists">
                         <div class="card-header">
                             <div class="d-flex align-items-center filter-head justify-content-between">
-                                <h4>Filter</h4>
+                                <h4>Filter Doctors</h4>
                                 <a href="#" class="text-secondary text-decoration-underline clear-all-filters">Clear All</a>
-                            </div>
-                            <div class="filter-input">
-                                <div class="position-relative input-icon">
-                                    <input type="text" class="form-control">
-                                    <span><i class="isax isax-search-normal-1"></i></span>
-                                </div>
                             </div>
                         </div>
                         <div class="card-body p-0">
@@ -176,45 +195,52 @@ try {
                                         </div>
                                     </div>
                                 </div>
+                                
                                 <div id="collapse1" class="accordion-collapse show" aria-labelledby="heading1">
                                     <div class="accordion-body pt-3">
-                                        <?php
-                                        if (!empty($final_specialities)):
-                                            $speciality_index = 2; // Starting from checkebox-sm2
-
-                                            // Show all specialities from the list at once
-                                            $speciality_array = array_keys($final_specialities);
-
-                                            // Display all specialities
-                                            foreach ($speciality_array as $index => $speciality):
-                                                $count = $final_specialities[$speciality];
-                                                $checkbox_id = 'checkebox-sm' . $speciality_index;
-                                        ?>
-                                        <div class="d-flex align-items-center justify-content-between mb-2">
-                                            <div class="form-check">
-                                                <input class="form-check-input speciality-filter" type="checkbox" value="<?php echo htmlspecialchars($speciality); ?>" id="<?php echo $checkbox_id; ?>" data-speciality="<?php echo htmlspecialchars($speciality); ?>">
-                                                <label class="form-check-label" for="<?php echo $checkbox_id; ?>">
-                                                    <?php echo htmlspecialchars($speciality); ?>
-                                                </label>
+                                        <div class="specialities-scroll">
+                                            <?php
+                                            if (!empty($final_specialities)):
+                                                $speciality_index = 2; // Starting from checkebox-sm2
+                                                
+                                                arsort($final_specialities);
+                                                
+                                                // Display all specialities
+                                                foreach ($final_specialities as $speciality => $count):
+                                                    $checkbox_id = 'checkebox-sm' . $speciality_index;
+                                            ?>
+                                            <div class="d-flex align-items-center justify-content-between mb-2">
+                                                <div class="form-check">
+                                                    <input class="form-check-input speciality-filter" type="checkbox" 
+                                                        value="<?php echo htmlspecialchars($speciality); ?>" 
+                                                        id="<?php echo $checkbox_id; ?>" 
+                                                        data-speciality="<?php echo htmlspecialchars($speciality); ?>">
+                                                    <label class="form-check-label" for="<?php echo $checkbox_id; ?>">
+                                                        <?php echo htmlspecialchars($speciality); ?>
+                                                    </label>
+                                                </div>
+                                                <span class="filter-badge"><?php echo $count; ?></span>
                                             </div>
-                                            <span class="filter-badge"><?php echo $count; ?></span>
-                                        </div>
-                                        <?php
-                                                $speciality_index++;
-                                            endforeach;
-                                        ?>
-                                        <?php else: ?>
-                                        <div class="d-flex align-items-center justify-content-between mb-2">
-                                            <div class="form-check">
-                                                <input class="form-check-input" type="checkbox" value="" id="checkebox-sm2" checked="">
-                                                <label class="form-check-label" for="checkebox-sm2">
-                                                    No Specialities Available
-                                                </label>
+                                            <?php
+                                                    $speciality_index++;
+                                                endforeach;
+                                            else:
+                                            ?>
+                                            <div class="d-flex align-items-center justify-content-between mb-2">
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="checkbox" value="" id="checkebox-sm2" checked="">
+                                                    <label class="form-check-label" for="checkebox-sm2">
+                                                        No Specialities Available
+                                                    </label>
+                                                </div>
+                                                <span class="filter-badge">0</span>
                                             </div>
-                                            <span class="filter-badge">0</span>
+                                            <?php endif; ?>
                                         </div>
-                                        <?php endif; ?>
                                     </div>
+                                        <div class="view-all">
+                                            <a href="javascript:void(0);" class="viewall-button-two text-secondary text-decoration-underline">View More</a>
+                                        </div>
                                 </div>
                             </div>
                             <div class="accordion-item border-bottom">
@@ -251,81 +277,7 @@ try {
                                     </div>
                                 </div>
                             </div>
-                            <div class="accordion-item border-bottom">
-                                <div class="accordion-header" id="heading3">
-                                    <div class="accordion-button" data-bs-toggle="collapse" data-bs-target="#collapse3" aria-controls="collapse3" role="button">
-                                        <div class="d-flex align-items-center w-100">
-                                            <h5>Availability</h5>
-                                            <div class="ms-auto">
-                                                <span><i class="fas fa-chevron-down"></i></span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div id="collapse3" class="accordion-collapse show" aria-labelledby="heading3">
-                                    <div class="accordion-body pt-3">
-                                        <div class="d-flex align-items-center justify-content-between mb-2">
-                                            <div class="form-check">
-                                                <input class="form-check-input" type="checkbox" value="" id="checkebox-sm13" checked="">
-                                                <label class="form-check-label" for="checkebox-sm13">
-                                                    Available Today
-                                                </label>
-                                            </div>
-                                        </div>
-                                        <div class="d-flex align-items-center justify-content-between mb-2">
-                                            <div class="form-check">
-                                                <input class="form-check-input" type="checkbox" value="" id="checkebox-sm14">
-                                                <label class="form-check-label" for="checkebox-sm14">
-                                                    Available Tomorrow
-                                                </label>
-                                            </div>
-                                        </div>
-                                        <div class="view-content">
-                                            <div class="viewall-two">
-                                                <div class="d-flex align-items-center justify-content-between mb-2">
-                                                    <div class="form-check">
-                                                        <input class="form-check-input" type="checkbox" value="" id="checkebox-sm15">
-                                                        <label class="form-check-label" for="checkebox-sm15">
-                                                            Available in Next 7 Days
-                                                        </label>
-                                                    </div>
-                                                </div>
-                                                <div class="d-flex align-items-center justify-content-between mb-2">
-                                                    <div class="form-check">
-                                                        <input class="form-check-input" type="checkbox" value="" id="checkebox-sm16">
-                                                        <label class="form-check-label" for="checkebox-sm16">
-                                                            Available in Next 30 Days
-                                                        </label>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="view-all">
-                                                <a href="javascript:void(0);" class="viewall-button-two text-secondary text-decoration-underline">View More</a>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <!-- <div class="accordion-item border-bottom">
-                                <div class="accordion-header" id="heading4">
-                                    <div class="accordion-button" data-bs-toggle="collapse" data-bs-target="#collapse4" aria-controls="collapse4" role="button">
-                                        <div class="d-flex align-items-center w-100">
-                                            <h5>Pricing</h5>
-                                            <div class="ms-auto">
-                                                <span><i class="fas fa-chevron-down"></i></span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div id="collapse4" class="accordion-collapse show" aria-labelledby="heading4">
-                                    <div class="accordion-body pt-3">
-                                        <div class="filter-range">
-                                            <input type="text" id="range_03">
-                                        </div>
-                                        <p class="mb-0">Range : $200 - $5695</p>
-                                    </div>
-                                </div>
-                            </div> -->
+                            
                             <div class="accordion-item border-bottom">
                                 <div class="accordion-header" id="heading5">
                                     <div class="accordion-button" data-bs-toggle="collapse" data-bs-target="#collapse5" aria-controls="collapse5" role="button">
@@ -381,165 +333,7 @@ try {
                                     </div>
                                 </div>
                             </div>
-                            <!-- <div class="accordion-item border-bottom">
-                                <div class="accordion-header" id="heading6">
-                                    <div class="accordion-button" data-bs-toggle="collapse" data-bs-target="#collapse6" aria-controls="collapse6" role="button">
-                                        <div class="d-flex align-items-center w-100">
-                                            <h5>Clinics</h5>
-                                            <div class="ms-auto">
-                                                <span><i class="fas fa-chevron-down"></i></span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div id="collapse6" class="accordion-collapse show" aria-labelledby="heading6">
-                                    <div class="accordion-body pt-3">
-                                        <div class="d-flex align-items-center justify-content-between mb-2">
-                                            <div class="form-check">
-                                                <input class="form-check-input" type="checkbox" value="" id="checkebox-sm25" checked="">
-                                                <label class="form-check-label" for="checkebox-sm25">
-                                                    Bright Smiles Dental Clinic
-                                                </label>
-                                            </div>
-                                        </div>
-                                        <div class="d-flex align-items-center justify-content-between mb-2">
-                                            <div class="form-check">
-                                                <input class="form-check-input" type="checkbox" value="" id="checkebox-sm26">
-                                                <label class="form-check-label" for="checkebox-sm26">
-                                                    Family Care Clinic
-                                                </label>
-                                            </div>
-                                        </div>
-                                        <div class="d-flex align-items-center justify-content-between mb-2">
-                                            <div class="form-check">
-                                                <input class="form-check-input" type="checkbox" value="" id="checkebox-sm27">
-                                                <label class="form-check-label" for="checkebox-sm27">
-                                                    Express Health Clinic
-                                                </label>
-                                            </div>
-                                        </div>
-                                        <div class="view-content">
-                                            <div class="viewall-4">
-                                                <div class="d-flex align-items-center justify-content-between mb-2">
-                                                    <div class="form-check">
-                                                        <input class="form-check-input" type="checkbox" value="" id="checkebox-sm28">
-                                                        <label class="form-check-label" for="checkebox-sm28">
-                                                            Restore Physical Therapy
-                                                        </label>
-                                                    </div>
-                                                </div>
-                                                <div class="d-flex align-items-center justify-content-between mb-2">
-                                                    <div class="form-check">
-                                                        <input class="form-check-input" type="checkbox" value="" id="checkebox-sm29">
-                                                        <label class="form-check-label" for="checkebox-sm29">
-                                                            Blossom Women’s Health Clinic
-                                                        </label>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="view-all">
-                                                <a href="javascript:void(0);" class="viewall-button-4 text-secondary text-decoration-underline">View More</a>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div> -->
-                            <!-- <div class="accordion-item border-bottom">
-                                <div class="accordion-header" id="heading7">
-                                    <div class="accordion-button" data-bs-toggle="collapse" data-bs-target="#collapse7" aria-controls="collapse7" role="button">
-                                        <div class="d-flex align-items-center w-100">
-                                            <h5>Consultation type</h5>
-                                            <div class="ms-auto">
-                                                <span><i class="fas fa-chevron-down"></i></span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div id="collapse7" class="accordion-collapse show" aria-labelledby="heading7">
-                                    <div class="accordion-body pt-3">
-                                        <div class="d-flex align-items-center justify-content-between mb-2">
-                                            <div class="form-check">
-                                                <input class="form-check-input" type="checkbox" value="" id="checkebox-sm30" checked="">
-                                                <label class="form-check-label" for="checkebox-sm30">
-                                                    Audio Call
-                                                </label>
-                                            </div>
-                                        </div>
-                                        <div class="d-flex align-items-center justify-content-between mb-2">
-                                            <div class="form-check">
-                                                <input class="form-check-input" type="checkbox" value="" id="checkebox-sm31">
-                                                <label class="form-check-label" for="checkebox-sm31">
-                                                    Video Call
-                                                </label>
-                                            </div>
-                                        </div>
-                                        <div class="d-flex align-items-center justify-content-between mb-2">
-                                            <div class="form-check">
-                                                <input class="form-check-input" type="checkbox" value="" id="checkebox-sm32">
-                                                <label class="form-check-label" for="checkebox-sm32">
-                                                    Instant Counseling
-                                                </label>
-                                            </div>
-                                        </div>
-                                        <div class="d-flex align-items-center justify-content-between">
-                                            <div class="form-check">
-                                                <input class="form-check-input" type="checkbox" value="" id="checkebox-sm33">
-                                                <label class="form-check-label" for="checkebox-sm33">
-                                                    Chat
-                                                </label>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div> -->
-                            <!-- <div class="accordion-item border-bottom">
-                                <div class="accordion-header" id="heading8">
-                                    <div class="accordion-button" data-bs-toggle="collapse" data-bs-target="#collapse8" aria-controls="collapse8" role="button">
-                                        <div class="d-flex align-items-center w-100">
-                                            <h5>Languages</h5>
-                                            <div class="ms-auto">
-                                                <span><i class="fas fa-chevron-down"></i></span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div id="collapse8" class="accordion-collapse show" aria-labelledby="heading8">
-                                    <div class="accordion-body pt-3">
-                                        <div class="d-flex align-items-center justify-content-between mb-2">
-                                            <div class="form-check">
-                                                <input class="form-check-input" type="checkbox" value="" id="checkebox-sm34" checked="">
-                                                <label class="form-check-label" for="checkebox-sm34">
-                                                    English
-                                                </label>
-                                            </div>
-                                        </div>
-                                        <div class="d-flex align-items-center justify-content-between mb-2">
-                                            <div class="form-check">
-                                                <input class="form-check-input" type="checkbox" value="" id="checkebox-sm35">
-                                                <label class="form-check-label" for="checkebox-sm35">
-                                                    French
-                                                </label>
-                                            </div>
-                                        </div>
-                                        <div class="d-flex align-items-center justify-content-between mb-2">
-                                            <div class="form-check">
-                                                <input class="form-check-input" type="checkbox" value="" id="checkebox-sm36">
-                                                <label class="form-check-label" for="checkebox-sm36">
-                                                    Spanish
-                                                </label>
-                                            </div>
-                                        </div>
-                                        <div class="d-flex align-items-center justify-content-between">
-                                            <div class="form-check">
-                                                <input class="form-check-input" type="checkbox" value="" id="checkebox-sm37">
-                                                <label class="form-check-label" for="checkebox-sm37">
-                                                    German
-                                                </label>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div> -->
+                            
                             <div class="accordion-item">
                                 <div class="accordion-header" id="heading9">
                                     <div class="accordion-button" data-bs-toggle="collapse" data-bs-target="#collapse9" aria-controls="collapse9" role="button">
@@ -633,7 +427,7 @@ try {
                         </div>
                         <div class="col-md-6">
                             <div class="d-flex align-items-center justify-content-end mb-4">
-                                <div class="doctor-filter-availability me-2">
+                                <div class="doctor-filter-availability me-3">
                                     <p>Availability</p>
                                     <div class="status-toggle status-tog">
                                         <input type="checkbox" id="status_6" class="check">
@@ -653,9 +447,6 @@ try {
                                         </a>
                                     </div>
                                 </div>
-                                <!-- <a href="doctor-grid.html" class="btn btn-sm head-icon me-2"><i class="isax isax-grid-7"></i></a> -->
-                                <a href="doctors.php" class="btn btn-sm head-icon active me-2"><i class="isax isax-row-vertical"></i></a>
-                                <a href="map-list.html" class="btn btn-sm head-icon"><i class="isax isax-location"></i></a>
                             </div>
                         </div>
                     </div>
@@ -667,7 +458,8 @@ try {
                                 </div>
                             <?php else: ?>
                                 <?php foreach ($doctors as $doctor): ?>
-                                    <div class="card doctor-list-card" data-speciality="<?php echo htmlspecialchars($doctor['specialty'] ?? 'General Physician'); ?>">
+                                    <div class="card doctor-list-card" 
+                                        data-speciality="<?php echo htmlspecialchars($doctor['specialty'] ?? 'General Physician'); ?>">
                                         <div class="d-md-flex align-items-center">
                                             <div class="card-img card-img-hover">
                                                 <a href="doctor-profile.php?id=<?php echo $doctor['id']; ?>">
@@ -678,9 +470,6 @@ try {
                                                         <i class="fa-solid fa-star me-1"></i>
                                                         <?php echo number_format($doctor['average_rating'] ?? 0, 1); ?>
                                                     </span>
-                                                    <a href="javascript:void(0)" class="fav-icon">
-                                                        <i class="fa fa-heart"></i>
-                                                    </a>
                                                 </div>
                                             </div>
                                             <div class="card-body p-0">
@@ -723,24 +512,23 @@ try {
                                                                         $location_display = !empty($location_parts) ? implode(', ', $location_parts) : 'Dhaka, Bangladesh';
                                                                         echo htmlspecialchars($location_display);
                                                                         ?>
-                                                                        <a href="#" class="text-primary text-decoration-underline ms-2">Get Direction</a>
                                                                     </p>
                                                                 </div>
                                                             </div>
                                                             <div class="col-sm-6">
                                                                 <div>
                                                                     <p class="d-flex align-items-center mb-0 fs-14 mb-2">
-                                                                        <i class="isax isax-language-circle text-dark me-2"></i>
-                                                                        <?php echo htmlspecialchars($doctor['languages_spoken'] ?? 'English, Bengali'); ?>
+                                                                        <i class="isax isax-archive-14 text-dark me-2"></i>
+                                                                        <?php echo $doctor['experience_years'] ?? 5; ?> Years of Experience
                                                                     </p>
                                                                     <p class="d-flex align-items-center mb-0 fs-14 mb-2">
                                                                         <i class="isax isax-like-1 text-dark me-2"></i>
                                                                         <?php echo number_format($doctor['average_rating'] ?? 0, 1); ?>%
                                                                         (<?php echo $doctor['total_reviews'] ?? 0; ?> Votes)
                                                                     </p>
-                                                                    <p class="d-flex align-items-center mb-0 fs-14">
-                                                                        <i class="isax isax-archive-14 text-dark me-2"></i>
-                                                                        <?php echo $doctor['experience_years'] ?? 5; ?> Years of Experience
+                                                                    <p class="d-flex align-items-center mb-0 fs-14 mb-2">
+                                                                        <i class="isax isax-language-circle text-dark me-2"></i>
+                                                                        <?php echo htmlspecialchars($doctor['languages_spoken'] ?? 'English, Bengali'); ?>
                                                                     </p>
                                                                 </div>
                                                             </div>
@@ -753,7 +541,7 @@ try {
                                                                 $<?php echo number_format($doctor['consultation_fee'] ?? 100, 0); ?>
                                                             </h4>
                                                         </div>
-                                                        <a href="booking.html?doctor_id=<?php echo $doctor['id']; ?>" class="btn btn-md btn-dark d-inline-flex align-items-center rounded-pill">
+                                                        <a href="booking.php?doctor_id=<?php echo $doctor['id']; ?>" class="btn btn-md btn-dark d-inline-flex align-items-center rounded-pill">
                                                             <i class="isax isax-calendar-1 me-2"></i>
                                                             Book Now
                                                         </a>
@@ -766,120 +554,137 @@ try {
                             <?php endif; ?>
                         </div>
                     </div>
+                </div>
             </div>
-</body>
-</html>
-
-<?php include 'footer.php'; ?>
-
-    <!-- select JS -->
-    <script src="assets/plugins/select2/js/select2.min.js"></script>
+        </div>
+    </div>
 
     <!-- Rangeslider JS -->
     <script src="assets/plugins/ion-rangeslider/js/ion.rangeSlider.js"></script>
     <script src="assets/plugins/ion-rangeslider/js/custom-rangeslider.js"></script>
     <script src="assets/plugins/ion-rangeslider/js/ion.rangeSlider.min.js"></script>
-
-    <!-- Datepicker JS -->
-    <script src="assets/js/moment.min.js"></script>
-    <script src="assets/js/bootstrap-datetimepicker.min.js"></script>
-
+    
     <!-- Speciality Filter Script -->
     <script>
-	$(document).ready(function() {
-		console.log('Filter script initialized');
-		console.log('Doctor cards found:', $('.doctor-list-card').length);
-		console.log('Speciality filters found:', $('.speciality-filter').length);
-		
-		// Function to filter doctors by speciality
-		function filterDoctorsBySpeciality() {
-			var selectedSpecialities = [];
-			
-			// Get all checked speciality checkboxes
-			$('.speciality-filter:checked').each(function() {
-				var speciality = $.trim($(this).val());
-				if (speciality !== '') {
-					selectedSpecialities.push(speciality);
-				}
-			});
-			
-			console.log('Selected specialities:', selectedSpecialities);
-			
-			// If no specialities are selected, show all doctors
-			if (selectedSpecialities.length === 0) {
-				$('.doctor-list-card').stop(true, true).show();
-				updateDoctorCount();
-				return;
-			}
-			
-			// Filter doctors based on selected specialities (doctor can have multiple comma-separated specialties)
-			$('.doctor-list-card').each(function() {
-				var doctorSpecialityStr = $(this).data('speciality') || '';
-				doctorSpecialityStr = $.trim(doctorSpecialityStr);
-				
-				if (doctorSpecialityStr === '' || doctorSpecialityStr === 'null') {
-					doctorSpecialityStr = 'General Physician';
-				}
-				
-				// Split doctor's specialties (e.g. "Cardiologist, Dermatologist" -> ["Cardiologist", "Dermatologist"])
-				var doctorSpecialities = doctorSpecialityStr.split(',').map(function(s) { return $.trim(s); }).filter(function(s) { return s !== ''; });
-				if (doctorSpecialities.length === 0) doctorSpecialities = ['General Physician'];
-				
-				// Show if any of the doctor's specialties matches any selected filter
-				var matches = false;
-				for (var i = 0; i < selectedSpecialities.length; i++) {
-					if (doctorSpecialities.indexOf(selectedSpecialities[i]) !== -1) {
-						matches = true;
-						break;
-					}
-				}
-				
-				if (matches) {
-					$(this).stop(true, true).show();
-				} else {
-					$(this).stop(true, true).hide();
-				}
-			});
-			
-			updateDoctorCount();
-		}
-		
-		// Function to update the doctor count
-		function updateDoctorCount() {
-			var visibleCount = $('.doctor-list-card:visible').length;
-			$('#doctor-count').text(visibleCount);
-			
-			// Show message if no doctors match the filter
-			if (visibleCount === 0) {
-				if ($('.no-doctors-message').length === 0) {
-					$('.col-lg-12').append(
-						'<div class="text-center no-doctors-message mt-4">' +
-						'<p class="text-muted">No doctors found matching the selected specialities.</p>' +
-						'</div>'
-					);
-				}
-			} else {
-				$('.no-doctors-message').remove();
-			}
-		}
-		
-		// Handle speciality checkbox changes
-		$(document).on('change', '.speciality-filter', function() {
-			console.log('Checkbox changed:', $(this).val(), 'Checked:', $(this).is(':checked'));
-			filterDoctorsBySpeciality();
-		});
-		
-		// Handle "Clear All" link
-		$(document).on('click', '.clear-all-filters', function(e) {
-			e.preventDefault();
-			// Uncheck all speciality filters
-			$('.speciality-filter').prop('checked', false);
-			// Show all doctors
-			$('.doctor-list-card').stop(true, true).show();
-			updateDoctorCount();
-		});
-		
-		// Initialize - show all doctors by default
-		updateDoctorCount();
-	});
-	</script>
+    $(document).ready(function() {
+        console.log('✅ Filter script initialized');
+        console.log('📊 Total doctors found:', $('.doctor-list-card').length);
+        console.log('🔍 Total speciality filters found:', $('.speciality-filter').length);
+        
+        // Function to filter doctors by speciality
+        function filterDoctorsBySpeciality() {
+            var selectedSpecialities = [];
+            
+            // Get all checked speciality checkboxes
+            $('.speciality-filter:checked').each(function() {
+                var speciality = $(this).val().trim();
+                if (speciality !== '') {
+                    selectedSpecialities.push(speciality);
+                }
+            });
+            
+            console.log('✅ Selected specialities:', selectedSpecialities);
+            
+            // If no specialities are selected, show all doctors
+            if (selectedSpecialities.length === 0) {
+                $('.doctor-list-card').fadeIn(300);
+                updateDoctorCount();
+                return;
+            }
+            
+            // Filter doctors based on selected specialities
+            $('.doctor-list-card').each(function() {
+                var doctorSpecialityStr = $(this).data('speciality') || '';
+                doctorSpecialityStr = doctorSpecialityStr.trim();
+                
+                if (doctorSpecialityStr === '' || doctorSpecialityStr === 'null') {
+                    doctorSpecialityStr = 'General Physician';
+                }
+                
+                // Split doctor's specialties (e.g. "Cardiologist, Dermatologist" -> ["Cardiologist", "Dermatologist"])
+                var doctorSpecialities = doctorSpecialityStr.split(',').map(function(s) { 
+                    return s.trim(); 
+                }).filter(function(s) { 
+                    return s !== ''; 
+                });
+                
+                if (doctorSpecialities.length === 0) {
+                    doctorSpecialities = ['General Physician'];
+                }
+                
+                console.log('Doctor specialities:', doctorSpecialities, 'Selected:', selectedSpecialities);
+                
+                // Check if any selected speciality matches doctor's specialties
+                var matches = false;
+                for (var i = 0; i < selectedSpecialities.length; i++) {
+                    for (var j = 0; j < doctorSpecialities.length; j++) {
+                        if (doctorSpecialities[j].toLowerCase().trim() === selectedSpecialities[i].toLowerCase().trim()) {
+                            matches = true;
+                            break;
+                        }
+                    }
+                    if (matches) break;
+                }
+                
+                // Show or hide based on match
+                if (matches) {
+                    $(this).fadeIn(300);
+                } else {
+                    $(this).fadeOut(300);
+                }
+            });
+            
+            updateDoctorCount();
+        }
+        
+        // Function to update the doctor count
+        function updateDoctorCount() {
+            var visibleCount = $('.doctor-list-card:visible').length;
+            $('#doctor-count').text(visibleCount);
+            
+            // Show message if no doctors match the filter
+            if (visibleCount === 0) {
+                if ($('.no-doctors-message').length === 0) {
+                    $('.col-lg-12').append(
+                        '<div class="text-center no-doctors-message mt-4">' +
+                        '<p class="text-muted">No doctors found matching the selected specialities.</p>' +
+                        '</div>'
+                    );
+                }
+            } else {
+                $('.no-doctors-message').remove();
+            }
+        }
+        
+        // Handle speciality checkbox changes
+        $(document).on('change', '.speciality-filter', function() {
+            console.log('🔄 Checkbox changed:', $(this).val(), 'Checked:', $(this).is(':checked'));
+            filterDoctorsBySpeciality();
+        });
+        
+        // Handle "Clear All" link
+        $(document).on('click', '.clear-all-filters', function(e) {
+            e.preventDefault();
+            console.log('🧹 Clear All clicked');
+            
+            // Uncheck all speciality filters
+            $('.speciality-filter').prop('checked', false);
+            
+            // Show all doctors
+            $('.doctor-list-card').fadeIn(300);
+            
+            // Update count
+            updateDoctorCount();
+        });
+        
+        // Initialize - show all doctors by default
+        updateDoctorCount();
+        
+        // Log all doctor specialities for debugging
+        $('.doctor-list-card').each(function(index) {
+            console.log(`👨‍⚕️ Doctor ${index + 1} data-speciality:`, $(this).data('speciality'));
+        });
+    });
+    </script>
+
+<?php include 'footer.php'; ?>

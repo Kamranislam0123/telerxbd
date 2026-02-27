@@ -1,5 +1,3 @@
-<head>
-<body>
     <!-- Footer -->
     <footer class="footer-twelve">
         <div class="footer-top-sec">
@@ -10,7 +8,7 @@
                     </div>
                     <div class="footer-buy-btn">
                         <h6>Get started with TeleRx Bangladesh?</h6>
-                        <a href="booking.php" class="btn btn-primary">Book Now</a>
+                        <a href="doctors.php" class="btn btn-primary">Book Now</a>
                     </div>
                 </div>
                 <div class="footer-middle">
@@ -74,7 +72,7 @@
                     <div class="row">
                         <div class="col-md-12">
                             <div class="copyright-text">
-                                <p class="mb-0"> <p>Copyright &copy; <script type="text/javascript">document.write(new Date().getFullYear());</script> TeleRx Bangladesh | All Rights Reserved</p>
+                                <p class="mb-0">Copyright &copy; <script>document.write(new Date().getFullYear());</script> TeleRx Bangladesh | All Rights Reserved</p>
                             </div>
                         </div>
                     </div>
@@ -84,7 +82,6 @@
         </div>
     </footer>
     <!-- /Footer -->
-
 
     <!-- ScrollToTop -->
     <div class="progress-wrap active-progress">
@@ -127,5 +124,17 @@
 
     <!-- Custom JS -->
     <script src="assets/js/script.js"></script>
+
+    <!-- Sticky Sidebar JS -->
+    <script src="assets/plugins/theia-sticky-sidebar/ResizeSensor.js"></script>
+    <script src="assets/plugins/theia-sticky-sidebar/theia-sticky-sidebar.js"></script>
+
+    <!-- Apexchart JS -->
+    <script src="assets/plugins/apex/apexcharts.min.js"></script>
+    <script src="assets/plugins/apex/chart-data.js"></script>
+    
+    <!-- Circle Progress JS -->
+    <script src="assets/js/circle-progress.min.js"></script>
+
 </body>
-</head>
+</html>
