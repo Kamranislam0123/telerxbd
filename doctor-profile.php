@@ -108,738 +108,554 @@ try {
 }
 
 ?>
-<!DOCTYPE html>
-<html lang="en">
-	<head>
-
-		<meta charset="utf-8">
-		<title><?php echo htmlspecialchars($doctor['name']); ?> - TeleRx Bangladesh</title>
-		<meta name="viewport" content="width=device-width, initial-scale=1.0">
-		<meta name="description" content="The responsive professional Doccure template offers many features, like scheduling appointments with  top doctors, clinics, and hospitals via voice, video call & chat.">
-		<meta name="keywords" content="practo clone, doccure, doctor appointment, Practo clone html template, doctor booking template">
-		<meta name="author" content="Practo Clone HTML Template - Doctor Booking Template">
-		<meta property="og:url" content="https://doccure.dreamstechnologies.com/html/">
-		<meta property="og:type" content="website">
-		<meta property="og:title" content="Doctors Appointment HTML Website Templates | Doccure">
-		<meta property="og:description" content="The responsive professional Doccure template offers many features, like scheduling appointments with  top doctors, clinics, and hospitals via voice, video call & chat.">
-		<meta property="og:image" content="assets/img/preview-banner.jpg">
-		<meta name="twitter:card" content="summary_large_image">
-		<meta property="twitter:domain" content="https://doccure.dreamstechnologies.com/html/">
-		<meta property="twitter:url" content="https://doccure.dreamstechnologies.com/html/">
-		<meta name="twitter:title" content="Doctors Appointment HTML Website Templates | Doccure">
-		<meta name="twitter:description" content="The responsive professional Doccure template offers many features, like scheduling appointments with  top doctors, clinics, and hospitals via voice, video call & chat.">
-		<meta name="twitter:image" content="assets/img/preview-banner.jpg">	
-		
-		<!-- Favicon -->
-		<link rel="shortcut icon" href="assets/img/favicon.png" type="image/x-icon">
-
-		<!-- Apple Touch Icon -->
-		<link rel="apple-touch-icon" sizes="180x180" href="assets/img/apple-touch-icon.png">
-
-		<!-- Theme Settings Js -->
-		<script src="assets/js/theme-script.js"></script>
-		
-		<!-- Bootstrap CSS -->
-		<link rel="stylesheet" href="assets/css/bootstrap.min.css">
-				
-		<!-- Fontawesome CSS -->
-		<link rel="stylesheet" href="assets/plugins/fontawesome/css/fontawesome.min.css">
-		<link rel="stylesheet" href="assets/plugins/fontawesome/css/all.min.css">
-
-		<!-- Iconsax CSS-->
-		<link rel="stylesheet" href="assets/css/iconsax.css">
-
-		<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-		<link href="https://fonts.googleapis.com/css2?family=Inter:wght@200;300;400;500;600;700;800;900&display=swap" rel="stylesheet">
-
-		<!-- Feathericon CSS -->
-    	<link rel="stylesheet" href="assets/css/feather.css">
-
-    	<!-- Datepicker CSS -->
-		<link rel="stylesheet" href="assets/css/bootstrap-datetimepicker.min.css">
-
-		<!-- Owl Carousel CSS -->
-		<link rel="stylesheet" href="assets/css/owl.carousel.min.css">
-
-		<!-- Animation CSS -->
-		<link rel="stylesheet" href="assets/css/aos.css">
-		
-		<!-- Main CSS -->
-		<link rel="stylesheet" href="assets/css/custom.css">
-
-	</head>		
-	<body>
-
-		<!-- Main Wrapper -->
-		<div class="main-wrapper home-one" data-magic-cursor="hide">
-					
-			<!-- Header -->
-			<header class="header header-custom header-fixed header-one home-head-one">
-				<div class="container">
-					<nav class="navbar navbar-expand-lg header-nav">
-						<div class="navbar-header">
-							<a id="mobile_btn" href="javascript:void(0);">
-								<span class="bar-icon">
-									<span></span>
-									<span></span>
-									<span></span>
-								</span>
-							</a>
-							<a href="index.html" class="navbar-brand logo">
-								<img src="assets/img/logo.svg" class="img-fluid" alt="Logo">
-							</a>
-						</div>
-						<div class="main-menu-wrapper">
-							<div class="menu-header">
-								<a href="index.html" class="menu-logo">
-									<img src="assets/img/logo.svg" class="img-fluid" alt="Logo">
-								</a>
-								<a id="menu_close" class="menu-close" href="javascript:void(0);">
-									<i class="fas fa-times"></i>
-								</a>
-							</div>
-							<ul class="main-nav">
-								<li class="has-submenu megamenu active">
-									<a href="index.html">Home </a></li>
-								<li><a href="doctors.php">Doctor List</a></li>
-								<li><a href="doctor-profile.php">Doctor Profile</a></li>
-								<li><a href="about-us.php">About Us</a></li>
-								<li><a href="contact-us.php">Contact</a></li>
-								<li><a href="blog.php">Blog</a></li>
-								<li class="login-link"><a href="login.php">Login / Signup</a></li>
-							</ul>
-						</div>
-						<ul class="nav header-navbar-rht">
-							<li class="register-btn">
-								<a href="registration.php" class="btn btn-dark reg-btn"><i class="isax isax-user"></i>Register</a>
-							</li>
-							<li class="register-btn">
-								<a href="login.php" class="btn btn-primary log-btn"><i class="isax isax-lock"></i>Login</a>
-							</li>
-						</ul>
+	<!-- Breadcrumb -->
+	<div class="breadcrumb-bar">
+		<div class="container">
+			<div class="row align-items-center inner-banner">
+				<div class="col-md-12 col-12 text-center">
+					<nav aria-label="breadcrumb" class="page-breadcrumb">
+						<h2 class="doc-name"><?php echo htmlspecialchars($doctor['name']); ?> Profile</h2>
 					</nav>
 				</div>
-			</header>
-			<!-- /Header -->		
-
-			<!-- Breadcrumb -->
-			<div class="breadcrumb-bar">
-				<div class="container">
-					<div class="row align-items-center inner-banner">
-						<div class="col-md-12 col-12 text-center">
-							<nav aria-label="breadcrumb" class="page-breadcrumb">
-								<ol class="breadcrumb">
-									<li class="breadcrumb-item"><a href="index.html"><i class="isax isax-home-15"></i></a></li>
-									<li class="breadcrumb-item" aria-current="page">Patient</li>
-									<li class="breadcrumb-item active">Doctor Profile 1</li>
-								</ol>
-								<h2 class="breadcrumb-title">Doctor Profile</h2>
-							</nav>
-						</div>
-					</div>
-				</div>
-				<div class="breadcrumb-bg">
-					<img src="assets/img/bg/breadcrumb-bg-01.png" alt="img" class="breadcrumb-bg-01">
-					<img src="assets/img/bg/breadcrumb-bg-02.png" alt="img" class="breadcrumb-bg-02">
-					<img src="assets/img/bg/breadcrumb-icon.png" alt="img" class="breadcrumb-bg-03">
-					<img src="assets/img/bg/breadcrumb-icon.png" alt="img" class="breadcrumb-bg-04">
-				</div>
 			</div>
-			<!-- /Breadcrumb -->
-			
-			<!-- Page Content -->
-			<div class="content">
-				<div class="container">
+		</div>
+		<div class="breadcrumb-bg">
+			<img src="assets/img/bg/breadcrumb-bg-01.png" alt="img" class="breadcrumb-bg-01">
+			<img src="assets/img/bg/breadcrumb-bg-02.png" alt="img" class="breadcrumb-bg-02">
+			<img src="assets/img/bg/breadcrumb-icon.png" alt="img" class="breadcrumb-bg-03">
+			<img src="assets/img/bg/breadcrumb-icon.png" alt="img" class="breadcrumb-bg-04">
+		</div>
+	</div>
+	<!-- /Breadcrumb -->
 
-					<!-- Doctor Widget -->
-					<div class="card doc-profile-card">
-						<div class="card-body">
-							<div class="doctor-widget doctor-profile-two">
-								<div class="doc-info-left">
-									<div class="doctor-img">
-										<img src="<?php echo htmlspecialchars($doctor['profile_image']); ?>" class="img-fluid" alt="Doctor Image">
-									</div>
-									<div class="doc-info-cont">
-										<span class="badge doc-avail-badge"><i class="fa-solid fa-circle"></i><?php echo $doctor['is_available'] ? 'Available' : 'Unavailable'; ?> </span>
-										<h4 class="doc-name"><?php echo htmlspecialchars($doctor['name']); ?> <img src="assets/img/icons/badge-check.svg" alt="Img"><span class="badge doctor-role-badge"><i class="fa-solid fa-circle"></i>Doctor</span></h4>
-										<p><?php echo htmlspecialchars($doctor['specialty']); ?> - BMDC: <?php echo htmlspecialchars($doctor['bmdc_no']); ?></p>
-										<p>Speaks : <?php echo htmlspecialchars($doctor['languages_spoken']); ?></p>
-										<p class="address-detail"><span class="loc-icon"><i class="feather-map-pin"></i></span><?php echo htmlspecialchars($doctor['address'] . ', ' . $doctor['city'] . ', ' . $doctor['state']); ?> <span class="view-text">( View Location )</span></p>
-									</div>
-								</div>
-								<div class="doc-info-right">
-									<ul class="doctors-activities">
-										<li>
-											<div class="hospital-info">
-												<span class="list-icon"><img src="assets/img/icons/watch-icon.svg" alt="Img"></span>
-												<p>Full Time, Online Therapy Available</p>
-											</div>
-											<ul class="sub-links">
-												<li><a href="#"><i class="feather-heart"></i></a></li>
-												<li><a href="#"><i class="feather-share-2"></i></a></li>
-												<li><a href="#"><i class="feather-link"></i></a></li>
-											</ul>
-										</li>
-										<li>
-											<div class="hospital-info">
-												<span class="list-icon"><img src="assets/img/icons/thumb-icon.svg" alt="Img"></span>
-												<p><b>94% </b> Recommended</p>
-											</div>
-										</li>
-										<li>
-											<div class="hospital-info">
-												<span class="list-icon"><img src="assets/img/icons/building-icon.svg" alt="Img"></span>
-												<p>Royal Prince Alfred Hospital</p>
-											</div>
-											<h5 class="accept-text"><span><i class="feather-check"></i></span>Accepting New Patients</h5>
-										</li>
-										<li>
-											<div class="rating">
-												<?php for($i = 1; $i <= 5; $i++): ?>
-													<i class="fas fa-star <?php echo $i <= round($doctor['average_rating']) ? 'filled' : ''; ?>"></i>
-												<?php endfor; ?>
-												<span><?php echo number_format($doctor['average_rating'], 1); ?></span>
-												<a href="#" class="d-inline-block average-rating"><?php echo $doctor['total_reviews']; ?> Reviews</a>
-											</div>
-											<ul class="contact-doctors">
-												<li><a href="chat-doctor.html"><span><img src="assets/img/icons/device-message2.svg" alt="Img"></span>Chat</a></li>
-												<li><a href="voice-call.html"><span class="bg-violet"><i class="feather-phone-forwarded"></i></span>Audio Call</a></li>
-												<li><a href="video-call.html"><span class="bg-indigo"><i class="fa-solid fa-video"></i></span>Video Call</a></li>
-											</ul>
-										</li>
-									</ul>
-								</div>
+	<!-- Page Content -->
+	<div class="content">
+		<div class="container">
+
+			<!-- Doctor Widget -->
+			<div class="card doc-profile-card">
+				<div class="card-body">
+					<div class="doctor-widget doctor-profile-two">
+						<div class="doc-info-left">
+							<div class="doctor-img">
+								<img src="<?php echo htmlspecialchars($doctor['profile_image']); ?>" class="img-fluid" alt="Doctor Image">
 							</div>
-							<div class="doc-profile-card-bottom">
-								<ul>
-									<li>
-										<span class="bg-blue"><img src="assets/img/icons/calendar3.svg" alt="Img"></span>
-										<?php echo number_format($doctor['total_appointments']); ?>+ Appointments Booked
-									</li>
-									<li>
-										<span class="bg-dark-blue"><img src="assets/img/icons/bullseye.svg" alt="Img"></span>
-										In Practice for <?php echo $doctor['experience_years']; ?> Years
-									</li>
-									<li>
-										<span class="bg-green"><img src="assets/img/icons/bookmark-star.svg" alt="Img"></span>
-										<?php echo count($awards); ?>+ Awards
-									</li>
-								</ul>
-								<div class="bottom-book-btn">
-									<p><span>Consultation Fee : $<?php echo number_format($doctor['consultation_fee'], 0); ?> </span> for a Session</p>
-									<div class="clinic-booking">
-										<a class="apt-btn" href="booking.html?id=<?php echo $profile_doctor_id; ?>">Book Appointment</a>
-									</div>
-								</div>
+							<div class="doc-info-cont">
+								<span class="badge doc-avail-badge"><i class="fa-solid fa-circle"></i><?php echo $doctor['is_available'] ? 'Available' : 'Unavailable'; ?> </span>
+								<h4 class="doc-name"><?php echo htmlspecialchars($doctor['name']); ?> <img src="assets/img/icons/badge-check.svg" alt="Img"><span class="badge doctor-role-badge"><i class="fa-solid fa-circle"></i>Doctor</span></h4>
+								<p><?php echo htmlspecialchars($doctor['specialty']); ?> - BMDC: <?php echo htmlspecialchars($doctor['bmdc_no']); ?></p>
+								<p>Speaks : <?php echo htmlspecialchars($doctor['languages_spoken']); ?></p>
+								<p class="address-detail"><span class="loc-icon"><i class="feather-map-pin"></i></span><?php echo htmlspecialchars($doctor['address'] . ', ' . $doctor['city'] . ', ' . $doctor['state']); ?> <span class="view-text">( View Location )</span></p>
 							</div>
 						</div>
+						<div class="doc-info-right">
+							<ul class="doctors-activities">
+								<li>
+									<div class="hospital-info">
+										<span class="list-icon"><img src="assets/img/icons/watch-icon.svg" alt="Img"></span>
+										<p>Full Time, Online Therapy Available</p>
+									</div>
+									<ul class="sub-links">
+										<li><a href="#"><i class="feather-heart"></i></a></li>
+										<li><a href="#"><i class="feather-share-2"></i></a></li>
+										<li><a href="#"><i class="feather-link"></i></a></li>
+									</ul>
+								</li>
+								<li>
+									<div class="hospital-info">
+										<span class="list-icon"><img src="assets/img/icons/thumb-icon.svg" alt="Img"></span>
+										<p><b>94% </b> Recommended</p>
+									</div>
+								</li>
+								<li>
+									<div class="hospital-info">
+										<span class="list-icon"><img src="assets/img/icons/building-icon.svg" alt="Img"></span>
+										<p>Royal Prince Alfred Hospital</p>
+									</div>
+									<h5 class="accept-text"><span><i class="feather-check"></i></span>Accepting New Patients</h5>
+								</li>
+								<li>
+									<div class="rating">
+										<?php for($i = 1; $i <= 5; $i++): ?>
+											<i class="fas fa-star <?php echo $i <= round($doctor['average_rating']) ? 'filled' : ''; ?>"></i>
+										<?php endfor; ?>
+										<span><?php echo number_format($doctor['average_rating'], 1); ?></span>
+										<a href="#" class="d-inline-block average-rating"><?php echo $doctor['total_reviews']; ?> Reviews</a>
+									</div>
+									<ul class="contact-doctors">
+										<li><a href="chat-doctor.html"><span><img src="assets/img/icons/device-message2.svg" alt="Img"></span>Chat</a></li>
+										<li><a href="voice-call.html"><span class="bg-violet"><i class="feather-phone-forwarded"></i></span>Audio Call</a></li>
+										<li><a href="video-call.html"><span class="bg-indigo"><i class="fa-solid fa-video"></i></span>Video Call</a></li>
+									</ul>
+								</li>
+							</ul>
+						</div>
 					</div>
-					<!-- /Doctor Widget -->
-					
-					<div class="doctors-detailed-info">
-						<ul class="information-title-list">
-							<li class="active">
-								<a href="#doc_bio">Doctor Bio</a>
+					<div class="doc-profile-card-bottom">
+						<ul>
+							<li>
+								<span class="bg-blue"><img src="assets/img/icons/calendar3.svg" alt="Img"></span>
+								<?php echo number_format($doctor['total_appointments']); ?>+ Appointments Booked
 							</li>
 							<li>
-								<a href="#experience">Experience</a>
+								<span class="bg-dark-blue"><img src="assets/img/icons/bullseye.svg" alt="Img"></span>
+								In Practice for <?php echo $doctor['experience_years']; ?> Years
 							</li>
 							<li>
-								<a href="#insurence">Insurances</a>
-							</li>
-							<li>
-								<a href="#services">Treatments</a>
-							</li>
-							<li>
-								<a href="#speciality">Speciality</a>
-							</li>
-							<li>
-								<a href="#availability">Availability</a>
-							</li>
-							<li>
-								<a href="#clinic">Clinics</a>
-							</li>
-							<li>
-								<a href="#membership">Memberships</a>
-							</li>
-							<li>
-								<a href="#awards">Awards</a>
-							</li>
-							<li>
-								<a href="#bussiness_hour">Business Hours</a>
-							</li>
-							<li>
-								<a href="#review">Review</a>
+								<span class="bg-green"><img src="assets/img/icons/bookmark-star.svg" alt="Img"></span>
+								<?php echo count($awards); ?>+ Awards
 							</li>
 						</ul>
-						<div class="doc-information-main">
-							<div class="doc-information-details bio-detail" id="doc_bio">
-								<div class="detail-title">
-									<h4>Doctor Bio</h4>
-								</div>
-								<p><?php echo htmlspecialchars($doctor['bio']); ?></p>
-								<a href="#" class="show-more d-flex align-items-center">See More<i class="fa-solid fa-chevron-down ms-2"></i></a>
+						<div class="bottom-book-btn">
+							<p><span>Consultation Fee : $<?php echo number_format($doctor['consultation_fee'], 0); ?> </span> for a Session</p>
+							<div class="clinic-booking">
+								<a class="apt-btn" href="booking.html?id=<?php echo $profile_doctor_id; ?>">Book Appointment</a>
 							</div>
-							<div class="doc-information-details" id="experience">
-								<div class="detail-title">
-									<h4>Practice Experience</h4>
-								</div>
-								<?php if (!empty($experiences)): ?>
-									<?php foreach ($experiences as $index => $exp): ?>
-										<div class="experience-info <?php echo ($index === count($experiences) - 1) ? 'mb-0' : ''; ?>">
-											<div class="experience-logo">
-												<span><img src="assets/img/icons/experience-logo-0<?php echo ($index % 2) + 1; ?>.svg" alt="Img"></span>
-											</div>
-											<div class="experience-content <?php echo ($index === count($experiences) - 1) ? 'mb-0' : ''; ?>">
-												<h5><?php echo htmlspecialchars($exp['hospital_name']); ?></h5>
-												<ul class="ent-list">
-													<li><?php echo htmlspecialchars($exp['title']); ?> </li>
-													<li><?php echo htmlspecialchars($exp['location']); ?></li>
-												</ul>
-												<ul class="date-list">
-													<li>
-														<?php
-														$start_date = date('M Y', strtotime($exp['start_date']));
-														$end_date = $exp['currently_working'] ? 'Present' : ($exp['end_date'] ? date('M Y', strtotime($exp['end_date'])) : 'Present');
-														echo $start_date . ' - ' . $end_date;
-														?>
-													</li>
-													<li><?php echo htmlspecialchars($exp['years_of_experience']); ?></li>
-												</ul>
-												<p><?php echo htmlspecialchars($exp['job_description'] ?: 'Experienced healthcare professional providing quality medical care.'); ?></p>
-											</div>
-										</div>
-									<?php endforeach; ?>
-								<?php else: ?>
-									<div class="experience-info">
-										<div class="experience-logo">
-											<span><img src="assets/img/icons/experience-logo-01.svg" alt="Img"></span>
-										</div>
-										<div class="experience-content mb-0">
-											<p class="text-muted">No experience information available.</p>
-										</div>
-									</div>
-								<?php endif; ?>
-							</div>
-							<!-- <div class="doc-information-details" id="insurence">
-								<div class="detail-title slider-nav d-flex justify-content-between align-items-center">
-									<h4>Insurance  Accepted (6)</h4>
-									<div class="nav nav-container slide-1"></div>
-								</div>
-								<div class="insurence-logo-slider owl-carousel">
-									<div class="insurence-logo">
-										<span><img src="assets/img/icons/insurence-logo-01.svg" alt="Img"></span>
-									</div>
-									<div class="insurence-logo">
-										<span><img src="assets/img/icons/insurence-logo-02.svg" alt="Img"></span>
-									</div>
-									<div class="insurence-logo">
-										<span><img src="assets/img/icons/insurence-logo-03.svg" alt="Img"></span>
-									</div>
-									<div class="insurence-logo">
-										<span><img src="assets/img/icons/insurence-logo-04.svg" alt="Img"></span>
-									</div>
-									<div class="insurence-logo">
-										<span><img src="assets/img/icons/insurence-logo-05.svg" alt="Img"></span>
-									</div>
-									<div class="insurence-logo">
-										<span><img src="assets/img/icons/insurence-logo-06.svg" alt="Img"></span>
-									</div>
-									<div class="insurence-logo">
-										<span><img src="assets/img/icons/insurence-logo-03.svg" alt="Img"></span>
-									</div>
-									<div class="insurence-logo">
-										<span><img src="assets/img/icons/insurence-logo-04.svg" alt="Img"></span>
-									</div>
-								</div>
-							</div> -->
-							<!-- <div class="doc-information-details" id="speciality">
-								<div class="detail-title">
-									<h4>Speciality</h4>
-								</div>
-								<ul class="special-links">
-									<li><a href="#">Orthopedic Consultation</a></li>
-									<li><a href="#">Delivery Blocks</a></li>
-									<li><a href="#">Ultrasound Injection</a></li>
-									<li><a href="#">Tooth Bleaching</a></li>
-									<li><a href="#">Tooth Bleaching</a></li>
-									<li><a href="#">Cosmetic</a></li>
-								</ul>
-							</div> -->
-							<!-- <div class="doc-information-details" id="services">
-								<div class="detail-title">
-									<h4>Services & Pricing</h4>
-								</div>
-								<ul class="special-links">
-									<li><a href="#">Orthopedic Consultation <span>$52</span></a></li>
-									<li><a href="#">Delivery Blocks <span>$24</span></a></li>
-									<li><a href="#">Ultrasound Injection <span>$31</span></a></li>
-									<li><a href="#">Tooth Bleaching <span>$20</span></a></li>
-									<li><a href="#">Tooth Bleaching <span>$15</span></a></li>
-									<li><a href="#">Cosmetic <span>$10</span></a></li>
-								</ul>
-							</div> -->
-							<!-- <div class="doc-information-details" id="availability">
-								<div class="detail-title slider-nav d-flex justify-content-between align-items-center">
-									<h4>Availability</h4>
-									<div class="nav nav-container slide-2"></div>
-								</div>
-								<div class="availability-slots-slider owl-carousel">
-									<div class="availability-date">
-										<div class="book-date">
-											<h6>Wed Feb 2024</h6>
-											<span>01:00 - 02:00 PM</span>
-										</div>
-									</div>
-									<div class="availability-date">
-										<div class="book-date">
-											<h6>Wed Feb 2024</h6>
-											<span>01:00 - 02:00 PM</span>
-										</div>
-									</div>
-									<div class="availability-date">
-										<div class="book-date">
-											<h6>Wed Feb 2024</h6>
-											<span>01:00 - 02:00 PM</span>
-										</div>
-									</div>
-									<div class="availability-date">
-										<div class="book-date">
-											<h6>Wed Feb 2024</h6>
-											<span>01:00 - 02:00 PM</span>
-										</div>
-									</div>
-									<div class="availability-date">
-										<div class="book-date">
-											<h6>Wed Feb 2024</h6>
-											<span>01:00 - 02:00 PM</span>
-										</div>
-									</div>
-									<div class="availability-date">
-										<div class="book-date">
-											<h6>Wed Feb 2024</h6>
-											<span>01:00 - 02:00 PM</span>
-										</div>
-									</div>
-									<div class="availability-date">
-										<div class="book-date">
-											<h6>Wed Feb 2024</h6>
-											<span>01:00 - 02:00 PM</span>
-										</div>
-									</div>
-									<div class="availability-date">
-										<div class="book-date">
-											<h6>Wed Feb 2024</h6>
-											<span>01:00 - 02:00 PM</span>
-										</div>
-									</div>
-								</div>
-							</div> -->
-							<!-- <div class="doc-information-details" id="clinic">
-								<div class="detail-title">
-									<h4>Clinics & Locations</h4>
-								</div>
-								<div class="clinic-loc">
-									<div class="row align-items-center">
-										<div class="col-lg-7">
-											<div class="clinic-info">
-												<div class="clinic-img"><img src="assets/img/clinic/clinic-11.jpg" alt="Img"></div>
-												<div class="detail-clinic">
-													<h5>Sofi's Clinic - </h5>
-													<span>$350 / Apponitment</span>
-													<p>2286 Sundown Lane, Old Trafford 24541, UK</p>
-												</div>
-											</div>
-											<div class="d-flex align-items-center avail-time-slot">
-												<div class="availability-date">
-													<div class="book-date">
-														<h6>Monday</h6>
-														<span>07:00 AM - 09:00 PM</span>
-													</div>
-												</div>
-												<div class="availability-date">
-													<div class="book-date">
-														<h6>Tuesday</h6>
-														<span>07:00 AM - 09:00 PM</span>
-													</div>
-												</div>
-											</div>
-										</div>
-										<div class="col-lg-5">
-											<div class="contact-map d-flex">
-												<iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3193.7301009561315!2d-76.13077892422932!3d36.82498697224007!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x89bae976cfe9f8af%3A0xa61eac05156fbdb9!2sBeachStreet%20USA!5e0!3m2!1sen!2sin!4v1669777904208!5m2!1sen!2sin" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
-											</div>
-										</div>
-									</div>
-								</div>
-								<div class="clinic-loc mb-0">
-									<div class="row align-items-center">
-										<div class="col-lg-7">
-											<div class="clinic-info">
-												<div class="clinic-img"><img src="assets/img/clinic/clinic-12.jpg" alt="Img"></div>
-												<div class="detail-clinic">
-													<h5>The Family Dentistry Clinic </h5>
-													<span>$550 / Apponitment</span>
-													<p>MDS - Periodontology and Oral Implantology, BDS</p>
-												</div>
-											</div>
-											<div class="d-flex align-items-center avail-time-slot">
-												<div class="availability-date">
-													<div class="book-date">
-														<h6>Friday</h6>
-														<span>07:00 AM - 09:00 PM</span>
-													</div>
-												</div>
-												<div class="availability-date">
-													<div class="book-date">
-														<h6>Saturday</h6>
-														<span>07:00 AM - 09:00 PM</span>
-													</div>
-												</div>
-											</div>
-										</div>
-										<div class="col-lg-5">
-											<div class="contact-map d-flex">
-												<iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3193.7301009561315!2d-76.13077892422932!3d36.82498697224007!2m3!1f0!2f0!3m2!1sen!2sin!4v1669777904208!5m2!1sen!2sin" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
-											</div>
-										</div>
-									</div>
-								</div>
-							</div> -->
-							<!-- <div class="doc-information-details" id="membership">
-								<div class="detail-title">
-									<h4>Membership</h4>
-								</div>
-								<div class="member-ship-info">
-									<span class="mem-check"><i class="fa-solid fa-check"></i></span>
-									<p>Affiliate members include related allied health professionals- evidence based
-										(Dietitians, Physiotherapist, Occupational therapist and Clinical Psychologist) who will
-										team up with allopathic physicians to
-										support the Lifestyle Medicine movement in India through ISLM.
-									</p>
-								</div>
-								<div class="member-ship-info mb-0">
-									<span class="mem-check"><i class="fa-solid fa-check"></i></span>
-									<p>Physician members include the allopathic doctors only (MBBS, MD, MS, DM, MCH, DNB or equivalent degree)
-										who hold a valid medical license as recognized by the Medical Council of India.
-									</p>
-								</div>
-							</div> -->
-							<!-- <div class="doc-information-details" id="awards">
-								<div class="detail-title slider-nav d-flex justify-content-between align-items-center">
-									<h4>Awards</h4>
-									<div class="nav nav-container slide-3"></div>
-								</div>
-								<div class="awards-slider owl-carousel">
-									<div class="award-card">
-										<div class="award-card-info">
-											<span><img src="assets/img/icons/bookmark-star.svg" alt="Img"></span>
-											<h5>Award Name (2021)</h5>
-											<p>evidence based (Dietitians, Physiotherapist, Occupational therapist and Clinical)</p>
-										</div>
-									</div>
-									<div class="award-card">
-										<div class="award-card-info">
-											<span><img src="assets/img/icons/bookmark-star.svg" alt="Img"></span>
-											<h5>Award Name (2022)</h5>
-											<p>evidence based (Dietitians, Physiotherapist, Occupational therapist and Clinical)</p>
-										</div>
-									</div>
-									<div class="award-card">
-										<div class="award-card-info">
-											<span><img src="assets/img/icons/bookmark-star.svg" alt="Img"></span>
-											<h5>Award Name (2023)</h5>
-											<p>evidence based (Dietitians, Physiotherapist, Occupational therapist and Clinical)</p>
-										</div>
-									</div>
-									<div class="award-card">
-										<div class="award-card-info">
-											<span><img src="assets/img/icons/bookmark-star.svg" alt="Img"></span>
-											<h5>Award Name (2024)</h5>
-											<p>evidence based (Dietitians, Physiotherapist, Occupational therapist and Clinical)</p>
-										</div>
-									</div>
-									<div class="award-card">
-										<div class="award-card-info">
-											<span><img src="assets/img/icons/bookmark-star.svg" alt="Img"></span>
-											<h5>Award Name (2020)</h5>
-											<p>evidence based (Dietitians, Physiotherapist, Occupational therapist and Clinical)</p>
-										</div>
-									</div>
-								</div>
-							</div> -->
-							<!-- <div class="doc-information-details" id="bussiness_hour">
-								<div class="detail-title">
-									<h4>Business Hours</h4>
-								</div>
-								<div class="hours-business">
-									<ul>
-										<li>
-											<div class="today-hours">
-												<h6>Today</h6>
-												<span>5 Feb 2024</span>
-											</div>
-											<div class="availed">
-												<span class="badge doc-avail-badge"><i class="fa-solid fa-circle"></i>Available </span>
-												<p>07:00 AM - 09:00 PM</p>
-											</div>
-										</li>
-										<li>
-											<h6>Monday</h6>
-											<p>07:00 AM - 09:00 PM</p>
-										</li>
-										<li>
-											<h6>Tuesday</h6>
-											<p>07:00 AM - 09:00 PM</p>
-										</li>
-										<li>
-											<h6>Wednesday</h6>
-											<p>07:00 AM - 09:00 PM</p>
-										</li>
-										<li>
-											<h6>Thursday</h6>
-											<p>07:00 AM - 09:00 PM</p>
-										</li>
-										<li>
-											<h6>Friday</h6>
-											<p>07:00 AM - 09:00 PM</p>
-										</li>
-										<li>
-											<h6>Saturday</h6>
-											<p>07:00 AM - 09:00 PM</p>
-										</li>
-										<li>
-											<h6>Sunday</h6>
-											<p>07:00 AM - 09:00 PM</p>
-										</li>
-									</ul>
-								</div>
-							</div> -->
-							<!-- <div class="doc-information-details" id="review">
-								<div class="detail-title">
-									<h4>Reviews (200)</h4>
-								</div>
-								<div class="doc-review-card">
-									<div class="user-info-review">
-										<div class="reviewer-img">
-											<a href="#" class="avatar-img"><img src="assets/img/clients/client-13.jpg" alt="Img"></a>
-											<div class="review-star">
-												<a href="#">kadajsalamander</a>
-												<div class="rating">
-													<i class="fas fa-star filled"></i>
-													<i class="fas fa-star filled"></i>
-													<i class="fas fa-star filled"></i>
-													<i class="fas fa-star filled"></i>
-													<i class="fas fa-star filled"></i>
-													<span>5.0 | 2 days ago</span>
-												</div>
-											</div>
-										</div>
-										<span class="thumb-icon"><i class="fa-regular fa-thumbs-up"></i>Yes,Recommend for Appointment</span>
-									</div>
-									<p>Thank you for this informative article! I've had a couple of hit-and-miss experiences with
-										freelancers in the past, and I realize now that I wasn't vetting them properly. Your checklist
-										for choosing the right freelancer is going to be my go-to from now on
-									</p>
-									<a href="#" class="reply d-flex align-items-center"><i class="fa-solid fa-reply me-2"></i>Reply</a>
-								</div>
-								<div class="doc-review-card">
-									<div class="user-info-review">
-										<div class="reviewer-img">
-											<a href="#" class="avatar-img"><img src="assets/img/clients/client-14.jpg" alt="Img"></a>
-											<div class="review-star">
-												<a href="#">Dane jose</a>
-												<div class="rating">
-													<i class="fas fa-star filled"></i>
-													<i class="fas fa-star filled"></i>
-													<i class="fas fa-star filled"></i>
-													<i class="fas fa-star filled"></i>
-													<i class="fas fa-star filled"></i>
-													<span>5.0 | 1 Months ago</span>
-												</div>
-											</div>
-										</div>
-										<span class="thumb-icon"><i class="fa-regular fa-thumbs-up"></i>Yes,Recommend for Appointment</span>
-									</div>
-									<p>As a freelancer myself, I find this article spot on! It's important for clients to
-										understand what to look for in a freelancer and how to foster a good working relationship.
-										The point about mutual respect
-										and clear communication is key in my experience. Well done
-									</p>
-									<a href="#" class="reply d-flex align-items-center"><i class="fa-solid fa-reply me-2"></i>Reply</a>
-								</div>
-								<div class="doc-review-card mb-0">
-									<div class="user-info-review">
-										<div class="reviewer-img">
-											<a href="#" class="avatar-img"><img src="assets/img/clients/client-15.jpg" alt="Img"></a>
-											<div class="review-star">
-												<a href="#">Dane jose</a>
-												<div class="rating">
-													<i class="fas fa-star filled"></i>
-													<i class="fas fa-star filled"></i>
-													<i class="fas fa-star filled"></i>
-													<i class="fas fa-star filled"></i>
-													<i class="fas fa-star filled"></i>
-													<span>5.0 | 15 days ago</span>
-												</div>
-											</div>
-										</div>
-										<span class="thumb-icon"><i class="fa-regular fa-thumbs-up"></i>Yes,Recommend for Appointment</span>
-									</div>
-									<p>Great article! I've bookmarked it for future reference. I'd love to read more about managing long-term relationships with freelancers, if you have any tips on that.
-									</p>
-									<a href="#" class="reply d-flex align-items-center"><i class="fa-solid fa-reply me-2"></i>Reply</a>
-									<div class="replied-info">
-										<div class="user-info-review">
-											<div class="reviewer-img">
-												<a href="#" class="avatar-img"><img src="assets/img/clients/client-16.jpg" alt="Img"></a>
-												<div class="review-star">
-													<a href="#">Robert Hollenbeck</a>
-												</div>
-											</div>
-										</div>
-										<p>Thank you for your comment and I will try to make a another post on that topic.
-										</p>
-										<a href="#" class="reply d-flex align-items-center"><i class="fa-solid fa-reply me-2"></i>Reply</a>
-									</div>
-									<!-- Pagination -->
-									<div class="pagination dashboard-pagination">
-										<ul>
-											<li>
-												<a href="#" class="page-link prev-link"><i class="fa-solid fa-chevron-left me-2"></i>Prev</a>
-											</li>
-											<li>
-												<a href="#" class="page-link active">1</a>
-											</li>
-											<li>
-												<a href="#" class="page-link">2</a>
-											</li>
-											<li>
-												<a href="#" class="page-link">3</a>
-											</li>
-											<li>
-												<a href="#" class="page-link">4</a>
-											</li>
-											<li>
-												<a href="#" class="page-link">5</a>
-											</li>
-											<li>
-												<a href="#" class="page-link">6</a>
-											</li>
-											<li>
-												<a href="#" class="page-link next-link">Next<i class="fa-solid fa-chevron-right ms-2"></i></a>
-											</li>
-										</ul>
-									</div>
-									<!-- /Pagination -->
-								</div>
-							</div> -->
 						</div>
 					</div>
-
 				</div>
-			</div>		
-			<!-- /Page Content -->
+			</div>
+			<!-- /Doctor Widget -->
+			
+			<div class="doctors-detailed-info">
+				<div class="doc-information-main">
+					<div class="doc-information-details bio-detail" id="doc_bio">
+						<div class="detail-title">
+							<h4>Doctor Bio</h4>
+						</div>
+						<p><?php echo htmlspecialchars($doctor['bio']); ?></p>
+						<a href="#" class="show-more d-flex align-items-center">See More<i class="fa-solid fa-chevron-down ms-2"></i></a>
+					</div>
+					<div class="doc-information-details" id="experience">
+						<div class="detail-title">
+							<h4>Practice Experience</h4>
+						</div>
+						<?php if (!empty($experiences)): ?>
+							<?php foreach ($experiences as $index => $exp): ?>
+								<div class="experience-info <?php echo ($index === count($experiences) - 1) ? 'mb-0' : ''; ?>">
+									<div class="experience-logo">
+										<span><img src="assets/img/icons/experience-logo-0<?php echo ($index % 2) + 1; ?>.svg" alt="Img"></span>
+									</div>
+									<div class="experience-content <?php echo ($index === count($experiences) - 1) ? 'mb-0' : ''; ?>">
+										<h5><?php echo htmlspecialchars($exp['hospital_name']); ?></h5>
+										<ul class="ent-list">
+											<li><?php echo htmlspecialchars($exp['title']); ?> </li>
+											<li><?php echo htmlspecialchars($exp['location']); ?></li>
+										</ul>
+										<ul class="date-list">
+											<li>
+												<?php
+												$start_date = date('M Y', strtotime($exp['start_date']));
+												$end_date = $exp['currently_working'] ? 'Present' : ($exp['end_date'] ? date('M Y', strtotime($exp['end_date'])) : 'Present');
+												echo $start_date . ' - ' . $end_date;
+												?>
+											</li>
+											<li><?php echo htmlspecialchars($exp['years_of_experience']); ?></li>
+										</ul>
+										<p><?php echo htmlspecialchars($exp['job_description'] ?: 'Experienced healthcare professional providing quality medical care.'); ?></p>
+									</div>
+								</div>
+							<?php endforeach; ?>
+						<?php else: ?>
+							<div class="experience-info">
+								<div class="experience-logo">
+									<span><img src="assets/img/icons/experience-logo-01.svg" alt="Img"></span>
+								</div>
+								<div class="experience-content mb-0">
+									<p class="text-muted">No experience information available.</p>
+								</div>
+							</div>
+						<?php endif; ?>
+					</div>
+					<!-- <div class="doc-information-details" id="insurence">
+						<div class="detail-title slider-nav d-flex justify-content-between align-items-center">
+							<h4>Insurance  Accepted (6)</h4>
+							<div class="nav nav-container slide-1"></div>
+						</div>
+						<div class="insurence-logo-slider owl-carousel">
+							<div class="insurence-logo">
+								<span><img src="assets/img/icons/insurence-logo-01.svg" alt="Img"></span>
+							</div>
+							<div class="insurence-logo">
+								<span><img src="assets/img/icons/insurence-logo-02.svg" alt="Img"></span>
+							</div>
+							<div class="insurence-logo">
+								<span><img src="assets/img/icons/insurence-logo-03.svg" alt="Img"></span>
+							</div>
+							<div class="insurence-logo">
+								<span><img src="assets/img/icons/insurence-logo-04.svg" alt="Img"></span>
+							</div>
+							<div class="insurence-logo">
+								<span><img src="assets/img/icons/insurence-logo-05.svg" alt="Img"></span>
+							</div>
+							<div class="insurence-logo">
+								<span><img src="assets/img/icons/insurence-logo-06.svg" alt="Img"></span>
+							</div>
+							<div class="insurence-logo">
+								<span><img src="assets/img/icons/insurence-logo-03.svg" alt="Img"></span>
+							</div>
+							<div class="insurence-logo">
+								<span><img src="assets/img/icons/insurence-logo-04.svg" alt="Img"></span>
+							</div>
+						</div>
+					</div> -->
+					<!-- <div class="doc-information-details" id="speciality">
+						<div class="detail-title">
+							<h4>Speciality</h4>
+						</div>
+						<ul class="special-links">
+							<li><a href="#">Orthopedic Consultation</a></li>
+							<li><a href="#">Delivery Blocks</a></li>
+							<li><a href="#">Ultrasound Injection</a></li>
+							<li><a href="#">Tooth Bleaching</a></li>
+							<li><a href="#">Tooth Bleaching</a></li>
+							<li><a href="#">Cosmetic</a></li>
+						</ul>
+					</div> -->
+					<!-- <div class="doc-information-details" id="services">
+						<div class="detail-title">
+							<h4>Services & Pricing</h4>
+						</div>
+						<ul class="special-links">
+							<li><a href="#">Orthopedic Consultation <span>$52</span></a></li>
+							<li><a href="#">Delivery Blocks <span>$24</span></a></li>
+							<li><a href="#">Ultrasound Injection <span>$31</span></a></li>
+							<li><a href="#">Tooth Bleaching <span>$20</span></a></li>
+							<li><a href="#">Tooth Bleaching <span>$15</span></a></li>
+							<li><a href="#">Cosmetic <span>$10</span></a></li>
+						</ul>
+					</div> -->
+					<!-- <div class="doc-information-details" id="availability">
+						<div class="detail-title slider-nav d-flex justify-content-between align-items-center">
+							<h4>Availability</h4>
+							<div class="nav nav-container slide-2"></div>
+						</div>
+						<div class="availability-slots-slider owl-carousel">
+							<div class="availability-date">
+								<div class="book-date">
+									<h6>Wed Feb 2024</h6>
+									<span>01:00 - 02:00 PM</span>
+								</div>
+							</div>
+							<div class="availability-date">
+								<div class="book-date">
+									<h6>Wed Feb 2024</h6>
+									<span>01:00 - 02:00 PM</span>
+								</div>
+							</div>
+							<div class="availability-date">
+								<div class="book-date">
+									<h6>Wed Feb 2024</h6>
+									<span>01:00 - 02:00 PM</span>
+								</div>
+							</div>
+							<div class="availability-date">
+								<div class="book-date">
+									<h6>Wed Feb 2024</h6>
+									<span>01:00 - 02:00 PM</span>
+								</div>
+							</div>
+							<div class="availability-date">
+								<div class="book-date">
+									<h6>Wed Feb 2024</h6>
+									<span>01:00 - 02:00 PM</span>
+								</div>
+							</div>
+							<div class="availability-date">
+								<div class="book-date">
+									<h6>Wed Feb 2024</h6>
+									<span>01:00 - 02:00 PM</span>
+								</div>
+							</div>
+							<div class="availability-date">
+								<div class="book-date">
+									<h6>Wed Feb 2024</h6>
+									<span>01:00 - 02:00 PM</span>
+								</div>
+							</div>
+							<div class="availability-date">
+								<div class="book-date">
+									<h6>Wed Feb 2024</h6>
+									<span>01:00 - 02:00 PM</span>
+								</div>
+							</div>
+						</div>
+					</div> -->
+					<!-- <div class="doc-information-details" id="clinic">
+						<div class="detail-title">
+							<h4>Clinics & Locations</h4>
+						</div>
+						<div class="clinic-loc">
+							<div class="row align-items-center">
+								<div class="col-lg-7">
+									<div class="clinic-info">
+										<div class="clinic-img"><img src="assets/img/clinic/clinic-11.jpg" alt="Img"></div>
+										<div class="detail-clinic">
+											<h5>Sofi's Clinic - </h5>
+											<span>$350 / Apponitment</span>
+											<p>2286 Sundown Lane, Old Trafford 24541, UK</p>
+										</div>
+									</div>
+									<div class="d-flex align-items-center avail-time-slot">
+										<div class="availability-date">
+											<div class="book-date">
+												<h6>Monday</h6>
+												<span>07:00 AM - 09:00 PM</span>
+											</div>
+										</div>
+										<div class="availability-date">
+											<div class="book-date">
+												<h6>Tuesday</h6>
+												<span>07:00 AM - 09:00 PM</span>
+											</div>
+										</div>
+									</div>
+								</div>
+								<div class="col-lg-5">
+									<div class="contact-map d-flex">
+										<iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3193.7301009561315!2d-76.13077892422932!3d36.82498697224007!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x89bae976cfe9f8af%3A0xa61eac05156fbdb9!2sBeachStreet%20USA!5e0!3m2!1sen!2sin!4v1669777904208!5m2!1sen!2sin" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+									</div>
+								</div>
+							</div>
+						</div>
+						<div class="clinic-loc mb-0">
+							<div class="row align-items-center">
+								<div class="col-lg-7">
+									<div class="clinic-info">
+										<div class="clinic-img"><img src="assets/img/clinic/clinic-12.jpg" alt="Img"></div>
+										<div class="detail-clinic">
+											<h5>The Family Dentistry Clinic </h5>
+											<span>$550 / Apponitment</span>
+											<p>MDS - Periodontology and Oral Implantology, BDS</p>
+										</div>
+									</div>
+									<div class="d-flex align-items-center avail-time-slot">
+										<div class="availability-date">
+											<div class="book-date">
+												<h6>Friday</h6>
+												<span>07:00 AM - 09:00 PM</span>
+											</div>
+										</div>
+										<div class="availability-date">
+											<div class="book-date">
+												<h6>Saturday</h6>
+												<span>07:00 AM - 09:00 PM</span>
+											</div>
+										</div>
+									</div>
+								</div>
+								<div class="col-lg-5">
+									<div class="contact-map d-flex">
+										<iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3193.7301009561315!2d-76.13077892422932!3d36.82498697224007!2m3!1f0!2f0!3m2!1sen!2sin!4v1669777904208!5m2!1sen!2sin" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div> -->
+					<!-- <div class="doc-information-details" id="membership">
+						<div class="detail-title">
+							<h4>Membership</h4>
+						</div>
+						<div class="member-ship-info">
+							<span class="mem-check"><i class="fa-solid fa-check"></i></span>
+							<p>Affiliate members include related allied health professionals- evidence based
+								(Dietitians, Physiotherapist, Occupational therapist and Clinical Psychologist) who will
+								team up with allopathic physicians to
+								support the Lifestyle Medicine movement in India through ISLM.
+							</p>
+						</div>
+						<div class="member-ship-info mb-0">
+							<span class="mem-check"><i class="fa-solid fa-check"></i></span>
+							<p>Physician members include the allopathic doctors only (MBBS, MD, MS, DM, MCH, DNB or equivalent degree)
+								who hold a valid medical license as recognized by the Medical Council of India.
+							</p>
+						</div>
+					</div> -->
+					<!-- <div class="doc-information-details" id="awards">
+						<div class="detail-title slider-nav d-flex justify-content-between align-items-center">
+							<h4>Awards</h4>
+							<div class="nav nav-container slide-3"></div>
+						</div>
+						<div class="awards-slider owl-carousel">
+							<div class="award-card">
+								<div class="award-card-info">
+									<span><img src="assets/img/icons/bookmark-star.svg" alt="Img"></span>
+									<h5>Award Name (2021)</h5>
+									<p>evidence based (Dietitians, Physiotherapist, Occupational therapist and Clinical)</p>
+								</div>
+							</div>
+							<div class="award-card">
+								<div class="award-card-info">
+									<span><img src="assets/img/icons/bookmark-star.svg" alt="Img"></span>
+									<h5>Award Name (2022)</h5>
+									<p>evidence based (Dietitians, Physiotherapist, Occupational therapist and Clinical)</p>
+								</div>
+							</div>
+							<div class="award-card">
+								<div class="award-card-info">
+									<span><img src="assets/img/icons/bookmark-star.svg" alt="Img"></span>
+									<h5>Award Name (2023)</h5>
+									<p>evidence based (Dietitians, Physiotherapist, Occupational therapist and Clinical)</p>
+								</div>
+							</div>
+							<div class="award-card">
+								<div class="award-card-info">
+									<span><img src="assets/img/icons/bookmark-star.svg" alt="Img"></span>
+									<h5>Award Name (2024)</h5>
+									<p>evidence based (Dietitians, Physiotherapist, Occupational therapist and Clinical)</p>
+								</div>
+							</div>
+							<div class="award-card">
+								<div class="award-card-info">
+									<span><img src="assets/img/icons/bookmark-star.svg" alt="Img"></span>
+									<h5>Award Name (2020)</h5>
+									<p>evidence based (Dietitians, Physiotherapist, Occupational therapist and Clinical)</p>
+								</div>
+							</div>
+						</div>
+					</div> -->
+					<!-- <div class="doc-information-details" id="bussiness_hour">
+						<div class="detail-title">
+							<h4>Business Hours</h4>
+						</div>
+						<div class="hours-business">
+							<ul>
+								<li>
+									<div class="today-hours">
+										<h6>Today</h6>
+										<span>5 Feb 2024</span>
+									</div>
+									<div class="availed">
+										<span class="badge doc-avail-badge"><i class="fa-solid fa-circle"></i>Available </span>
+										<p>07:00 AM - 09:00 PM</p>
+									</div>
+								</li>
+								<li>
+									<h6>Monday</h6>
+									<p>07:00 AM - 09:00 PM</p>
+								</li>
+								<li>
+									<h6>Tuesday</h6>
+									<p>07:00 AM - 09:00 PM</p>
+								</li>
+								<li>
+									<h6>Wednesday</h6>
+									<p>07:00 AM - 09:00 PM</p>
+								</li>
+								<li>
+									<h6>Thursday</h6>
+									<p>07:00 AM - 09:00 PM</p>
+								</li>
+								<li>
+									<h6>Friday</h6>
+									<p>07:00 AM - 09:00 PM</p>
+								</li>
+								<li>
+									<h6>Saturday</h6>
+									<p>07:00 AM - 09:00 PM</p>
+								</li>
+								<li>
+									<h6>Sunday</h6>
+									<p>07:00 AM - 09:00 PM</p>
+								</li>
+							</ul>
+						</div>
+					</div> -->
+					<!-- <div class="doc-information-details" id="review">
+						<div class="detail-title">
+							<h4>Reviews (200)</h4>
+						</div>
+						<div class="doc-review-card">
+							<div class="user-info-review">
+								<div class="reviewer-img">
+									<a href="#" class="avatar-img"><img src="assets/img/clients/client-13.jpg" alt="Img"></a>
+									<div class="review-star">
+										<a href="#">kadajsalamander</a>
+										<div class="rating">
+											<i class="fas fa-star filled"></i>
+											<i class="fas fa-star filled"></i>
+											<i class="fas fa-star filled"></i>
+											<i class="fas fa-star filled"></i>
+											<i class="fas fa-star filled"></i>
+											<span>5.0 | 2 days ago</span>
+										</div>
+									</div>
+								</div>
+								<span class="thumb-icon"><i class="fa-regular fa-thumbs-up"></i>Yes,Recommend for Appointment</span>
+							</div>
+							<p>Thank you for this informative article! I've had a couple of hit-and-miss experiences with
+								freelancers in the past, and I realize now that I wasn't vetting them properly. Your checklist
+								for choosing the right freelancer is going to be my go-to from now on
+							</p>
+							<a href="#" class="reply d-flex align-items-center"><i class="fa-solid fa-reply me-2"></i>Reply</a>
+						</div>
+						<div class="doc-review-card">
+							<div class="user-info-review">
+								<div class="reviewer-img">
+									<a href="#" class="avatar-img"><img src="assets/img/clients/client-14.jpg" alt="Img"></a>
+									<div class="review-star">
+										<a href="#">Dane jose</a>
+										<div class="rating">
+											<i class="fas fa-star filled"></i>
+											<i class="fas fa-star filled"></i>
+											<i class="fas fa-star filled"></i>
+											<i class="fas fa-star filled"></i>
+											<i class="fas fa-star filled"></i>
+											<span>5.0 | 1 Months ago</span>
+										</div>
+									</div>
+								</div>
+								<span class="thumb-icon"><i class="fa-regular fa-thumbs-up"></i>Yes,Recommend for Appointment</span>
+							</div>
+							<p>As a freelancer myself, I find this article spot on! It's important for clients to
+								understand what to look for in a freelancer and how to foster a good working relationship.
+								The point about mutual respect
+								and clear communication is key in my experience. Well done
+							</p>
+							<a href="#" class="reply d-flex align-items-center"><i class="fa-solid fa-reply me-2"></i>Reply</a>
+						</div>
+						<div class="doc-review-card mb-0">
+							<div class="user-info-review">
+								<div class="reviewer-img">
+									<a href="#" class="avatar-img"><img src="assets/img/clients/client-15.jpg" alt="Img"></a>
+									<div class="review-star">
+										<a href="#">Dane jose</a>
+										<div class="rating">
+											<i class="fas fa-star filled"></i>
+											<i class="fas fa-star filled"></i>
+											<i class="fas fa-star filled"></i>
+											<i class="fas fa-star filled"></i>
+											<i class="fas fa-star filled"></i>
+											<span>5.0 | 15 days ago</span>
+										</div>
+									</div>
+								</div>
+								<span class="thumb-icon"><i class="fa-regular fa-thumbs-up"></i>Yes,Recommend for Appointment</span>
+							</div>
+							<p>Great article! I've bookmarked it for future reference. I'd love to read more about managing long-term relationships with freelancers, if you have any tips on that.
+							</p>
+							<a href="#" class="reply d-flex align-items-center"><i class="fa-solid fa-reply me-2"></i>Reply</a>
+							<div class="replied-info">
+								<div class="user-info-review">
+									<div class="reviewer-img">
+										<a href="#" class="avatar-img"><img src="assets/img/clients/client-16.jpg" alt="Img"></a>
+										<div class="review-star">
+											<a href="#">Robert Hollenbeck</a>
+										</div>
+									</div>
+								</div>
+								<p>Thank you for your comment and I will try to make a another post on that topic.
+								</p>
+								<a href="#" class="reply d-flex align-items-center"><i class="fa-solid fa-reply me-2"></i>Reply</a>
+							</div>
+						</div>
+					</div> -->
+				</div>
+			</div>
+
+		</div>
+	</div>		
+<!-- /Page Content -->
    
 			<!-- Footer Section -->
 			<footer class="footer inner-footer">
