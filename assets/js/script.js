@@ -3869,7 +3869,139 @@ Version      : 1.3
 $(document).ready(function () {
 	let progressVal = 0;
 	let businessType = 0;
-	
+
+	// Toast for booking page (top-right)
+	function showBookingToast(type, message) {
+		var container = document.getElementById('booking-toast-container');
+		if (!container || typeof bootstrap === 'undefined') return;
+		var isSuccess = type === 'success';
+		var bgClass = isSuccess ? 'bg-success text-white' : 'bg-danger text-white';
+		var icon = isSuccess ? '<i class="fa-solid fa-check-circle me-2"></i>' : '<i class="fa-solid fa-exclamation-circle me-2"></i>';
+		var title = isSuccess ? 'Success' : 'Error';
+		var toastEl = document.createElement('div');
+		toastEl.className = 'toast align-items-center ' + bgClass + ' border-0';
+		toastEl.setAttribute('role', 'alert');
+		toastEl.innerHTML = '<div class="d-flex"><div class="toast-body">' + icon + '<strong>' + title + '</strong> ' + message + '</div><button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button></div>';
+		container.appendChild(toastEl);
+		var bsToast = new bootstrap.Toast(toastEl, { delay: 4500 });
+		toastEl.addEventListener('hidden.bs.toast', function() { toastEl.remove(); });
+		bsToast.show();
+	}
+
+	// Format slot time for display (HH:MM -> 6:15 AM)
+	function formatSlotForSummary(timeStr) {
+		if (!timeStr) return '';
+		var parts = (timeStr + '').split(':');
+		var h = parseInt(parts[0], 10) || 0;
+		var m = parseInt(parts[1], 10) || 0;
+		var ampm = h >= 12 ? 'PM' : 'AM';
+		h = h % 12 || 12;
+		return h + ':' + String(m).padStart(2, '0') + ' ' + ampm;
+	}
+
+	// Add Basic Info: validate, fill summary, go to payment step (do NOT save yet)
+	$('#first .next_btns').on('click', function(e) {
+		var $btn = $(this);
+		var doctorId = $('#booking_doctor_id').val();
+		var appointmentDate = $('#booking_appointment_date').val();
+		var slotTime = $('input[name="appointment_slot"]:checked').val() || $('#booking_slot_time').val();
+		var fullName = $('#booking_full_name').val();
+		var mobile = $('#booking_mobile').val();
+		if (!doctorId || !appointmentDate || !slotTime) {
+			e.preventDefault();
+			e.stopImmediatePropagation();
+			showBookingToast('danger', 'Please select a date and a time slot.');
+			return false;
+		}
+		if (!fullName || !mobile) {
+			e.preventDefault();
+			e.stopImmediatePropagation();
+			showBookingToast('danger', 'Please enter Full Name and Mobile Number.');
+			return false;
+		}
+		e.preventDefault();
+		e.stopImmediatePropagation();
+		// Fill summary from form (no save yet)
+		var dateFormatted = appointmentDate ? (moment(appointmentDate).format('MMM D, YYYY') || appointmentDate) : '—';
+		$('#summary_date_time').text(dateFormatted + ', ' + formatSlotForSummary(slotTime));
+		$('#summary_full_name').text(fullName || '—');
+		$('#summary_mobile').text(mobile || '—');
+		$('#summary_age').text($('#booking_age').val() || '—');
+		$('#summary_weight').text($('#booking_weight').val() || '—');
+		$('#summary_body_temperature').text($('#booking_body_temperature').val() || '—');
+		$('#summary_blood_pressure').text($('#booking_blood_pressure').val() || '—');
+		$('#summary_pulse').text($('#booking_pulse').val() || '—');
+		$('#summary_spo2').text($('#booking_spo2').val() || '—');
+		$('#summary_rbs_fbs').text($('#booking_rbs_fbs').val() || '—');
+		$('#summary_attachment').text('—');
+		var symptoms = $('#booking_symptoms').val() || '';
+		$('#summary_symptoms').text(symptoms.length > 80 ? symptoms.substring(0, 80) + '...' : symptoms || '—');
+		// Advance to payment step
+		var $step = $btn.closest('fieldset');
+		$step.next().fadeIn('slow');
+		$step.css('display', 'none');
+		$('.progress-active').removeClass('progress-active').addClass('progress-activated').next().addClass('progress-active');
+		return false;
+	});
+
+	// Confirm & Pay: save booking to DB, then go to confirmation step
+	$('#booking_confirm_pay_btn').on('click', function(e) {
+		e.preventDefault();
+		e.stopImmediatePropagation();
+		var $btn = $(this);
+		var doctorId = $('#booking_doctor_id').val();
+		var appointmentDate = $('#booking_appointment_date').val();
+		var slotTime = $('input[name="appointment_slot"]:checked').val() || $('#booking_slot_time').val();
+		var fullName = $('#booking_full_name').val();
+		var mobile = $('#booking_mobile').val();
+		if (!doctorId || !appointmentDate || !slotTime) {
+			showBookingToast('danger', 'Please select a date and a time slot.');
+			return false;
+		}
+		if (!fullName || !mobile) {
+			showBookingToast('danger', 'Please enter Full Name and Mobile Number.');
+			return false;
+		}
+		showBookingToast('success', 'Confirming your booking...');
+		$btn.prop('disabled', true).html('<i class="fa fa-spinner fa-spin me-2"></i>Confirming...');
+		$.post('php/book-appointment.php', {
+			doctor_id: doctorId,
+			appointment_date: appointmentDate,
+			slot_time: slotTime,
+			patient_name: fullName,
+			mobile: mobile,
+			notes: $('#booking_symptoms').val() || '',
+			age: $('#booking_age').val() || '',
+			weight: $('#booking_weight').val() || '',
+			body_temperature: $('#booking_body_temperature').val() || '',
+			blood_pressure: $('#booking_blood_pressure').val() || '',
+			pulse: $('#booking_pulse').val() || '',
+			spo2: $('#booking_spo2').val() || '',
+			rbs_fbs: $('#booking_rbs_fbs').val() || ''
+		}, function(r) {
+			if (r && r.success) {
+				showBookingToast('success', r.message || 'Booking confirmed!');
+				$('.booking-id-badge').text(r.booking_number || ('APT' + (r.appointment_id || '')));
+				var $step = $btn.closest('fieldset');
+				$step.next().fadeIn('slow');
+				$step.css('display', 'none');
+				$('.progress-active').removeClass('progress-active').addClass('progress-activated').next().addClass('progress-active');
+			} else {
+				showBookingToast('danger', r && r.message ? r.message : 'Booking failed.');
+			}
+			$btn.prop('disabled', false).html('Confirm & Pay <i class="isax isax-arrow-right-3 ms-1"></i>');
+		}, 'json').fail(function(xhr) {
+			var msg = 'Booking failed. Please try again.';
+			try {
+				var r = JSON.parse(xhr.responseText);
+				if (r && r.message) msg = r.message;
+			} catch (z) {}
+			showBookingToast('danger', msg);
+			$btn.prop('disabled', false).html('Confirm & Pay <i class="isax isax-arrow-right-3 ms-1"></i>');
+		});
+		return false;
+	});
+
 	$(".next_btns").on('click', function () {
 		$(this).parent().parent().parent().parent().next().fadeIn('slow');
 		$(this).parent().parent().parent().parent().css({
@@ -3894,6 +4026,7 @@ if ($('#datetimepickershow').length > 0) {
 		inline: true,
 		sideBySide: true,
 		format: 'DD-MM-YYYY',
+		minDate: moment().startOf('day'),
 		icons: {
 			up: "fas fa-angle-up",
 			down: "fas fa-angle-down",
@@ -3902,6 +4035,84 @@ if ($('#datetimepickershow').length > 0) {
 		}
 
 	});
+
+	// Handle date change: fetch available slots from API (doctor_availability_ranges)
+	$('#datetimepickershow').on('dp.change', function(e) {
+		if (!e.date) return;
+		const selectedDate = e.date;
+		const slotDate = selectedDate.format('YYYY-MM-DD');
+		const doctorId = $('#booking_doctor_id').val();
+		const container = $('#booking-slots-container');
+		if (!container.length) return;
+		$('#booking_appointment_date').val(slotDate);
+		$('#booking_slot_time').val('');
+		container.find('input[name="appointment_slot"]').prop('checked', false);
+		if (!doctorId) {
+			container.html('<p class="text-muted mb-0">Select a doctor to see available slots.</p>');
+			return;
+		}
+		container.html('<p class="text-muted mb-0">Loading slots...</p>');
+		$.get('php/get-available-slots.php', { doctor_id: doctorId, slot_date: slotDate }, function(r) {
+			if (!r || !r.success || !r.slots || r.slots.length === 0) {
+				container.html('<p class="text-muted mb-0">No slots available for ' + selectedDate.format('dddd, MMMM D, YYYY') + '. Select another date.</p>');
+				return;
+			}
+			function slotToPeriod(time) {
+				const parts = (time || '').split(':');
+				const h = parseInt(parts[0], 10);
+				if (h >= 6 && h < 12) return 'morning';
+				if (h >= 12 && h < 18) return 'afternoon';
+				if (h >= 18 && h < 24) return 'evening';
+				return 'night';
+			}
+			const periodLabels = { morning: 'Morning (6 AM – 12 PM)', afternoon: 'Afternoon (12 PM – 6 PM)', evening: 'Evening (6 PM – 12 AM)', night: 'Night (12 AM – 6 AM)' };
+			const byPeriod = { morning: [], afternoon: [], evening: [], night: [] };
+			r.slots.forEach(function(t) {
+				const p = slotToPeriod(t);
+				if (byPeriod[p]) byPeriod[p].push(t);
+			});
+			let html = '';
+			['morning', 'afternoon', 'evening', 'night'].forEach(function(period) {
+				if (byPeriod[period].length === 0) return;
+				byPeriod[period].sort();
+				html += '<div class="book-title"><h6 class="fs-14 mb-2">' + (periodLabels[period] || period) + '</h6></div>';
+				html += '<div class="token-slot mt-2 mb-3">';
+				byPeriod[period].forEach(function(time) {
+					const label = format_slot_time_12(time);
+					html += '<div class="form-check-inline visits me-0"><label class="visit-btns">' +
+						'<input type="radio" class="form-check-input" name="appointment_slot" value="' + time + '">' +
+						'<span class="visit-rsn">' + label + '</span></label></div>';
+				});
+				html += '</div>';
+			});
+			container.html(html);
+			container.find('input[name="appointment_slot"]').on('change', function() {
+				$('#booking_slot_time').val($(this).val());
+			});
+		}, 'json').fail(function() {
+			container.html('<p class="text-muted mb-0">Failed to load slots. Please try again.</p>');
+		});
+	});
+
+	// Auto-load today's slots when doctor is selected (must run after handler is attached)
+	var doctorId = $('#booking_doctor_id').val();
+	if (doctorId) {
+		var today = moment().startOf('day');
+		$('#datetimepickershow').data('DateTimePicker').date(today);
+		var ev = $.Event('dp.change');
+		ev.date = today;
+		$('#datetimepickershow').trigger(ev);
+	}
+	
+	// Function to format 24-hour time to 12-hour format
+	function format_slot_time_12(t) {
+		const parts = t.split(':');
+		let h = parseInt(parts[0]) || 0;
+		let m = parseInt(parts[1]) || 0;
+		const ampm = h >= 12 ? 'PM' : 'AM';
+		h = h % 12 || 12;
+		return h + ':' + String(m).padStart(2, '0') + ' ' + ampm;
+	}
 }
 
 if($('.viewall-one').length > 0) {

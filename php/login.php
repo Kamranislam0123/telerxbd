@@ -198,7 +198,7 @@ try {
             $_SESSION['patient_id'] = $user_data['id'];
             $_SESSION['patient_name'] = $user_data['name'];
             $_SESSION['patient_email'] = $user_data['email'];
-            $redirect_url = 'patient-dashboard.php';
+            $redirect_url = 'index.php';
             break;
     }
     

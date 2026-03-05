@@ -18,7 +18,7 @@ if (!file_exists($config_path)) {
         setcookie(session_name(), '', time() - 3600, '/');
     }
     session_destroy();
-    header('Location: ../login.php'); // এক লেভেল উপরে যাবে কারণ logout.php php ফোল্ডারের ভিতরে
+    header('Location: ../index.php');
     exit;
 }
 
@@ -50,7 +50,7 @@ if (isset($_COOKIE[session_name()])) {
 // Destroy the session
 session_destroy();
 
-// Redirect to login page (এক লেভেল উপরে)
-header('Location: ../login.php');
+// Redirect to home page
+header('Location: ../index.php');
 exit;
 ?>

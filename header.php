@@ -130,9 +130,9 @@ $current_page = basename($_SERVER['PHP_SELF']);
                         <!-- Mobile view login/signup link -->
                         <li class="login-link">
                             <?php if(isset($_SESSION['logged_in']) && $_SESSION['logged_in'] === true): ?>
-                                <a href="logout">Logout</a>
+                                <a href="php/logout.php">Logout</a>
                             <?php else: ?>
-                                <a href="login">Login / Signup</a>
+                                <a href="login.php">Login / Signup</a>
                             <?php endif; ?>
                         </li>
                     </ul>
@@ -209,7 +209,7 @@ $current_page = basename($_SERVER['PHP_SELF']);
                                     <a class="dropdown-item" href="patient-profile-settings">Profile Settings</a>
                                 <?php endif; ?>
 
-                                <a class="dropdown-item" href="php/logout">Logout</a>
+                                <a class="dropdown-item" href="php/logout.php">Logout</a>
                             </div>
                         </li>
                     <?php else: ?>
@@ -220,7 +220,7 @@ $current_page = basename($_SERVER['PHP_SELF']);
                             </a>
                         </li>
                         <li class="register-btn">
-                            <a href="login" class="btn btn-primary log-btn">
+                            <a href="login.php" class="btn btn-primary log-btn">
                                 <i class="isax isax-lock"></i>Login
                             </a>
                         </li>
