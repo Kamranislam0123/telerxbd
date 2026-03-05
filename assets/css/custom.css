@@ -46628,13 +46628,13 @@ ul.benifits-col li i {
 .about-section .about-img-info .about-box {
   background: #15558d;
   border-radius: 8px;
-  margin: 15px 0 25px;
-  padding: 45px 10px;
+  margin: 0px 0 25px;
+  padding: 67px 10px;
   text-align: center;
 }
 .about-section .about-img-info .about-box h4 {
   font-weight: 600;
-  font-size: 20px;
+  font-size: 25px;
   color: #FFF;
   max-width: 208px;
   margin: 0 auto 0;
@@ -46657,6 +46657,7 @@ ul.benifits-col li i {
 .section-inner-header h6 {
   font-weight: 600;
   font-size: 16px;
+  padding-bottom: 5px;
   color: #15558d;
   margin-bottom: 0;
 }
@@ -46689,7 +46690,8 @@ ul.benifits-col li i {
   padding-bottom: 25px;
 }
 .about-content-details p {
-  font-size: 16px;
+  font-size: 15px;
+  text-align: justify;
   margin-bottom: 16px;
 }
 .about-content-details p:last-child {
@@ -46816,7 +46818,7 @@ ul.benifits-col li i {
 
 .way-section {
   background-color: #FFF;
-  padding-bottom: 60px;
+  padding-bottom: 0px;
 }
 .way-section .way-bg {
   background: #15558d;
@@ -58932,6 +58934,7 @@ ul li {
 .contact-info {
   background: linear-gradient(90.08deg, #08971b 0.09%, #12b554 70.28%);
   padding: 60px;
+  margin-bottom: 30px;
   border-radius: 30px;
 }
 @media (max-width: 1199.98px) {

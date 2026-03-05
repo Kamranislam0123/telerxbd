@@ -108,148 +108,29 @@ try {
 }
 
 ?>
-<!DOCTYPE html>
-<html lang="en">
-	<head>
-
-		<meta charset="utf-8">
-		<title><?php echo htmlspecialchars($doctor['name']); ?> - TeleRx Bangladesh</title>
-		<meta name="viewport" content="width=device-width, initial-scale=1.0">
-		<meta name="description" content="The responsive professional Doccure template offers many features, like scheduling appointments with  top doctors, clinics, and hospitals via voice, video call & chat.">
-		<meta name="keywords" content="practo clone, doccure, doctor appointment, Practo clone html template, doctor booking template">
-		<meta name="author" content="Practo Clone HTML Template - Doctor Booking Template">
-		<meta property="og:url" content="https://doccure.dreamstechnologies.com/html/">
-		<meta property="og:type" content="website">
-		<meta property="og:title" content="Doctors Appointment HTML Website Templates | Doccure">
-		<meta property="og:description" content="The responsive professional Doccure template offers many features, like scheduling appointments with  top doctors, clinics, and hospitals via voice, video call & chat.">
-		<meta property="og:image" content="assets/img/preview-banner.jpg">
-		<meta name="twitter:card" content="summary_large_image">
-		<meta property="twitter:domain" content="https://doccure.dreamstechnologies.com/html/">
-		<meta property="twitter:url" content="https://doccure.dreamstechnologies.com/html/">
-		<meta name="twitter:title" content="Doctors Appointment HTML Website Templates | Doccure">
-		<meta name="twitter:description" content="The responsive professional Doccure template offers many features, like scheduling appointments with  top doctors, clinics, and hospitals via voice, video call & chat.">
-		<meta name="twitter:image" content="assets/img/preview-banner.jpg">	
-		
-		<!-- Favicon -->
-		<link rel="shortcut icon" href="assets/img/favicon.png" type="image/x-icon">
-
-		<!-- Apple Touch Icon -->
-		<link rel="apple-touch-icon" sizes="180x180" href="assets/img/apple-touch-icon.png">
-
-		<!-- Theme Settings Js -->
-		<script src="assets/js/theme-script.js"></script>
-		
-		<!-- Bootstrap CSS -->
-		<link rel="stylesheet" href="assets/css/bootstrap.min.css">
-				
-		<!-- Fontawesome CSS -->
-		<link rel="stylesheet" href="assets/plugins/fontawesome/css/fontawesome.min.css">
-		<link rel="stylesheet" href="assets/plugins/fontawesome/css/all.min.css">
-
-		<!-- Iconsax CSS-->
-		<link rel="stylesheet" href="assets/css/iconsax.css">
-
-		<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-		<link href="https://fonts.googleapis.com/css2?family=Inter:wght@200;300;400;500;600;700;800;900&display=swap" rel="stylesheet">
-
-		<!-- Feathericon CSS -->
-    	<link rel="stylesheet" href="assets/css/feather.css">
-
-    	<!-- Datepicker CSS -->
-		<link rel="stylesheet" href="assets/css/bootstrap-datetimepicker.min.css">
-
-		<!-- Owl Carousel CSS -->
-		<link rel="stylesheet" href="assets/css/owl.carousel.min.css">
-
-		<!-- Animation CSS -->
-		<link rel="stylesheet" href="assets/css/aos.css">
-		
-		<!-- Main CSS -->
-		<link rel="stylesheet" href="assets/css/custom.css">
-
-	</head>		
-	<body>
-
-		<!-- Main Wrapper -->
-		<div class="main-wrapper home-one" data-magic-cursor="hide">
-					
-			<!-- Header -->
-			<header class="header header-custom header-fixed header-one home-head-one">
-				<div class="container">
-					<nav class="navbar navbar-expand-lg header-nav">
-						<div class="navbar-header">
-							<a id="mobile_btn" href="javascript:void(0);">
-								<span class="bar-icon">
-									<span></span>
-									<span></span>
-									<span></span>
-								</span>
-							</a>
-							<a href="index.html" class="navbar-brand logo">
-								<img src="assets/img/logo.svg" class="img-fluid" alt="Logo">
-							</a>
-						</div>
-						<div class="main-menu-wrapper">
-							<div class="menu-header">
-								<a href="index.html" class="menu-logo">
-									<img src="assets/img/logo.svg" class="img-fluid" alt="Logo">
-								</a>
-								<a id="menu_close" class="menu-close" href="javascript:void(0);">
-									<i class="fas fa-times"></i>
-								</a>
-							</div>
-							<ul class="main-nav">
-								<li class="has-submenu megamenu active">
-									<a href="index.html">Home </a></li>
-								<li><a href="doctors.php">Doctor List</a></li>
-								<li><a href="doctor-profile.php">Doctor Profile</a></li>
-								<li><a href="about-us.php">About Us</a></li>
-								<li><a href="contact-us.php">Contact</a></li>
-								<li><a href="blog.php">Blog</a></li>
-								<li class="login-link"><a href="login.php">Login / Signup</a></li>
-							</ul>
-						</div>
-						<ul class="nav header-navbar-rht">
-							<li class="register-btn">
-								<a href="registration.php" class="btn btn-dark reg-btn"><i class="isax isax-user"></i>Register</a>
-							</li>
-							<li class="register-btn">
-								<a href="login.php" class="btn btn-primary log-btn"><i class="isax isax-lock"></i>Login</a>
-							</li>
-						</ul>
+	<!-- Breadcrumb -->
+	<div class="breadcrumb-bar">
+		<div class="container">
+			<div class="row align-items-center inner-banner">
+				<div class="col-md-12 col-12 text-center">
+					<nav aria-label="breadcrumb" class="page-breadcrumb">
+						<h2 class="doc-name"><?php echo htmlspecialchars($doctor['name']); ?> Profile</h2>
 					</nav>
 				</div>
-			</header>
-			<!-- /Header -->		
-
-			<!-- Breadcrumb -->
-			<div class="breadcrumb-bar">
-				<div class="container">
-					<div class="row align-items-center inner-banner">
-						<div class="col-md-12 col-12 text-center">
-							<nav aria-label="breadcrumb" class="page-breadcrumb">
-								<ol class="breadcrumb">
-									<li class="breadcrumb-item"><a href="index.html"><i class="isax isax-home-15"></i></a></li>
-									<li class="breadcrumb-item" aria-current="page">Patient</li>
-									<li class="breadcrumb-item active">Doctor Profile 1</li>
-								</ol>
-								<h2 class="breadcrumb-title">Doctor Profile</h2>
-							</nav>
-						</div>
-					</div>
-				</div>
-				<div class="breadcrumb-bg">
-					<img src="assets/img/bg/breadcrumb-bg-01.png" alt="img" class="breadcrumb-bg-01">
-					<img src="assets/img/bg/breadcrumb-bg-02.png" alt="img" class="breadcrumb-bg-02">
-					<img src="assets/img/bg/breadcrumb-icon.png" alt="img" class="breadcrumb-bg-03">
-					<img src="assets/img/bg/breadcrumb-icon.png" alt="img" class="breadcrumb-bg-04">
-				</div>
 			</div>
-			<!-- /Breadcrumb -->
-			
-			<!-- Page Content -->
-			<div class="content">
-				<div class="container">
+		</div>
+		<div class="breadcrumb-bg">
+			<img src="assets/img/bg/breadcrumb-bg-01.png" alt="img" class="breadcrumb-bg-01">
+			<img src="assets/img/bg/breadcrumb-bg-02.png" alt="img" class="breadcrumb-bg-02">
+			<img src="assets/img/bg/breadcrumb-icon.png" alt="img" class="breadcrumb-bg-03">
+			<img src="assets/img/bg/breadcrumb-icon.png" alt="img" class="breadcrumb-bg-04">
+		</div>
+	</div>
+	<!-- /Breadcrumb -->
+
+	<!-- Page Content -->
+	<div class="content">
+		<div class="container">
 
 					<!-- Doctor Widget -->
 					<div class="card doc-profile-card">
@@ -837,9 +718,9 @@ try {
 						</div>
 					</div>
 
-				</div>
-			</div>		
-			<!-- /Page Content -->
+		</div>
+	</div>		
+<!-- /Page Content -->
    
 			<!-- Footer Section -->
 			<footer class="footer inner-footer">

@@ -41,17 +41,11 @@ $current_page = basename($_SERVER['PHP_SELF']);
     <!-- Apple Touch Icon -->
     <link rel="apple-touch-icon" sizes="180x180" href="assets/img/apple-touch-icon.png">
 
-    <!-- Theme Settings Js -->
-    <script src="assets/js/theme-script.js"></script>
-
     <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="assets/css/bootstrap.min.css">
 
     <!-- Iconsax CSS-->
     <link rel="stylesheet" href="assets/css/iconsax.css">
-
-    <!-- Datetimepicker CSS -->
-    <link rel="stylesheet" href="assets/css/bootstrap-datetimepicker.min.css">
 
     <!-- select CSS -->
     <link rel="stylesheet" href="assets/plugins/select2/css/select2.min.css">
@@ -77,7 +71,14 @@ $current_page = basename($_SERVER['PHP_SELF']);
 
     <!-- Main CSS -->
     <link rel="stylesheet" href="assets/css/custom.css">
-    
+
+    <!-- Rangeslider CSS -->
+    <link rel="stylesheet" href="assets/plugins/ion-rangeslider/css/ion.rangeSlider.css">
+    <link rel="stylesheet" href="assets/plugins/ion-rangeslider/css/ion.rangeSlider.min.css">
+
+    <!-- Theme Settings Js -->
+    <script src="assets/js/theme-script.js"></script>
+
 </head>
 <body>
     <!-- Main Wrapper -->
@@ -119,7 +120,7 @@ $current_page = basename($_SERVER['PHP_SELF']);
                             <a href="global-care">Global Care</a>
                         </li>
                         <li class="<?php echo ($current_page == 'welfare') ? 'active' : ''; ?>">
-                            <a href="welfare">TeleRx Welfare</a>
+                            <a href="welfare">Welfare</a>
                         </li>
                         <li class="<?php echo ($current_page == 'about-us') ? 'active' : ''; ?>">
                             <a href="about-us">About Us</a>
