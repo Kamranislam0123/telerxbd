@@ -8,6 +8,11 @@ RewriteEngine On
 AddType application/x-httpd-php .php
 AddHandler application/x-httpd-php .php
 
+# Remove .php extension from URL
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_FILENAME}\.php -f
+RewriteRule ^([^\.]+)$ $1.php [L]
+
 # Security headers
 <IfModule mod_headers.c>
     Header always set X-Content-Type-Options nosniff

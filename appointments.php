@@ -1,7 +1,7 @@
 <?php
 /**
- * Doctor Profile Settings - TeleRx Bangladesh
- * Dynamic profile settings page with all forms in tabs
+ * Doctor Appointments - TeleRx Bangladesh
+ * Dynamic appointments list (upcoming, cancelled, completed) from appointments table.
  */
 
 // Include configuration
@@ -90,8 +90,31 @@ try {
     $stmt->bind_param("i", $doctor_id);
     $stmt->execute();
     $clinics = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
-
     $stmt->close();
+
+    // Fetch doctor's appointments (all), then split by status/date
+    $upcoming_appointments = [];
+    $cancelled_appointments = [];
+    $completed_appointments = [];
+    $apt_stmt = $conn->prepare("SELECT id, appointment_number, patient_name, mobile, appointment_date, slot_time, status, notes, created_at FROM appointments WHERE doctor_id = ? ORDER BY appointment_date DESC, slot_time DESC");
+    if ($apt_stmt) {
+        $apt_stmt->bind_param("i", $doctor_id);
+        $apt_stmt->execute();
+        $apt_result = $apt_stmt->get_result();
+        $today = date('Y-m-d');
+        while ($row = $apt_result->fetch_assoc()) {
+            $row['appointment_number'] = $row['appointment_number'] ?? ('APT' . str_pad($row['id'], 5, '0', STR_PAD_LEFT));
+            if (isset($row['status']) && strtolower($row['status']) === 'cancelled') {
+                $cancelled_appointments[] = $row;
+            } elseif ($row['appointment_date'] >= $today) {
+                $upcoming_appointments[] = $row;
+            } else {
+                $completed_appointments[] = $row;
+            }
+        }
+        $apt_stmt->close();
+    }
+
     $conn->close();
 
 } catch (Exception $e) {
@@ -177,13 +200,13 @@ include 'header.php';
 								<div class="appointment-tabs">
 									<ul class="nav nav-pills inner-tab " id="pills-tab" role="tablist">
 										<li class="nav-item" role="presentation">
-											<button class="nav-link active" id="pills-upcoming-tab" data-bs-toggle="pill" data-bs-target="#pills-upcoming" type="button" role="tab" aria-controls="pills-upcoming" aria-selected="false">Upcoming<span>21</span></button>
+											<button class="nav-link active" id="pills-upcoming-tab" data-bs-toggle="pill" data-bs-target="#pills-upcoming" type="button" role="tab" aria-controls="pills-upcoming" aria-selected="false">Upcoming<span><?php echo count($upcoming_appointments); ?></span></button>
 										</li>	
 										<li class="nav-item" role="presentation">
-											<button class="nav-link" id="pills-cancel-tab" data-bs-toggle="pill" data-bs-target="#pills-cancel" type="button" role="tab" aria-controls="pills-cancel" aria-selected="true">Cancelled<span>16</span></button>
+											<button class="nav-link" id="pills-cancel-tab" data-bs-toggle="pill" data-bs-target="#pills-cancel" type="button" role="tab" aria-controls="pills-cancel" aria-selected="true">Cancelled<span><?php echo count($cancelled_appointments); ?></span></button>
 										</li>
 										<li class="nav-item" role="presentation">
-											<button class="nav-link" id="pills-complete-tab" data-bs-toggle="pill" data-bs-target="#pills-complete" type="button" role="tab" aria-controls="pills-complete" aria-selected="true">Completed<span>214</span></button>
+											<button class="nav-link" id="pills-complete-tab" data-bs-toggle="pill" data-bs-target="#pills-complete" type="button" role="tab" aria-controls="pills-complete" aria-selected="true">Completed<span><?php echo count($completed_appointments); ?></span></button>
 										</li>
 									</ul>
 								</div>
@@ -341,45 +364,47 @@ include 'header.php';
 
 							<div class="tab-content appointment-tab-content">
 								<div class="tab-pane fade show active" id="pills-upcoming" role="tabpanel" aria-labelledby="pills-upcoming-tab">
-									<!-- Appointment List -->
+									<?php
+									$profile_imgs = ['profile-01.jpg', 'profile-02.jpg', 'profile-03.jpg', 'profile-04.jpg', 'profile-05.jpg', 'profile-06.jpg', 'profile-07.jpg', 'profile-08.jpg'];
+									foreach ($upcoming_appointments as $idx => $a):
+										$apt_date = $a['appointment_date'];
+										$slot = $a['slot_time'] ?? '';
+										$time_display = $slot ? date('g.i A', strtotime($slot)) : '';
+										$date_display = $apt_date ? date('d M Y', strtotime($apt_date)) . ($time_display ? ' ' . $time_display : '') : '';
+										$img = 'assets/img/doctors-dashboard/' . ($profile_imgs[$idx % count($profile_imgs)]);
+									?>
 									<div class="appointment-wrap">
 										<ul>
 											<li>
 												<div class="patinet-information">
-													<a href="doctor-upcoming-appointment.html">
-														<img src="assets/img/doctors-dashboard/profile-01.jpg" alt="User Image">
+													<a href="appointment-detail.php?id=<?php echo (int)$a['id']; ?>">
+														<img src="<?php echo htmlspecialchars($img); ?>" alt="User Image">
 													</a>
 													<div class="patient-info">
-														<p>#Apt0001</p>
-														<h6><a href="doctor-upcoming-appointment.html">Adrian</a></h6>
+														<p>#<?php echo htmlspecialchars($a['appointment_number']); ?></p>
+														<h6><a href="appointment-detail.php?id=<?php echo (int)$a['id']; ?>"><?php echo htmlspecialchars($a['patient_name'] ?? 'Patient'); ?></a></h6>
 													</div>
 												</div>
 											</li>
 											<li class="appointment-info">
-												<p><i class="isax isax-clock5"></i>11 Nov 2024 10.45 AM</p>
+												<p><i class="isax isax-clock5"></i><?php echo htmlspecialchars($date_display); ?></p>
 												<ul class="d-flex apponitment-types">
-													<li>General Visit</li>
+													<li>Consultation</li>
 													<li>Video Call</li>
 												</ul>
-												
 											</li>
 											<li class="mail-info-patient">
 												<ul>
-													<li><i class="isax isax-sms5"></i>adran@example.com</li>
-													<li><i class="isax isax-call5"></i>+1 504 368 6874</li>
+													<li><i class="isax isax-call5"></i><?php echo htmlspecialchars($a['mobile'] ?? '—'); ?></li>
 												</ul>
 											</li>
 											<li class="appointment-action">
 												<ul>
 													<li>
-														<a href="doctor-upcoming-appointment.html"><i class="isax isax-eye4"></i></a>
+														<a href="appointment-detail.php?id=<?php echo (int)$a['id']; ?>"><i class="isax isax-eye4"></i></a>
 													</li>
-													<li>
-														<a href="#"><i class="isax isax-messages-25"></i></a>
-													</li>
-													<li>
-														<a href="#"><i class="isax isax-close-circle5"></i></a>
-													</li>
+													<li><a href="#"><i class="isax isax-messages-25"></i></a></li>
+													<li><a href="#"><i class="isax isax-close-circle5"></i></a></li>
 												</ul>
 											</li>
 											<li class="appointment-start">
@@ -387,894 +412,89 @@ include 'header.php';
 											</li>
 										</ul>
 									</div>
-									<!-- /Appointment List -->
-
-									<!-- Appointment List -->
-									<div class="appointment-wrap">
-										<ul>
-											<li>
-												<div class="patinet-information">
-													<a href="doctor-upcoming-appointment.html">
-														<img src="assets/img/doctors-dashboard/profile-02.jpg" alt="User Image">
-													</a>
-													<div class="patient-info">
-														<p>#Apt0002</p>
-														<h6><a href="doctor-upcoming-appointment.html">Kelly</a><span class="badge new-tag">New</span></h6>
-													</div>
-												</div>
-											</li>
-											<li class="appointment-info">
-												<p><i class="isax isax-clock5"></i>05 Nov 2024 11.50 AM</p>
-												<ul class="d-flex apponitment-types">
-													<li>General Visit</li>
-													<li>Audio Call</li>
-												</ul>
-												
-											</li>
-											<li class="mail-info-patient">
-												<ul>
-													<li><i class="isax isax-sms5"></i>kelly@example.com</li>
-													<li><i class="isax isax-call5"></i> +1 832 891 8403</li>
-												</ul>
-											</li>
-											<li class="appointment-action">
-												<ul>
-													<li>
-														<a href="doctor-upcoming-appointment.html"><i class="isax isax-eye4"></i></a>
-													</li>
-													<li>
-														<a href="#"><i class="isax isax-messages-25"></i></a>
-													</li>
-													<li>
-														<a href="#"><i class="isax isax-close-circle5"></i></a>
-													</li>
-												</ul>
-											</li>
-											<li class="appointment-start">
-												<a href="doctor-appointment-start.html" class="start-link">Start Now</a>
-											</li>
-										</ul>
-									</div>
-									<!-- /Appointment List -->
-
-									<!-- Appointment List -->
-									<div class="appointment-wrap">
-										<ul>
-											<li>
-												<div class="patinet-information">
-													<a href="doctor-upcoming-appointment.html">
-														<img src="assets/img/doctors-dashboard/profile-03.jpg" alt="User Image">
-													</a>
-													<div class="patient-info">
-														<p>#Apt0003</p>
-														<h6><a href="doctor-upcoming-appointment.html">Samuel</a></h6>
-													</div>
-												</div>
-											</li>
-											<li class="appointment-info">
-												<p><i class="isax isax-clock5"></i>27 Oct 2024 09.30 AM</p>
-												<ul class="d-flex apponitment-types">
-													<li>General Visit</li>
-													<li>Video Call</li>
-												</ul>
-												
-											</li>
-											<li class="mail-info-patient">
-												<ul>
-													<li><i class="isax isax-sms5"></i>samuel@example.com</li>
-													<li><i class="isax isax-call5"></i>  +1 749 104 6291</li>
-												</ul>
-											</li>
-											<li class="appointment-action">
-												<ul>
-													<li>
-														<a href="doctor-upcoming-appointment.html"><i class="isax isax-eye4"></i></a>
-													</li>
-													<li>
-														<a href="#"><i class="isax isax-messages-25"></i></a>
-													</li>
-													<li>
-														<a href="#"><i class="isax isax-close-circle5"></i></a>
-													</li>
-												</ul>
-											</li>
-											<li class="appointment-start">
-												<a href="doctor-appointment-start.html" class="start-link">Start Now</a>
-											</li>
-										</ul>
-									</div>
-									<!-- /Appointment List -->
-
-									<!-- Appointment List -->
-									<div class="appointment-wrap">
-										<ul>
-											<li>
-												<div class="patinet-information">
-													<a href="doctor-upcoming-appointment.html">
-														<img src="assets/img/doctors-dashboard/profile-04.jpg" alt="User Image">
-													</a>
-													<div class="patient-info">
-														<p>#Apt0004</p>
-														<h6><a href="doctor-upcoming-appointment.html">Catherine</a></h6>
-													</div>
-												</div>
-											</li>
-											<li class="appointment-info">
-												<p><i class="isax isax-clock5"></i>18 Oct 2024 12.20 PM</p>
-												<ul class="d-flex apponitment-types">
-													<li>General Visit</li>
-													<li>Direct Visit</li>
-												</ul>
-												
-											</li>
-											<li class="mail-info-patient">
-												<ul>
-													<li><i class="isax isax-sms5"></i>catherine@example.com</li>
-													<li><i class="isax isax-call5"></i>+1 584 920 7183</li>
-												</ul>
-											</li>
-											<li class="appointment-action">
-												<ul>
-													<li>
-														<a href="doctor-upcoming-appointment.html"><i class="isax isax-eye4"></i></a>
-													</li>
-													<li>
-														<a href="#"><i class="isax isax-messages-25"></i></a>
-													</li>
-													<li>
-														<a href="#"><i class="isax isax-close-circle5"></i></a>
-													</li>
-												</ul>
-											</li>
-											<li class="appointment-start">
-												<a href="doctor-appointment-start.html" class="start-link">Start Now</a>
-											</li>
-										</ul>
-									</div>
-									<!-- /Appointment List -->
-
-									<!-- Appointment List -->
-									<div class="appointment-wrap">
-										<ul>
-											<li>
-												<div class="patinet-information">
-													<a href="doctor-upcoming-appointment.html">
-														<img src="assets/img/doctors-dashboard/profile-05.jpg" alt="User Image">
-													</a>
-													<div class="patient-info">
-														<p>#Apt0005</p>
-														<h6><a href="doctor-upcoming-appointment.html">Robert</a></h6>
-													</div>
-												</div>
-											</li>
-											<li class="appointment-info">
-												<p><i class="isax isax-clock5"></i>10 Oct 2024 11.30 AM</p>
-												<ul class="d-flex apponitment-types">
-													<li>General Visit</li>
-													<li>Chat</li>
-												</ul>
-												
-											</li>
-											<li class="mail-info-patient">
-												<ul>
-													<li><i class="isax isax-sms5"></i>robert@example.com</li>
-													<li><i class="isax isax-call5"></i> +1 059 327 6729</li>
-												</ul>
-											</li>
-											<li class="appointment-action">
-												<ul>
-													<li>
-														<a href="doctor-upcoming-appointment.html"><i class="isax isax-eye4"></i></a>
-													</li>
-													<li>
-														<a href="#"><i class="isax isax-messages-25"></i></a>
-													</li>
-													<li>
-														<a href="#"><i class="isax isax-close-circle5"></i></a>
-													</li>
-												</ul>
-											</li>
-											<li class="appointment-start">
-												<a href="doctor-appointment-start.html" class="start-link">Start Now</a>
-											</li>
-										</ul>
-									</div>
-									<!-- /Appointment List -->
-
-									<!-- Appointment List -->
-									<div class="appointment-wrap">
-										<ul>
-											<li>
-												<div class="patinet-information">
-													<a href="doctor-upcoming-appointment.html">
-														<img src="assets/img/doctors-dashboard/profile-06.jpg" alt="User Image">
-													</a>
-													<div class="patient-info">
-														<p>#Apt0006</p>
-														<h6><a href="doctor-upcoming-appointment.html">Anderea</a></h6>
-													</div>
-												</div>
-											</li>
-											<li class="appointment-info">
-												<p><i class="isax isax-clock5"></i>26 Sep 2024 10.20 AM</p>
-												<ul class="d-flex apponitment-types">
-													<li>General Visit</li>
-													<li>Chat</li>
-												</ul>
-												
-											</li>
-											<li class="mail-info-patient">
-												<ul>
-													<li><i class="isax isax-sms5"></i>anderea@example.com</li>
-													<li><i class="isax isax-call5"></i>  +1 278 402 7103</li>
-												</ul>
-											</li>
-											<li class="appointment-action">
-												<ul>
-													<li>
-														<a href="doctor-upcoming-appointment.html"><i class="isax isax-eye4"></i></a>
-													</li>
-													<li>
-														<a href="#"><i class="isax isax-messages-25"></i></a>
-													</li>
-													<li>
-														<a href="#"><i class="isax isax-close-circle5"></i></a>
-													</li>
-												</ul>
-											</li>
-											<li class="appointment-start">
-												<a href="doctor-appointment-start.html" class="start-link">Start Now</a>
-											</li>
-										</ul>
-									</div>
-									<!-- /Appointment List -->
-
-									<!-- Appointment List -->
-									<div class="appointment-wrap">
-										<ul>
-											<li>
-												<div class="patinet-information">
-													<a href="doctor-upcoming-appointment.html">
-														<img src="assets/img/doctors-dashboard/profile-07.jpg" alt="User Image">
-													</a>
-													<div class="patient-info">
-														<p>#Apt0007</p>
-														<h6><a href="doctor-upcoming-appointment.html">Peter</a></h6>
-													</div>
-												</div>
-											</li>
-											<li class="appointment-info">
-												<p><i class="isax isax-clock5"></i>14 Sep 2024 08.10 AM</p>
-												<ul class="d-flex apponitment-types">
-													<li>General Visit</li>
-													<li>Chat</li>
-												</ul>
-												
-											</li>
-											<li class="mail-info-patient">
-												<ul>
-													<li><i class="isax isax-sms5"></i>peter@example.com</li>
-													<li><i class="isax isax-call5"></i> +1 638 278 0249</li>
-												</ul>
-											</li>
-											<li class="appointment-action">
-												<ul>
-													<li>
-														<a href="doctor-upcoming-appointment.html"><i class="isax isax-eye4"></i></a>
-													</li>
-													<li>
-														<a href="#"><i class="isax isax-messages-25"></i></a>
-													</li>
-													<li>
-														<a href="#"><i class="isax isax-close-circle5"></i></a>
-													</li>
-												</ul>
-											</li>
-											<li class="appointment-start">
-												<a href="doctor-appointment-start.html" class="start-link">Start Now</a>
-											</li>
-										</ul>
-									</div>
-									<!-- /Appointment List -->
-
-									<!-- Appointment List -->
-									<div class="appointment-wrap">
-										<ul>
-											<li>
-												<div class="patinet-information">
-													<a href="doctor-upcoming-appointment.html">
-														<img src="assets/img/doctors-dashboard/profile-08.jpg" alt="User Image">
-													</a>
-													<div class="patient-info">
-														<p>#Apt0008</p>
-														<h6><a href="doctor-upcoming-appointment.html">Emily</a></h6>
-													</div>
-												</div>
-											</li>
-											<li class="appointment-info">
-												<p><i class="isax isax-clock5"></i>03 Sep 2024 06.00 PM</p>
-												<ul class="d-flex apponitment-types">
-													<li>General Visit</li>
-													<li>Video Call</li>
-												</ul>
-												
-											</li>
-											<li class="mail-info-patient">
-												<ul>
-													<li><i class="isax isax-sms5"></i>emily@example.com</li>
-													<li><i class="isax isax-call5"></i>  +1 261 039 1873</li>
-												</ul>
-											</li>
-											<li class="appointment-action">
-												<ul>
-													<li>
-														<a href="doctor-upcoming-appointment.html"><i class="isax isax-eye4"></i></a>
-													</li>
-													<li>
-														<a href="#"><i class="isax isax-messages-25"></i></a>
-													</li>
-													<li>
-														<a href="#"><i class="isax isax-close-circle5"></i></a>
-													</li>
-												</ul>
-											</li>
-											<li class="appointment-start">
-												<a href="doctor-appointment-start.html" class="start-link">Start Now</a>
-											</li>
-										</ul>
-									</div>
-									<!-- /Appointment List -->
-
-									<!-- Pagination -->
-									<div class="pagination dashboard-pagination">
-										<ul>
-											<li>
-												<a href="#" class="page-link"><i class="fa-solid fa-chevron-left"></i></a>
-											</li>
-											<li>
-												<a href="#" class="page-link">1</a>
-											</li>
-											<li>
-												<a href="#" class="page-link active">2</a>
-											</li>
-											<li>
-												<a href="#" class="page-link">3</a>
-											</li>
-											<li>
-												<a href="#" class="page-link">4</a>
-											</li>
-											<li>
-												<a href="#" class="page-link">...</a>
-											</li>
-											<li>
-												<a href="#" class="page-link"><i class="fa-solid fa-chevron-right"></i></a>
-											</li>
-										</ul>
-									</div>
-									<!-- /Pagination -->
-
+									<?php endforeach; ?>
+									<?php if (empty($upcoming_appointments)): ?>
+									<div class="appointment-wrap"><p class="text-muted mb-0 p-3">No upcoming appointments.</p></div>
+									<?php endif; ?>
 								</div>
 								<div class="tab-pane fade" id="pills-cancel" role="tabpanel" aria-labelledby="pills-cancel-tab">
-									<!-- Appointment List -->
+									<?php
+									foreach ($cancelled_appointments as $idx => $a):
+										$apt_date = $a['appointment_date'];
+										$slot = $a['slot_time'] ?? '';
+										$time_display = $slot ? date('g.i A', strtotime($slot)) : '';
+										$date_display = $apt_date ? date('d M Y', strtotime($apt_date)) . ($time_display ? ' ' . $time_display : '') : '';
+										$img = 'assets/img/doctors-dashboard/' . ($profile_imgs[$idx % count($profile_imgs)]);
+									?>
 									<div class="appointment-wrap">
 										<ul>
 											<li>
 												<div class="patinet-information">
-													<a href="doctor-cancelled-appointment.html">
-														<img src="assets/img/doctors-dashboard/profile-01.jpg" alt="User Image">
+													<a href="appointment-detail.php?id=<?php echo (int)$a['id']; ?>">
+														<img src="<?php echo htmlspecialchars($img); ?>" alt="User Image">
 													</a>
 													<div class="patient-info">
-														<p>#Apt0001</p>
-														<h6><a href="doctor-cancelled-appointment.html">Adrian</a></h6>
+														<p>#<?php echo htmlspecialchars($a['appointment_number']); ?></p>
+														<h6><a href="appointment-detail.php?id=<?php echo (int)$a['id']; ?>"><?php echo htmlspecialchars($a['patient_name'] ?? 'Patient'); ?></a></h6>
 													</div>
 												</div>
 											</li>
 											<li class="appointment-info">
-												<p><i class="isax isax-clock5"></i>11 Nov 2024 10.45 AM</p>
+												<p><i class="isax isax-clock5"></i><?php echo htmlspecialchars($date_display); ?></p>
 												<ul class="d-flex apponitment-types">
-													<li>General Visit</li>
+													<li>Consultation</li>
 													<li>Video Call</li>
 												</ul>
-												
 											</li>
 											<li class="appointment-detail-btn">
-												<a href="doctor-cancelled-appointment.html" class="start-link">View Details</a>
+												<a href="appointment-detail.php?id=<?php echo (int)$a['id']; ?>" class="start-link">View Details</a>
 											</li>
 										</ul>
 									</div>
-									<!-- /Appointment List -->
-
-									<!-- Appointment List -->
-									<div class="appointment-wrap">
-										<ul>
-											<li>
-												<div class="patinet-information">
-													<a href="doctor-cancelled-appointment.html">
-														<img src="assets/img/doctors-dashboard/profile-02.jpg" alt="User Image">
-													</a>
-													<div class="patient-info">
-														<p>#Apt0002</p>
-														<h6><a href="doctor-cancelled-appointment.html">Kelly</a><span class="badge new-tag">New</span></h6>
-													</div>
-												</div>
-											</li>
-											<li class="appointment-info">
-												<p><i class="isax isax-clock5"></i>05 Nov 2024 11.50 AM</p>
-												<ul class="d-flex apponitment-types">
-													<li>General Visit</li>
-													<li>Audio Call</li>
-												</ul>
-												
-											</li>
-											<li class="appointment-detail-btn">
-												<a href="doctor-cancelled-appointment.html" class="start-link">View Details</a>
-											</li>
-										</ul>
-									</div>
-									<!-- /Appointment List -->
-
-									<!-- Appointment List -->
-									<div class="appointment-wrap">
-										<ul>
-											<li>
-												<div class="patinet-information">
-													<a href="doctor-cancelled-appointment.html">
-														<img src="assets/img/doctors-dashboard/profile-03.jpg" alt="User Image">
-													</a>
-													<div class="patient-info">
-														<p>#Apt0003</p>
-														<h6><a href="doctor-cancelled-appointment.html">Samuel</a></h6>
-													</div>
-												</div>
-											</li>
-											<li class="appointment-info">
-												<p><i class="isax isax-clock5"></i>27 Oct 2024 09.30 AM</p>
-												<ul class="d-flex apponitment-types">
-													<li>General Visit</li>
-													<li>Video Call</li>
-												</ul>
-												
-											</li>
-											<li class="appointment-detail-btn">
-												<a href="doctor-cancelled-appointment.html" class="start-link">View Details</a>
-											</li>
-										</ul>
-									</div>
-									<!-- /Appointment List -->
-
-									<!-- Appointment List -->
-									<div class="appointment-wrap">
-										<ul>
-											<li>
-												<div class="patinet-information">
-													<a href="doctor-cancelled-appointment.html">
-														<img src="assets/img/doctors-dashboard/profile-04.jpg" alt="User Image">
-													</a>
-													<div class="patient-info">
-														<p>#Apt0004</p>
-														<h6><a href="doctor-cancelled-appointment.html">Catherine</a></h6>
-													</div>
-												</div>
-											</li>
-											<li class="appointment-info">
-												<p><i class="isax isax-clock5"></i>18 Oct 2024 12.20 PM</p>
-												<ul class="d-flex apponitment-types">
-													<li>General Visit</li>
-													<li>Direct Visit</li>
-												</ul>
-												
-											</li>
-											<li class="appointment-detail-btn">
-												<a href="doctor-cancelled-appointment.html" class="start-link">View Details</a>
-											</li>
-										</ul>
-									</div>
-									<!-- /Appointment List -->
-
-									<!-- Appointment List -->
-									<div class="appointment-wrap">
-										<ul>
-											<li>
-												<div class="patinet-information">
-													<a href="doctor-cancelled-appointment.html">
-														<img src="assets/img/doctors-dashboard/profile-05.jpg" alt="User Image">
-													</a>
-													<div class="patient-info">
-														<p>#Apt0005</p>
-														<h6><a href="doctor-cancelled-appointment.html">Robert</a></h6>
-													</div>
-												</div>
-											</li>
-											<li class="appointment-info">
-												<p><i class="isax isax-clock5"></i>10 Oct 2024 11.30 AM</p>
-												<ul class="d-flex apponitment-types">
-													<li>General Visit</li>
-													<li>Chat</li>
-												</ul>
-												
-											</li>
-											<li class="appointment-detail-btn">
-												<a href="doctor-cancelled-appointment.html" class="start-link">View Details</a>
-											</li>
-										</ul>
-									</div>
-									<!-- /Appointment List -->
-
-									<!-- Appointment List -->
-									<div class="appointment-wrap">
-										<ul>
-											<li>
-												<div class="patinet-information">
-													<a href="doctor-cancelled-appointment.html">
-														<img src="assets/img/doctors-dashboard/profile-06.jpg" alt="User Image">
-													</a>
-													<div class="patient-info">
-														<p>#Apt0006</p>
-														<h6><a href="doctor-cancelled-appointment.html">Anderea</a></h6>
-													</div>
-												</div>
-											</li>
-											<li class="appointment-info">
-												<p><i class="isax isax-clock5"></i>26 Sep 2024 10.20 AM</p>
-												<ul class="d-flex apponitment-types">
-													<li>General Visit</li>
-													<li>Chat</li>
-												</ul>
-												
-											</li>
-											<li class="appointment-detail-btn">
-												<a href="doctor-cancelled-appointment.html" class="start-link">View Details</a>
-											</li>
-										</ul>
-									</div>
-									<!-- /Appointment List -->
-
-									<!-- Appointment List -->
-									<div class="appointment-wrap">
-										<ul>
-											<li>
-												<div class="patinet-information">
-													<a href="doctor-cancelled-appointment.html">
-														<img src="assets/img/doctors-dashboard/profile-07.jpg" alt="User Image">
-													</a>
-													<div class="patient-info">
-														<p>#Apt0007</p>
-														<h6><a href="doctor-cancelled-appointment.html">Peter</a></h6>
-													</div>
-												</div>
-											</li>
-											<li class="appointment-info">
-												<p><i class="isax isax-clock5"></i>14 Sep 2024 08.10 AM</p>
-												<ul class="d-flex apponitment-types">
-													<li>General Visit</li>
-													<li>Chat</li>
-												</ul>
-												
-											</li>
-											<li class="appointment-detail-btn">
-												<a href="doctor-cancelled-appointment.html" class="start-link">View Details</a>
-											</li>
-										</ul>
-									</div>
-									<!-- /Appointment List -->
-
-									<!-- Appointment List -->
-									<div class="appointment-wrap">
-										<ul>
-											<li>
-												<div class="patinet-information">
-													<a href="doctor-cancelled-appointment.html">
-														<img src="assets/img/doctors-dashboard/profile-08.jpg" alt="User Image">
-													</a>
-													<div class="patient-info">
-														<p>#Apt0008</p>
-														<h6><a href="doctor-cancelled-appointment.html">Emily</a></h6>
-													</div>
-												</div>
-											</li>
-											<li class="appointment-info">
-												<p><i class="isax isax-clock5"></i>03 Sep 2024 06.00 PM</p>
-												<ul class="d-flex apponitment-types">
-													<li>General Visit</li>
-													<li>Video Call</li>
-												</ul>
-												
-											</li>
-											<li class="appointment-detail-btn">
-												<a href="doctor-cancelled-appointment.html" class="start-link">View Details</a>
-											</li>
-										</ul>
-									</div>
-									<!-- /Appointment List -->
-
-									<!-- Pagination -->
-									<div class="pagination dashboard-pagination">
-										<ul>
-											<li>
-												<a href="#" class="page-link"><i class="fa-solid fa-chevron-left"></i></a>
-											</li>
-											<li>
-												<a href="#" class="page-link">1</a>
-											</li>
-											<li>
-												<a href="#" class="page-link active">2</a>
-											</li>
-											<li>
-												<a href="#" class="page-link">3</a>
-											</li>
-											<li>
-												<a href="#" class="page-link">4</a>
-											</li>
-											<li>
-												<a href="#" class="page-link">...</a>
-											</li>
-											<li>
-												<a href="#" class="page-link"><i class="fa-solid fa-chevron-right"></i></a>
-											</li>
-										</ul>
-									</div>
-									<!-- /Pagination -->
+									<?php endforeach; ?>
+									<?php if (empty($cancelled_appointments)): ?>
+									<div class="appointment-wrap"><p class="text-muted mb-0 p-3">No cancelled appointments.</p></div>
+									<?php endif; ?>
 								</div>
 								<div class="tab-pane fade" id="pills-complete" role="tabpanel" aria-labelledby="pills-complete-tab">
-									<!-- Appointment List -->
+									<?php
+									foreach ($completed_appointments as $idx => $a):
+										$apt_date = $a['appointment_date'];
+										$slot = $a['slot_time'] ?? '';
+										$time_display = $slot ? date('g.i A', strtotime($slot)) : '';
+										$date_display = $apt_date ? date('d M Y', strtotime($apt_date)) . ($time_display ? ' ' . $time_display : '') : '';
+										$img = 'assets/img/doctors-dashboard/' . ($profile_imgs[$idx % count($profile_imgs)]);
+									?>
 									<div class="appointment-wrap">
 										<ul>
 											<li>
 												<div class="patinet-information">
-													<a href="doctor-completed-appointment.html">
-														<img src="assets/img/doctors-dashboard/profile-01.jpg" alt="User Image">
+													<a href="appointment-detail.php?id=<?php echo (int)$a['id']; ?>">
+														<img src="<?php echo htmlspecialchars($img); ?>" alt="User Image">
 													</a>
 													<div class="patient-info">
-														<p>#Apt0001</p>
-														<h6><a href="doctor-completed-appointment.html">Adrian</a></h6>
+														<p>#<?php echo htmlspecialchars($a['appointment_number']); ?></p>
+														<h6><a href="appointment-detail.php?id=<?php echo (int)$a['id']; ?>"><?php echo htmlspecialchars($a['patient_name'] ?? 'Patient'); ?></a></h6>
 													</div>
 												</div>
 											</li>
 											<li class="appointment-info">
-												<p><i class="isax isax-clock5"></i>11 Nov 2024 10.45 AM</p>
+												<p><i class="isax isax-clock5"></i><?php echo htmlspecialchars($date_display); ?></p>
 												<ul class="d-flex apponitment-types">
-													<li>General Visit</li>
+													<li>Consultation</li>
 													<li>Video Call</li>
 												</ul>
-												
 											</li>
 											<li class="appointment-detail-btn">
-												<a href="doctor-completed-appointment.html" class="start-link">View Details</a>
+												<a href="appointment-detail.php?id=<?php echo (int)$a['id']; ?>" class="start-link">View Details</a>
 											</li>
 										</ul>
 									</div>
-									<!-- /Appointment List -->
+									<?php endforeach; ?>
+									<?php if (empty($completed_appointments)): ?>
+									<div class="appointment-wrap"><p class="text-muted mb-0 p-3">No completed appointments.</p></div>
+									<?php endif; ?>
 
-									<!-- Appointment List -->
-									<div class="appointment-wrap">
-										<ul>
-											<li>
-												<div class="patinet-information">
-													<a href="doctor-completed-appointment.html">
-														<img src="assets/img/doctors-dashboard/profile-02.jpg" alt="User Image">
-													</a>
-													<div class="patient-info">
-														<p>#Apt0002</p>
-														<h6><a href="doctor-completed-appointment.html">Kelly</a><span class="badge new-tag">New</span></h6>
-													</div>
-												</div>
-											</li>
-											<li class="appointment-info">
-												<p><i class="isax isax-clock5"></i>05 Nov 2024 11.50 AM</p>
-												<ul class="d-flex apponitment-types">
-													<li>General Visit</li>
-													<li>Audio Call</li>
-												</ul>
-												
-											</li>
-											<li class="appointment-detail-btn">
-												<a href="doctor-completed-appointment.html" class="start-link">View Details</a>
-											</li>
-										</ul>
-									</div>
-									<!-- /Appointment List -->
-
-									<!-- Appointment List -->
-									<div class="appointment-wrap">
-										<ul>
-											<li>
-												<div class="patinet-information">
-													<a href="doctor-completed-appointment.html">
-														<img src="assets/img/doctors-dashboard/profile-03.jpg" alt="User Image">
-													</a>
-													<div class="patient-info">
-														<p>#Apt0003</p>
-														<h6><a href="doctor-completed-appointment.html">Samuel</a></h6>
-													</div>
-												</div>
-											</li>
-											<li class="appointment-info">
-												<p><i class="isax isax-clock5"></i>27 Oct 2024 09.30 AM</p>
-												<ul class="d-flex apponitment-types">
-													<li>General Visit</li>
-													<li>Video Call</li>
-												</ul>
-												
-											</li>
-											<li class="appointment-detail-btn">
-												<a href="doctor-completed-appointment.html" class="start-link">View Details</a>
-											</li>
-										</ul>
-									</div>
-									<!-- /Appointment List -->
-
-									<!-- Appointment List -->
-									<div class="appointment-wrap">
-										<ul>
-											<li>
-												<div class="patinet-information">
-													<a href="doctor-completed-appointment.html">
-														<img src="assets/img/doctors-dashboard/profile-04.jpg" alt="User Image">
-													</a>
-													<div class="patient-info">
-														<p>#Apt0004</p>
-														<h6><a href="doctor-completed-appointment.html">Catherine</a></h6>
-													</div>
-												</div>
-											</li>
-											<li class="appointment-info">
-												<p><i class="isax isax-clock5"></i>18 Oct 2024 12.20 PM</p>
-												<ul class="d-flex apponitment-types">
-													<li>General Visit</li>
-													<li>Direct Visit</li>
-												</ul>
-												
-											</li>
-											<li class="appointment-detail-btn">
-												<a href="doctor-completed-appointment.html" class="start-link">View Details</a>
-											</li>
-										</ul>
-									</div>
-									<!-- /Appointment List -->
-
-									<!-- Appointment List -->
-									<div class="appointment-wrap">
-										<ul>
-											<li>
-												<div class="patinet-information">
-													<a href="doctor-completed-appointment.html">
-														<img src="assets/img/doctors-dashboard/profile-05.jpg" alt="User Image">
-													</a>
-													<div class="patient-info">
-														<p>#Apt0005</p>
-														<h6><a href="doctor-completed-appointment.html">Robert</a></h6>
-													</div>
-												</div>
-											</li>
-											<li class="appointment-info">
-												<p><i class="isax isax-clock5"></i>10 Oct 2024 11.30 AM</p>
-												<ul class="d-flex apponitment-types">
-													<li>General Visit</li>
-													<li>Chat</li>
-												</ul>
-												
-											</li>
-											<li class="appointment-detail-btn">
-												<a href="doctor-completed-appointment.html" class="start-link">View Details</a>
-											</li>
-										</ul>
-									</div>
-									<!-- /Appointment List -->
-
-									<!-- Appointment List -->
-									<div class="appointment-wrap">
-										<ul>
-											<li>
-												<div class="patinet-information">
-													<a href="doctor-completed-appointment.html">
-														<img src="assets/img/doctors-dashboard/profile-06.jpg" alt="User Image">
-													</a>
-													<div class="patient-info">
-														<p>#Apt0006</p>
-														<h6><a href="doctor-completed-appointment.html">Anderea</a></h6>
-													</div>
-												</div>
-											</li>
-											<li class="appointment-info">
-												<p><i class="isax isax-clock5"></i>26 Sep 2024 10.20 AM</p>
-												<ul class="d-flex apponitment-types">
-													<li>General Visit</li>
-													<li>Chat</li>
-												</ul>
-												
-											</li>
-											<li class="appointment-detail-btn">
-												<a href="doctor-completed-appointment.html" class="start-link">View Details</a>
-											</li>
-										</ul>
-									</div>
-									<!-- /Appointment List -->
-
-									<!-- Appointment List -->
-									<div class="appointment-wrap">
-										<ul>
-											<li>
-												<div class="patinet-information">
-													<a href="doctor-completed-appointment.html">
-														<img src="assets/img/doctors-dashboard/profile-07.jpg" alt="User Image">
-													</a>
-													<div class="patient-info">
-														<p>#Apt0007</p>
-														<h6><a href="doctor-completed-appointment.html">Peter</a></h6>
-													</div>
-												</div>
-											</li>
-											<li class="appointment-info">
-												<p><i class="isax isax-clock5"></i>14 Sep 2024 08.10 AM</p>
-												<ul class="d-flex apponitment-types">
-													<li>General Visit</li>
-													<li>Chat</li>
-												</ul>
-												
-											</li>
-											<li class="appointment-detail-btn">
-												<a href="doctor-completed-appointment.html" class="start-link">View Details</a>
-											</li>
-										</ul>
-									</div>
-									<!-- /Appointment List -->
-
-									<!-- Appointment List -->
-									<div class="appointment-wrap">
-										<ul>
-											<li>
-												<div class="patinet-information">
-													<a href="doctor-completed-appointment.html">
-														<img src="assets/img/doctors-dashboard/profile-08.jpg" alt="User Image">
-													</a>
-													<div class="patient-info">
-														<p>#Apt0008</p>
-														<h6><a href="doctor-completed-appointment.html">Emily</a></h6>
-													</div>
-												</div>
-											</li>
-											<li class="appointment-info">
-												<p><i class="isax isax-clock5"></i>03 Sep 2024 06.00 PM</p>
-												<ul class="d-flex apponitment-types">
-													<li>General Visit</li>
-													<li>Video Call</li>
-												</ul>
-												
-											</li>
-											<li class="appointment-detail-btn">
-												<a href="doctor-completed-appointment.html" class="start-link">View Details</a>
-											</li>
-										</ul>
-									</div>
-									<!-- /Appointment List -->
-
-									<!-- Pagination -->
-									<div class="pagination dashboard-pagination">
-										<ul>
-											<li>
-												<a href="#" class="page-link"><i class="fa-solid fa-chevron-left"></i></a>
-											</li>
-											<li>
-												<a href="#" class="page-link">1</a>
-											</li>
-											<li>
-												<a href="#" class="page-link active">2</a>
-											</li>
-											<li>
-												<a href="#" class="page-link">3</a>
-											</li>
-											<li>
-												<a href="#" class="page-link">4</a>
-											</li>
-											<li>
-												<a href="#" class="page-link">...</a>
-											</li>
-											<li>
-												<a href="#" class="page-link"><i class="fa-solid fa-chevron-right"></i></a>
-											</li>
-										</ul>
-									</div>
-									<!-- /Pagination -->
 								</div>
 							</div>
 						</div>

@@ -41,17 +41,11 @@ $current_page = basename($_SERVER['PHP_SELF']);
     <!-- Apple Touch Icon -->
     <link rel="apple-touch-icon" sizes="180x180" href="assets/img/apple-touch-icon.png">
 
-    <!-- Theme Settings Js -->
-    <script src="assets/js/theme-script.js"></script>
-
     <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="assets/css/bootstrap.min.css">
 
     <!-- Iconsax CSS-->
     <link rel="stylesheet" href="assets/css/iconsax.css">
-
-    <!-- Datetimepicker CSS -->
-    <link rel="stylesheet" href="assets/css/bootstrap-datetimepicker.min.css">
 
     <!-- select CSS -->
     <link rel="stylesheet" href="assets/plugins/select2/css/select2.min.css">
@@ -77,7 +71,14 @@ $current_page = basename($_SERVER['PHP_SELF']);
 
     <!-- Main CSS -->
     <link rel="stylesheet" href="assets/css/custom.css">
-    
+
+    <!-- Rangeslider CSS -->
+    <link rel="stylesheet" href="assets/plugins/ion-rangeslider/css/ion.rangeSlider.css">
+    <link rel="stylesheet" href="assets/plugins/ion-rangeslider/css/ion.rangeSlider.min.css">
+
+    <!-- Theme Settings Js -->
+    <script src="assets/js/theme-script.js"></script>
+
 </head>
 <body>
     <!-- Main Wrapper -->
@@ -130,9 +131,9 @@ $current_page = basename($_SERVER['PHP_SELF']);
                         <!-- Mobile view login/signup link -->
                         <li class="login-link">
                             <?php if(isset($_SESSION['logged_in']) && $_SESSION['logged_in'] === true): ?>
-                                <a href="logout">Logout</a>
+                                <a href="php/logout.php">Logout</a>
                             <?php else: ?>
-                                <a href="login">Login / Signup</a>
+                                <a href="login.php">Login / Signup</a>
                             <?php endif; ?>
                         </li>
                     </ul>
@@ -209,7 +210,7 @@ $current_page = basename($_SERVER['PHP_SELF']);
                                     <a class="dropdown-item" href="patient-profile-settings">Profile Settings</a>
                                 <?php endif; ?>
 
-                                <a class="dropdown-item" href="php/logout">Logout</a>
+                                <a class="dropdown-item" href="php/logout.php">Logout</a>
                             </div>
                         </li>
                     <?php else: ?>
@@ -220,7 +221,7 @@ $current_page = basename($_SERVER['PHP_SELF']);
                             </a>
                         </li>
                         <li class="register-btn">
-                            <a href="login" class="btn btn-primary log-btn">
+                            <a href="login.php" class="btn btn-primary log-btn">
                                 <i class="isax isax-lock"></i>Login
                             </a>
                         </li>

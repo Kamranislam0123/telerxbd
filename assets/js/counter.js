@@ -1,9 +1,12 @@
 function visible(partial) {
-    var $t = partial,
-        $w = jQuery(window),
+    var $t = partial;
+    if (!$t || !$t.length) return false;
+    var off = $t.offset();
+    if (!off) return false;
+    var $w = jQuery(window),
         viewTop = $w.scrollTop(),
         viewBottom = viewTop + $w.height(),
-        _top = $t.offset().top,
+        _top = off.top,
         _bottom = _top + $t.height(),
         compareTop = partial === true ? _bottom : _top,
         compareBottom = partial === true ? _top : _bottom;
@@ -13,8 +16,9 @@ function visible(partial) {
 }
 
 $(window).scroll(function(){
-
-  if(visible($('.count-digit')))
+  var $countDigit = $('.count-digit');
+  if (!$countDigit.length) return;
+  if(visible($countDigit.first()))
     {
       if($('.count-digit').hasClass('counter-loaded')) return;
       $('.count-digit').addClass('counter-loaded');

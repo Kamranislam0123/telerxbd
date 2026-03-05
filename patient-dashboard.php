@@ -37,6 +37,9 @@ try {
 
     $patient = $result->fetch_assoc();
     $stmt->close();
+
+    $appointments = [];
+    $upcoming = [];
     $conn->close();
 
     // Set default values if profile data is missing
@@ -207,7 +210,19 @@ include 'header.php';
 												</div>
 											</div>
 											<div class="dashboard-card-body">
-												<p class="text-muted text-center">No upcoming appointments</p>
+												<?php if (empty($upcoming)): ?>
+												<p class="text-muted text-center mb-0">No upcoming appointments</p>
+												<?php else: ?>
+												<ul class="list-unstyled mb-0">
+													<?php foreach (array_slice($upcoming, 0, 5) as $apt): ?>
+													<li class="d-flex justify-content-between align-items-center py-2 border-bottom">
+														<span><strong><?php echo htmlspecialchars($apt['doctor_name'] ?? 'Doctor'); ?></strong><br>
+														<small class="text-muted"><?php echo date('M j, Y', strtotime($apt['appointment_date'])); ?> <?php echo date('g:i A', strtotime($apt['slot_time'])); ?></small></span>
+														<span class="badge bg-success"><?php echo htmlspecialchars($apt['status'] ?? 'Booked'); ?></span>
+													</li>
+													<?php endforeach; ?>
+												</ul>
+												<?php endif; ?>
 											</div>
 										</div>
 									</div>								
@@ -256,17 +271,25 @@ include 'header.php';
 																		<tr>
 																			<th>ID</th>
 																			<th>Doctor</th>
-																			<th>Date</th>
-																			<th>Type</th>
+																			<th>Date & Time</th>
 																			<th>Status</th>
 																		</tr>
 																	</thead>
 																	<tbody>
+																		<?php if (empty($appointments)): ?>
 																		<tr>
-																			<td colspan="5" class="text-center py-5">
+																			<td colspan="4" class="text-center py-5">
 																				<p class="text-muted">No appointments found</p>
 																			</td>
 																		</tr>
+																		<?php else: foreach ($appointments as $apt): ?>
+																		<tr>
+																			<td>#APT<?php echo str_pad($apt['id'], 5, '0', STR_PAD_LEFT); ?></td>
+																			<td><?php echo htmlspecialchars($apt['doctor_name'] ?? '—'); ?><br><small class="text-muted"><?php echo htmlspecialchars($apt['specialty'] ?? ''); ?></small></td>
+																			<td><?php echo date('M j, Y', strtotime($apt['appointment_date'])); ?> <?php echo date('g:i A', strtotime($apt['slot_time'])); ?></td>
+																			<td><span class="badge bg-success"><?php echo htmlspecialchars($apt['status'] ?? 'Booked'); ?></span></td>
+																		</tr>
+																		<?php endforeach; endif; ?>
 																	</tbody>
 																</table>
 															</div>

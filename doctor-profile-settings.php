@@ -95,6 +95,61 @@ try {
     $stmt->close();
     $conn->close();
 
+    // Helper: get date for a day of week (today or next occurrence)
+    function getDayDate($dayName) {
+        $dayName = strtolower($dayName);
+        $daysMap = [
+            'monday' => 1, 'tuesday' => 2, 'wednesday' => 3,
+            'thursday' => 4, 'friday' => 5, 'saturday' => 6, 'sunday' => 0
+        ];
+        if (!isset($daysMap[$dayName])) return '';
+        $targetDay = $daysMap[$dayName];
+        $today = new DateTime();
+        $currentDay = (int)$today->format('w');
+        $daysToAdd = ($targetDay - $currentDay + 7) % 7;
+        $date = clone $today;
+        if ($daysToAdd > 0) $date->modify("+$daysToAdd days");
+        return $date->format('M d, Y');
+    }
+
+    // Same as getDayDate but returns Y-m-d for API (doctor_schedule slot_date)
+    function getDayDateYmd($dayName) {
+        $dayName = strtolower($dayName);
+        $daysMap = [
+            'monday' => 1, 'tuesday' => 2, 'wednesday' => 3,
+            'thursday' => 4, 'friday' => 5, 'saturday' => 6, 'sunday' => 0
+        ];
+        if (!isset($daysMap[$dayName])) return '';
+        $targetDay = $daysMap[$dayName];
+        $today = new DateTime();
+        $currentDay = (int)$today->format('w');
+        $daysToAdd = ($targetDay - $currentDay + 7) % 7;
+        $date = clone $today;
+        if ($daysToAdd > 0) $date->modify("+$daysToAdd days");
+        return $date->format('Y-m-d');
+    }
+
+    // Days ordered starting from today (current date first)
+    $daysList = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
+    $todayDayName = strtolower(date('l'));
+    $todayIdx = array_search($todayDayName, $daysList);
+    $daysOrder = [];
+    for ($i = 0; $i < 7; $i++) {
+        $daysOrder[] = $daysList[($todayIdx + $i) % 7];
+    }
+
+    $dayLabels = [];
+    foreach ($daysList as $day) {
+        $dayLabels[$day] = [
+            'display' => ucfirst($day) . ($day === $todayDayName ? ' (Today)' : ''),
+            'date' => getDayDate($day),
+            'is_today' => ($day === $todayDayName)
+        ];
+    }
+
+    // day_of_week for availability API: 0=Sunday, 1=Monday, ... 6=Saturday
+    $dayOfWeekMap = ['sunday' => 0, 'monday' => 1, 'tuesday' => 2, 'wednesday' => 3, 'thursday' => 4, 'friday' => 5, 'saturday' => 6];
+
 } catch (Exception $e) {
     error_log("Doctor profile settings error: " . $e->getMessage());
     header('Location: login.php');
@@ -439,180 +494,36 @@ include 'header.php';
 											</div>
 
 											<div class="available-tab">
-												<label class="form-label">Select Available days</label>
+												<label class="form-label">Select Available days (starting from today)</label>
 												<ul class="nav">
+													<?php foreach ($daysOrder as $idx => $day): $lab = $dayLabels[$day]; $active = ($idx === 0); $dayYmd = getDayDateYmd($day); $dow = $dayOfWeekMap[$day] ?? 0; ?>
 													<li>
-														<a href="#" class="active" data-bs-toggle="tab" data-bs-target="#monday">Monday</a>
+														<a href="#" class="<?php echo $active ? 'active' : ''; ?>" data-bs-toggle="tab" data-bs-target="#<?php echo $day; ?>" data-day="<?php echo $day; ?>" data-date="<?php echo htmlspecialchars($dayYmd); ?>" data-day-of-week="<?php echo $dow; ?>"><strong><?php echo htmlspecialchars($lab['display']); ?></strong><br><small style="font-size: 11px; color: #999;"><?php echo htmlspecialchars($lab['date']); ?></small></a>
 													</li>
-													<li>
-														<a href="#" data-bs-toggle="tab" data-bs-target="#tuesday">Tuesday</a>
-													</li>
-													<li>
-														<a href="#" data-bs-toggle="tab" data-bs-target="#wednesday">Wednesday</a>
-													</li>
-													<li>
-														<a href="#" data-bs-toggle="tab" data-bs-target="#thursday">Thursday</a>
-													</li>
-													<li>
-														<a href="#" data-bs-toggle="tab" data-bs-target="#friday">Friday</a>
-													</li>
-													<li>
-														<a href="#" data-bs-toggle="tab" data-bs-target="#saturday">Saturday</a>
-													</li>
-													<li>
-														<a href="#" data-bs-toggle="tab" data-bs-target="#sunday">Sunday</a>
-													</li>
+													<?php endforeach; ?>
 												</ul>
 											</div>
-
 											<div class="tab-content pt-0">
-
-												<!-- Slot -->
-												<div class="tab-pane active show" id="monday">
-													<div class="slot-box">
+												<?php foreach ($daysOrder as $idx => $day): $lab = $dayLabels[$day]; $active = ($idx === 0); $dayYmd = getDayDateYmd($day); $dow = $dayOfWeekMap[$day] ?? 0; ?>
+												<div class="tab-pane fade <?php echo $active ? 'active show' : ''; ?>" id="<?php echo $day; ?>" data-day="<?php echo $day; ?>" data-date="<?php echo htmlspecialchars($dayYmd); ?>" data-day-of-week="<?php echo $dow; ?>">
+													<div class="slot-box" data-day="<?php echo $day; ?>" data-date="<?php echo htmlspecialchars($dayYmd); ?>" data-day-of-week="<?php echo $dow; ?>">
 														<div class="slot-header">
-															<h5>Monday</h5>
+															<h5><?php echo htmlspecialchars($lab['display'] . ' - ' . $lab['date']); ?></h5>
 															<ul>
 																<li>
-																	<a href="#" class="add-slot" data-bs-toggle="modal" data-bs-target="#add_slot" data-day="monday">Add Slots</a>
+																	<a href="#" class="add-slot" data-bs-toggle="modal" data-bs-target="#add_slot" data-day="<?php echo $day; ?>" data-date="<?php echo htmlspecialchars($dayYmd); ?>" data-day-of-week="<?php echo $dow; ?>">Add Slots</a>
 																</li>
 																<li>
-																	<a href="#" class="del-slot" data-bs-toggle="modal" data-bs-target="#delete_slot" data-day="monday">Delete All</a>
+																	<a href="#" class="del-slot" data-bs-toggle="modal" data-bs-target="#delete_slot" data-day="<?php echo $day; ?>" data-date="<?php echo htmlspecialchars($dayYmd); ?>" data-day-of-week="<?php echo $dow; ?>">Delete All</a>
 																</li>
 															</ul>
 														</div>
-														<div class="slot-body" data-day="monday">
+														<div class="slot-body" data-day="<?php echo $day; ?>" data-date="<?php echo htmlspecialchars($dayYmd); ?>" data-day-of-week="<?php echo $dow; ?>">
 															<p>No Slots Available</p>
 														</div>
 													</div>
 												</div>
-												<!-- /Slot -->
-
-												<!-- Slot -->
-												<div class="tab-pane fade" id="tuesday">
-													<div class="slot-box">
-														<div class="slot-header">
-															<h5>Tuesday</h5>
-															<ul>
-																<li>
-																	<a href="#" class="add-slot" data-bs-toggle="modal" data-bs-target="#add_slot" data-day="tuesday">Add Slots</a>
-																</li>
-																<li>
-																	<a href="#" class="del-slot" data-bs-toggle="modal" data-bs-target="#delete_slot" data-day="tuesday">Delete All</a>
-																</li>
-															</ul>
-														</div>
-														<div class="slot-body" data-day="tuesday">
-															<p>No Slots Available</p>
-														</div>
-													</div>
-												</div>
-												<!-- /Slot -->
-
-												<!-- Slot -->
-												<div class="tab-pane fade" id="wednesday">
-													<div class="slot-box">
-														<div class="slot-header">
-															<h5>Wednesday</h5>
-															<ul>
-																<li>
-																	<a href="#" class="add-slot" data-bs-toggle="modal" data-bs-target="#add_slot" data-day="wednesday">Add Slots</a>
-																</li>
-																<li>
-																	<a href="#" class="del-slot" data-bs-toggle="modal" data-bs-target="#delete_slot" data-day="wednesday">Delete All</a>
-																</li>
-															</ul>
-														</div>
-														<div class="slot-body" data-day="wednesday">
-															<p>No Slots Available</p>
-														</div>
-													</div>
-												</div>
-												<!-- /Slot -->
-
-												<!-- Slot -->
-												<div class="tab-pane fade" id="thursday">
-													<div class="slot-box">
-														<div class="slot-header">
-															<h5>Thursday</h5>
-															<ul>
-																<li>
-																	<a href="#" class="add-slot" data-bs-toggle="modal" data-bs-target="#add_slot" data-day="thursday">Add Slots</a>
-																</li>
-																<li>
-																	<a href="#" class="del-slot" data-bs-toggle="modal" data-bs-target="#delete_slot" data-day="thursday">Delete All</a>
-																</li>
-															</ul>
-														</div>
-														<div class="slot-body" data-day="thursday">
-															<p>No Slots Available</p>
-														</div>
-													</div>
-												</div>
-												<!-- /Slot -->
-
-												<!-- Slot -->
-												<div class="tab-pane fade" id="friday">
-													<div class="slot-box">
-														<div class="slot-header">
-															<h5>Friday</h5>
-															<ul>
-																<li>
-																	<a href="#" class="add-slot" data-bs-toggle="modal" data-bs-target="#add_slot" data-day="friday">Add Slots</a>
-																</li>
-																<li>
-																	<a href="#" class="del-slot" data-bs-toggle="modal" data-bs-target="#delete_slot" data-day="friday">Delete All</a>
-																</li>
-															</ul>
-														</div>
-														<div class="slot-body" data-day="friday">
-															<p>No Slots Available</p>
-														</div>
-													</div>
-												</div>
-												<!-- /Slot -->
-
-												<!-- Slot -->
-												<div class="tab-pane fade" id="saturday">
-													<div class="slot-box">
-														<div class="slot-header">
-															<h5>Saturday</h5>
-															<ul>
-																<li>
-																	<a href="#" class="add-slot" data-bs-toggle="modal" data-bs-target="#add_slot" data-day="saturday">Add Slots</a>
-																</li>
-																<li>
-																	<a href="#" class="del-slot" data-bs-toggle="modal" data-bs-target="#delete_slot" data-day="saturday">Delete All</a>
-																</li>
-															</ul>
-														</div>
-														<div class="slot-body" data-day="saturday">
-															<p>No Slots Available</p>
-														</div>
-													</div>
-												</div>
-												<!-- /Slot -->
-
-												<!-- Slot -->
-												<div class="tab-pane fade" id="sunday">
-													<div class="slot-box">
-														<div class="slot-header">
-															<h5>Sunday</h5>
-															<ul>
-																<li>
-																	<a href="#" class="add-slot" data-bs-toggle="modal" data-bs-target="#add_slot" data-day="sunday">Add Slots</a>
-																</li>
-																<li>
-																	<a href="#" class="del-slot" data-bs-toggle="modal" data-bs-target="#delete_slot" data-day="sunday">Delete All</a>
-																</li>
-															</ul>
-														</div>
-														<div class="slot-body" data-day="sunday">
-															<p>No Slots Available</p>
-														</div>
-													</div>
-												</div>
-												<!-- /Slot -->
+												<?php endforeach; ?>
 
 												
 											</div>
@@ -653,6 +564,8 @@ include 'header.php';
 					</div>
 					<form id="add_slot_form" method="post" action="">
 						<input type="hidden" id="slot_day" name="slot_day" value="">
+						<input type="hidden" id="slot_date" name="slot_date" value="">
+						<input type="hidden" id="slot_day_of_week" name="slot_day_of_week" value="">
 						<div class="modal-body">
 							<div class="timing-modal">
 								<p class="text-muted small mb-3">Appointment duration: <strong>15 minutes</strong>. Select a slot tab, then choose which timings are available.</p>
@@ -788,15 +701,13 @@ include 'header.php';
 <?php include 'footer.php'; ?>
 		<script>
 		$(document).ready(function() {
-			// Stored slots per day: { monday: [ { period, periodLabel, times: ['06:00',...] }, ... ], ... }
-			var slotsByDay = { monday: [], tuesday: [], wednesday: [], thursday: [], friday: [], saturday: [], sunday: [] };
 			var slotPeriodLabels = { morning: 'Morning (6:00 AM – 12:00 PM)', afternoon: 'Afternoon (12:00 PM – 6:00 PM)', evening: 'Evening (6:00 PM – 12:00 AM)', night: 'Night (12:00 AM – 6:00 AM)' };
+			var deleteSlotDate = null;
 			var deleteSlotDay = null;
+			var deleteSlotDayOfWeek = null;
 
-			// Slot definitions: 4 slots x 6 hours, 24 x 15-min timings each
-			var slotTimings = {
-				morning:   [], afternoon: [], evening: [], night: []
-			};
+			// Slot definitions: 4 periods x 24 x 15-min timings each
+			var slotTimings = { morning: [], afternoon: [], evening: [], night: [] };
 			function pad(n) { return n < 10 ? '0' + n : n; }
 			function genTimes(startHour, startMin, count) {
 				var list = [];
@@ -815,52 +726,105 @@ include 'header.php';
 			slotTimings.night     = genTimes(0, 0, 24);
 
 			function formatTime24to12(val) {
-				var p = val.split(':');
+				var p = (val || '').split(':');
 				var h = parseInt(p[0], 10), m = parseInt(p[1] || 0, 10);
 				var ampm = h >= 12 ? 'PM' : 'AM';
 				var h12 = h % 12 || 12;
 				return h12 + ':' + pad(m) + ' ' + ampm;
 			}
 
-			function renderDaySlots(day) {
-				var body = $('.slot-body[data-day="' + day + '"]');
-				var slots = slotsByDay[day] || [];
-				if (slots.length === 0) {
-					body.html('<p>No Slots Available</p>');
+			function slotToPeriod(time) {
+				var parts = (time || '').split(':');
+				var h = parseInt(parts[0], 10);
+				if (h >= 6 && h < 12) return 'morning';
+				if (h >= 12 && h < 18) return 'afternoon';
+				if (h >= 18 && h < 24) return 'evening';
+				return 'night';
+			}
+
+			function renderSlotBody($body, slots) {
+				if (!slots || slots.length === 0) {
+					$body.html('<p>No Slots Available</p>');
 					return;
 				}
+				slots = slots.slice().sort();
+				var byPeriod = { morning: [], afternoon: [], evening: [], night: [] };
+				slots.forEach(function(t) {
+					var p = slotToPeriod(t);
+					if (byPeriod[p]) byPeriod[p].push(t);
+				});
 				var html = '';
-				slots.forEach(function(entry) {
-					html += '<div class="slot-group mb-3">';
-					html += '<h6 class="fs-14 mb-2">' + (slotPeriodLabels[entry.period] || entry.period) + '</h6>';
-					html += '<ul class="time-slots">';
-					(entry.times || []).sort().forEach(function(t) {
+				['morning','afternoon','evening','night'].forEach(function(period) {
+					if (byPeriod[period].length === 0) return;
+					html += '<div class="slot-group mb-3"><h6 class="fs-14 mb-2">' + (slotPeriodLabels[period] || period) + '</h6><ul class="time-slots">';
+					byPeriod[period].forEach(function(t) {
 						html += '<li><i class="isax isax-clock"></i>' + formatTime24to12(t) + '</li>';
 					});
 					html += '</ul></div>';
 				});
-				body.html(html);
+				$body.html(html);
 			}
 
-			function renderAllDays() {
-				['monday','tuesday','wednesday','thursday','friday','saturday','sunday'].forEach(renderDaySlots);
+			function loadSlotsForDay(dayOfWeek, day) {
+				var $body = $('.slot-body[data-day-of-week="' + dayOfWeek + '"]');
+				if (!$body.length) $body = $('.slot-body[data-day="' + day + '"]');
+				$body.html('<p class="text-muted">Loading...</p>');
+				$.get('php/get-doctor-availability-ranges.php', { day_of_week: dayOfWeek }, function(r) {
+					if (r && r.success && r.slots && r.slots.length) {
+						renderSlotBody($body, r.slots);
+					} else {
+						$body.html('<p>No Slots Available</p>');
+					}
+				}, 'json').fail(function() {
+					$body.html('<p>Failed to load slots.</p>');
+				});
+			}
+
+			// Load slots when a day tab is shown
+			$('.available-tab .nav a[data-date]').on('shown.bs.tab', function() {
+				var dayOfWeek = $(this).data('day-of-week');
+				var day = $(this).data('day');
+				if (dayOfWeek !== undefined) loadSlotsForDay(dayOfWeek, day);
+			});
+			// Load slots for the initially active day
+			var $activeTab = $('.tab-content.pt-0 .tab-pane.active.show');
+			if ($activeTab.length) {
+				loadSlotsForDay($activeTab.data('day-of-week'), $activeTab.data('day'));
 			}
 
 			$('.add-slot').on('click', function() {
 				var day = $(this).data('day');
+				var date = $(this).data('date');
+				var dayOfWeek = $(this).data('day-of-week');
 				if (day) $('#slot_day').val(day);
+				if (date) $('#slot_date').val(date);
+				if (dayOfWeek !== undefined) $('#slot_day_of_week').val(dayOfWeek);
 			});
 
 			$('.del-slot').on('click', function() {
+				deleteSlotDate = $(this).data('date') || null;
 				deleteSlotDay = $(this).data('day') || null;
+				deleteSlotDayOfWeek = $(this).data('day-of-week');
 			});
 
 			$('#delete_slot_confirm').on('click', function() {
-				if (deleteSlotDay && slotsByDay[deleteSlotDay]) {
-					slotsByDay[deleteSlotDay] = [];
-					renderDaySlots(deleteSlotDay);
+				if (deleteSlotDayOfWeek === undefined || deleteSlotDayOfWeek === null) {
+					$('#delete_slot').modal('hide');
+					return;
 				}
+				$.post('php/save-doctor-availability-ranges.php', { day_of_week: deleteSlotDayOfWeek, slot_times: [] }, function(r) {
+					if (r && r.success) {
+						showAlert('success', 'Slots removed.');
+						loadSlotsForDay(deleteSlotDayOfWeek, deleteSlotDay);
+					} else {
+						showAlert('danger', (r && r.message) ? r.message : 'Failed to remove slots.');
+					}
+				}, 'json').fail(function() {
+					showAlert('danger', 'Failed to remove slots.');
+				});
+				deleteSlotDate = null;
 				deleteSlotDay = null;
+				deleteSlotDayOfWeek = null;
 				$('#delete_slot').modal('hide');
 			});
 
@@ -896,42 +860,82 @@ include 'header.php';
 				$('#' + paneId).find('.slot-time-cb').prop('checked', false);
 			});
 
+			// Normalize time to HH:MM so it matches checkbox values (06:00 not 6:00)
+			function normalizeSlotTime(t) {
+				if (!t || typeof t !== 'string') return '';
+				var parts = t.trim().split(':');
+				var h = parseInt(parts[0], 10);
+				var m = parseInt(parts[1] || 0, 10);
+				return pad(isNaN(h) ? 0 : h) + ':' + pad(isNaN(m) ? 0 : m);
+			}
+
 			$('#add_slot').on('show.bs.modal', function() {
 				$('#slot_period').val('morning');
-				fillSlotPane('morning', 'slot_timings_morning');
-				fillSlotPane('afternoon', 'slot_timings_afternoon');
-				fillSlotPane('evening', 'slot_timings_evening');
-				fillSlotPane('night', 'slot_timings_night');
-				$('#slot_period_tabs a').removeClass('active').first().addClass('active');
-				$('#slot_period_content .tab-pane').removeClass('show active').first().addClass('show active');
+				var dayOfWeek = $('#slot_day_of_week').val();
+				var $content = $('#slot_period_content').closest('.form-wrap');
+				var $loader = $content.find('.slot-modal-loader');
+				if (!$loader.length) {
+					$content.find('.available-tab').after('<p class="slot-modal-loader text-muted small mb-0 mt-2">Loading existing slots…</p>');
+					$loader = $content.find('.slot-modal-loader');
+				}
+				$('#slot_period_content').hide();
+				$loader.show();
+				function showFormAndPreCheck(existingSlots) {
+					fillSlotPane('morning', 'slot_timings_morning');
+					fillSlotPane('afternoon', 'slot_timings_afternoon');
+					fillSlotPane('evening', 'slot_timings_evening');
+					fillSlotPane('night', 'slot_timings_night');
+					$('#slot_period_tabs a').removeClass('active').first().addClass('active');
+					$('#slot_period_content .tab-pane').removeClass('show active').first().addClass('show active');
+					(existingSlots || []).forEach(function(t) {
+						var v = normalizeSlotTime(t);
+						if (v) $('#add_slot_form').find('.slot-time-cb[value="' + v + '"]').prop('checked', true);
+					});
+					$loader.hide();
+					$('#slot_period_content').show();
+				}
+				if (dayOfWeek !== '' && dayOfWeek !== undefined) {
+					$.get('php/get-doctor-availability-ranges.php', { day_of_week: dayOfWeek }, function(r) {
+						var slots = (r && r.success && r.slots) ? r.slots : [];
+						showFormAndPreCheck(slots);
+					}, 'json').fail(function() {
+						showFormAndPreCheck([]);
+					});
+				} else {
+					showFormAndPreCheck([]);
+				}
 			});
 
 			$('#add_slot_form').on('submit', function(e) {
 				e.preventDefault();
-				var day = $('#slot_day').val();
-				var activePane = $('#slot_period_content .tab-pane.active');
-				var period = activePane.data('period');
-				var times = [];
-				activePane.find('.slot-time-cb:checked').each(function() {
-					times.push($(this).val());
+				var dayOfWeek = $('#slot_day_of_week').val();
+				var slotDay = $('#slot_day').val();
+				var checkedTimes = [];
+				$('#add_slot_form .slot-time-cb:checked').each(function() {
+					checkedTimes.push($(this).val());
 				});
-				if (!day) {
+				if (dayOfWeek === '' || dayOfWeek === undefined) {
 					alert('Please add slots from a day tab (e.g. Monday).');
 					return false;
 				}
-				if (!period) {
-					alert('Please select a slot tab (Morning, Afternoon, Evening or Night).');
+				if (checkedTimes.length === 0) {
+					alert('Please select at least one timing.');
 					return false;
 				}
-				if (times.length === 0) {
-					alert('Please select at least one timing for this slot.');
-					return false;
-				}
-				if (!slotsByDay[day]) slotsByDay[day] = [];
-				slotsByDay[day].push({ period: period, periodLabel: slotPeriodLabels[period], times: times });
-				renderDaySlots(day);
-				$('#add_slot').modal('hide');
-				$('#slot_day').val('');
+				$.post('php/save-doctor-availability-ranges.php', { day_of_week: dayOfWeek, slot_times: checkedTimes }, function(r) {
+					if (r && r.success) {
+						showAlert('success', 'Slots saved successfully.');
+						loadSlotsForDay(dayOfWeek, slotDay);
+						$('#add_slot').modal('hide');
+						$('#slot_day_of_week').val('');
+						$('#slot_day').val('');
+						$('#slot_date').val('');
+					} else {
+						alert((r && r.message) ? r.message : 'Failed to save slots.');
+					}
+				}, 'json').fail(function() {
+					alert('Failed to save slots.');
+				});
 				return false;
 			});
 

@@ -42,6 +42,9 @@ try {
 
     $doctor = $result->fetch_assoc();
     $stmt->close();
+
+    $appointments = [];
+    $upcoming_appointment = null;
     $conn->close();
 
     // Set default values if profile data is missing
@@ -111,33 +114,38 @@ include 'header.php';
 									<div class="title-card">
 										<h5>Upcoming Appointment</h5>
 									</div>
+									<?php if ($upcoming_appointment): ?>
 									<div class="upcoming-patient-info">
 										<div class="info-details">
-											<span class="img-avatar"><img src="assets/img/doctors-dashboard/profile-01.jpg" alt="Img"></span>
+											<span class="img-avatar"><img src="<?php echo htmlspecialchars($upcoming_appointment['profile_image']); ?>" alt=""></span>
 											<div class="name-info">
-												<span>#Apt0001</span>
-												<h6>Adrian Marshall</h6>
+												<span>#APT<?php echo str_pad($upcoming_appointment['id'], 5, '0', STR_PAD_LEFT); ?></span>
+												<h6><?php echo htmlspecialchars($upcoming_appointment['display_name']); ?></h6>
 											</div>
-
 										</div>
 										<div class="date-details">
-											<span>General visit</span>
-											<h6>Today, 10:45 AM</h6>
+											<span><?php echo htmlspecialchars($upcoming_appointment['status'] ?: 'Booked'); ?></span>
+											<h6><?php echo date('M j, Y', strtotime($upcoming_appointment['appointment_date'])); ?>, <?php echo date('g:i A', strtotime($upcoming_appointment['slot_time'])); ?></h6>
 										</div>
 										<div class="circle-bg">
 											<img src="assets/img/bg/dashboard-circle-bg.png" alt="Img">
 										</div>
 									</div>
 									<div class="appointment-card-footer">
-										<h5><i class="fa-solid fa-video"></i>Video Appointment</h5>
+										<h5><i class="fa-solid fa-calendar-check"></i>Appointment</h5>
 										<div class="btn-appointments">
-											<a href="chat-doctor.html" class="btn">Chat Now</a>
-											<a href="doctor-appointment-start.html" class="btn">Start Appointment</a>
+											<a href="appointments.php" class="btn">View Details</a>
 										</div>
 									</div>
+									<?php else: ?>
+									<div class="upcoming-patient-info">
+										<p class="text-muted mb-0 p-3">No upcoming appointments</p>
+									</div>
+									<?php endif; ?>
 								</div>
 							</div>
 						</div>
+						<!-- Appointments Today, Patients Today, Total Patient cards commented out
 						<div class="col-xl-4 d-flex">
 							<div class="dashboard-box-col w-100">
 								<div class="dashboard-widget-box">
@@ -172,6 +180,7 @@ include 'header.php';
 								</div>
 							</div>							
 						</div>
+						-->
 						<div class="col-xl-8 d-flex">
 							<div class="dashboard-card w-100">
 								<div class="dashboard-card-head">
@@ -200,136 +209,36 @@ include 'header.php';
 									<div class="table-responsive">
 										<table class="table dashboard-table appoint-table">
 											<tbody>
+												<?php if (empty($appointments)): ?>
+												<tr>
+													<td colspan="3" class="text-center py-4 text-muted">No appointments yet</td>
+												</tr>
+												<?php else: foreach ($appointments as $apt): ?>
 												<tr>
 													<td>
 														<div class="patient-info-profile">
 															<a href="appointments.php" class="table-avatar">
-																<img src="assets/img/doctors-dashboard/profile-01.jpg" alt="Img">
+																<img src="<?php echo htmlspecialchars($apt['profile_image']); ?>" alt="">
 															</a>
 															<div class="patient-name-info">
-																<span>#Apt0001</span>
-																<h5><a href="appointments.php">Adrian Marshall</a></h5>
+																<span>#APT<?php echo str_pad($apt['id'], 5, '0', STR_PAD_LEFT); ?></span>
+																<h5><a href="appointments.php"><?php echo htmlspecialchars($apt['display_name']); ?></a></h5>
 															</div>
 														</div>
-														
 													</td>
 													<td>
 														<div class="appointment-date-created">
-															<h6>11 Nov 2024 10.45 AM</h6>
-															<span class="badge table-badge">General</span>
+															<h6><?php echo date('j M Y', strtotime($apt['appointment_date'])); ?> <?php echo date('g:i A', strtotime($apt['slot_time'])); ?></h6>
+															<span class="badge table-badge"><?php echo htmlspecialchars($apt['status'] ?: 'Booked'); ?></span>
 														</div>
 													</td>
 													<td>
 														<div class="apponiment-actions d-flex align-items-center">
-															<a href="#" class="text-success-icon me-2"><i class="fa-solid fa-check"></i></a>
-															<a href="#" class="text-danger-icon"><i class="fa-solid fa-xmark"></i></a>
+															<a href="appointments.php" class="text-success-icon me-2" title="View"><i class="fa-solid fa-eye"></i></a>
 														</div>
 													</td>
 												</tr>
-												<tr>
-													<td>
-														<div class="patient-info-profile">
-															<a href="appointments.php" class="table-avatar">
-																<img src="assets/img/doctors-dashboard/profile-02.jpg" alt="Img">
-															</a>
-															<div class="patient-name-info">
-																<span>#Apt0002</span>
-																<h5><a href="appointments.php">Kelly Stevens</a></h5>
-															</div>
-														</div>
-														
-													</td>
-													<td>
-														<div class="appointment-date-created">
-															<h6>10 Nov 2024 11.00 AM</h6>
-															<span class="badge table-badge">Clinic Consulting</span>
-														</div>
-													</td>
-													<td>
-														<div class="apponiment-actions d-flex align-items-center">
-															<a href="#" class="text-success-icon me-2"><i class="fa-solid fa-check"></i></a>
-															<a href="#" class="text-danger-icon"><i class="fa-solid fa-xmark"></i></a>
-														</div>
-													</td>
-												</tr>
-												<tr>
-													<td>
-														<div class="patient-info-profile">
-															<a href="appointments.php" class="table-avatar">
-																<img src="assets/img/doctors-dashboard/profile-03.jpg" alt="Img">
-															</a>
-															<div class="patient-name-info">
-																<span>#Apt0003</span>
-																<h5><a href="appointments.php">Samuel Anderson</a></h5>
-															</div>
-														</div>
-														
-													</td>
-													<td>
-														<div class="appointment-date-created">
-															<h6>03 Nov 2024 02.00 PM</h6>
-															<span class="badge table-badge">General</span>
-														</div>
-													</td>
-													<td>
-														<div class="apponiment-actions d-flex align-items-center">
-															<a href="#" class="text-success-icon me-2"><i class="fa-solid fa-check"></i></a>
-															<a href="#" class="text-danger-icon"><i class="fa-solid fa-xmark"></i></a>
-														</div>
-													</td>
-												</tr>
-												<tr>
-													<td>
-														<div class="patient-info-profile">
-															<a href="appointments.php" class="table-avatar">
-																<img src="assets/img/doctors-dashboard/profile-04.jpg" alt="Img">
-															</a>
-															<div class="patient-name-info">
-																<span>#Apt0004</span>
-																<h5><a href="appointments.php">Catherine Griffin</a></h5>
-															</div>
-														</div>
-														
-													</td>
-													<td>
-														<div class="appointment-date-created">
-															<h6>01 Nov 2024 04.00 PM</h6>
-															<span class="badge table-badge">Clinic Consulting</span>
-														</div>
-													</td>
-													<td>
-														<div class="apponiment-actions d-flex align-items-center">
-															<a href="#" class="text-success-icon me-2"><i class="fa-solid fa-check"></i></a>
-															<a href="#" class="text-danger-icon"><i class="fa-solid fa-xmark"></i></a>
-														</div>
-													</td>
-												</tr>
-												<tr>
-													<td>
-														<div class="patient-info-profile">
-															<a href="appointments.php" class="table-avatar">
-																<img src="assets/img/doctors-dashboard/profile-05.jpg" alt="Img">
-															</a>
-															<div class="patient-name-info">
-																<span>#Apt0005</span>
-																<h5><a href="appointments.php">Robert Hutchinson</a></h5>
-															</div>
-														</div>
-														
-													</td>
-													<td>
-														<div class="appointment-date-created">
-															<h6>28 Oct 2024 05.30 PM</h6>
-															<span class="badge table-badge">General</span>
-														</div>
-													</td>
-													<td>
-														<div class="apponiment-actions d-flex align-items-center">
-															<a href="#" class="text-success-icon me-2"><i class="fa-solid fa-check"></i></a>
-															<a href="#" class="text-danger-icon"><i class="fa-solid fa-xmark"></i></a>
-														</div>
-													</td>
-												</tr>
+												<?php endforeach; endif; ?>
 											</tbody>
 										</table>
 									</div>
@@ -347,4 +256,9 @@ include 'header.php';
 </body>
 </html>
 
+<?php include 'footer.php'; ?>
+<?php include 'footer.php'; ?>
+<?php include 'footer.php'; ?>
+<?php include 'footer.php'; ?>
+<?php include 'footer.php'; ?>
 <?php include 'footer.php'; ?>
