@@ -145,9 +145,14 @@ try {
     
     // If user not found or password incorrect
     if (!$user_found) {
-        http_response_code(401);
-        echo json_encode(['success' => false, 'message' => 'Invalid email or password']);
         $conn->close();
+        $is_ajax = !empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest';
+        if ($is_ajax) {
+            http_response_code(401);
+            echo json_encode(['success' => false, 'message' => 'Invalid email or password']);
+        } else {
+            header('Location: login.php?error=1');
+        }
         exit;
     }
     
@@ -221,18 +226,24 @@ try {
     // Persist session before sending response (fixes "works locally, not on live" when session isn't written in time)
     session_write_close();
     
-    http_response_code(200);
-    echo json_encode([
-        'success' => true,
-        'message' => 'Login successful!',
-        'user_type' => $user_type,
-        'user' => [
-            'id' => $user_data['id'],
-            'name' => $user_data['name'],
-            'email' => $user_data['email']
-        ],
-        'redirect' => $redirect_url
-    ]);
+    $is_ajax = !empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest';
+    if ($is_ajax) {
+        http_response_code(200);
+        echo json_encode([
+            'success' => true,
+            'message' => 'Login successful!',
+            'user_type' => $user_type,
+            'user' => [
+                'id' => $user_data['id'],
+                'name' => $user_data['name'],
+                'email' => $user_data['email']
+            ],
+            'redirect' => $redirect_url
+        ]);
+    } else {
+        header('Location: ' . $redirect_url);
+        exit;
+    }
     
     $conn->close();
     
