@@ -127,3 +127,6 @@
 [27-Feb-2026 04:38:43 UTC] PHP Parse error:  syntax error, unexpected '<<' (T_SL), expecting end of file in /home/telerxb2/public_html/php/config.php on line 15
 [27-Feb-2026 04:38:53 UTC] PHP Parse error:  syntax error, unexpected '<<' (T_SL), expecting end of file in /home/telerxb2/public_html/php/config.php on line 15
 [03-Mar-2026 14:37:07 Asia/Dhaka] PHP Warning:  Cannot modify header information - headers already sent by (output started at /home/telerxb2/public_html/header.php:16) in /home/telerxb2/public_html/doctor-profile.php on line 21
+[05-Mar-2026 05:12:49 UTC] PHP Parse error:  syntax error, unexpected '<<' (T_SL), expecting end of file in /home/telerxb2/public_html/php/config.php on line 17
+[06-Mar-2026 14:06:17 Asia/Dhaka] PHP Warning:  Cannot modify header information - headers already sent by (output started at /home/telerxb2/public_html/header.php:16) in /home/telerxb2/public_html/doctor-profile.php on line 21
+[06-Mar-2026 15:50:37 Asia/Dhaka] PHP Warning:  Cannot modify header information - headers already sent by (output started at /home/telerxb2/public_html/header.php:16) in /home/telerxb2/public_html/doctor-profile.php on line 21
