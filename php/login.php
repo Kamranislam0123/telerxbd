@@ -198,7 +198,7 @@ try {
             $_SESSION['patient_id'] = $user_data['id'];
             $_SESSION['patient_name'] = $user_data['name'];
             $_SESSION['patient_email'] = $user_data['email'];
-            $redirect_url = 'index.php';
+            $redirect_url = 'patient-dashboard.php';
             break;
     }
     
@@ -217,6 +217,9 @@ try {
         $params['secure'],
         $params['httponly']
     );
+    
+    // Persist session before sending response (fixes "works locally, not on live" when session isn't written in time)
+    session_write_close();
     
     http_response_code(200);
     echo json_encode([

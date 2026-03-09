@@ -1,6 +1,9 @@
 <?php
 // Use config so session cookie path is '/' and works for dashboard after login
 require_once __DIR__ . '/php/config.php';
+// Base path for AJAX (works at root and in subdirectory on live)
+$login_base = rtrim(dirname($_SERVER['SCRIPT_NAME'] ?? ''), '/');
+$login_ajax_url = ($login_base === '' ? '' : $login_base) . '/php/login.php';
 include 'header.php';?>
 
 <head>
@@ -120,18 +123,16 @@ include 'header.php';?>
 					remember_me: $('#remember').is(':checked') ? 1 : 0
 				};
 				
-				// Submit via AJAX
+				// Submit via AJAX (URL works at root and in subdirectory on live)
 				$.ajax({
-					url: 'php/login.php',
+					url: <?php echo json_encode($login_ajax_url); ?>,
 					type: 'POST',
 					data: formData,
 					dataType: 'json',
 					success: function(response) {
-						if (response.success) {
-							var userType = response.user_type || 'doctor';
-							var redirectUrl = response.redirect;
-							
-							// Set redirect based on user type if not provided
+						if (response && response.success) {
+							var userType = (response.user_type || 'doctor');
+							var redirectUrl = (response.redirect && String(response.redirect).trim()) ? String(response.redirect).trim() : '';
 							if (!redirectUrl) {
 								switch(userType) {
 									case 'healthcare':
@@ -144,11 +145,10 @@ include 'header.php';?>
 										redirectUrl = 'doctor-profile-settings.php';
 								}
 							}
-							
-							messageDiv.addClass('alert-success').html('<strong>Success!</strong> ' + response.message).fadeIn();
+							messageDiv.addClass('alert-success').html('<strong>Success!</strong> ' + (response.message || 'Redirecting...')).fadeIn();
 							setTimeout(function() {
-								window.location.href = redirectUrl;
-							}, 1000);
+								window.location.replace(redirectUrl);
+							}, 800);
 						} else {
 							var errorMsg = response.message || 'Login failed. Please try again.';
 							if (response.errors && response.errors.length > 0) {
@@ -191,6 +191,21 @@ include 'header.php';?>
 						
 						messageDiv.addClass('alert-danger').html('<strong>Error!</strong> ' + errorMsg).fadeIn();
 						submitBtn.prop('disabled', false).text('Sign in');
+					},
+					complete: function(xhr) {
+						// If we got 200 but success callback didn't run (e.g. JSON parse issue), try to redirect anyway
+						if (xhr.status === 200 && xhr.responseText) {
+							try {
+								var data = JSON.parse(xhr.responseText.replace(/^\s+|\s+$/g, ''));
+								if (data && data.success && data.redirect) {
+									var url = String(data.redirect).trim();
+									if (url) {
+										messageDiv.addClass('alert-success').html('<strong>Success!</strong> Redirecting...').fadeIn();
+										setTimeout(function() { window.location.replace(url); }, 300);
+									}
+								}
+							} catch (e) { /* ignore */ }
+						}
 					}
 				});
 			});
