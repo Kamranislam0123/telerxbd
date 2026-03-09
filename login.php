@@ -1,9 +1,14 @@
 <?php
 // Use config so session cookie path is '/' and works for dashboard after login
 require_once __DIR__ . '/php/config.php';
-// Base path for AJAX (works at root and in subdirectory on live)
+// Full same-origin URL for login AJAX (avoids status 0 / CORS / mixed content issues on live)
+$is_https = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off')
+    || (!empty($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] === 'https')
+    || (!empty($_SERVER['HTTP_X_FORWARDED_SSL']) && (strtolower($_SERVER['HTTP_X_FORWARDED_SSL'] ?? '') === 'on' || $_SERVER['HTTP_X_FORWARDED_SSL'] === '1'));
+$login_host = $_SERVER['HTTP_HOST'] ?? $_SERVER['SERVER_NAME'] ?? 'localhost';
 $login_base = rtrim(dirname($_SERVER['SCRIPT_NAME'] ?? ''), '/');
-$login_ajax_url = ($login_base === '' ? '' : $login_base) . '/php/login.php';
+$login_path = ($login_base === '' || $login_base === '/') ? '' : $login_base;
+$login_ajax_url = ($is_https ? 'https://' : 'http://') . $login_host . $login_path . '/php/login.php';
 include 'header.php';?>
 
 <head>
@@ -43,7 +48,10 @@ include 'header.php';?>
 											<h3>Login <span>TeleRx Bangladesh</span></h3>
 										</div>
 										<div id="login-message" class="alert" style="display: none;"></div>
-										<form id="doctor-login-form" method="POST">
+										<?php if (!empty($_GET['error'])): ?>
+										<div class="alert alert-danger">Invalid email or password. Please try again.</div>
+										<?php endif; ?>
+										<form id="doctor-login-form" method="POST" action="<?php echo htmlspecialchars($login_ajax_url); ?>">
 											<div class="mb-3">
 												<label class="form-label">E-mail or Mobile</label>
 												<input type="text" class="form-control" name="email" id="login-email" placeholder="Enter email or mobile number" required>
@@ -123,12 +131,13 @@ include 'header.php';?>
 					remember_me: $('#remember').is(':checked') ? 1 : 0
 				};
 				
-				// Submit via AJAX (URL works at root and in subdirectory on live)
+				// Submit via AJAX (full same-origin URL; server redirects if not AJAX)
 				$.ajax({
 					url: <?php echo json_encode($login_ajax_url); ?>,
 					type: 'POST',
 					data: formData,
 					dataType: 'json',
+					headers: { 'X-Requested-With': 'XMLHttpRequest' },
 					success: function(response) {
 						if (response && response.success) {
 							var userType = (response.user_type || 'doctor');
@@ -163,32 +172,28 @@ include 'header.php';?>
 						}
 					},
 					error: function(xhr, status, error) {
-						var errorMsg = 'An error occurred. Please try again later.';
-						
-						// Try to parse JSON response
-						try {
-							var response = JSON.parse(xhr.responseText);
-							if (response.message) {
-								errorMsg = response.message;
+						var errorMsg;
+						if (xhr.status === 0) {
+							errorMsg = 'Connection failed (request blocked or network error). ';
+							errorMsg += 'Try: (1) Use the same protocol as the page (e.g. https:// if the site is secure). ';
+							errorMsg += '(2) Open in a private/incognito window. (3) Disable browser extensions that block requests. ';
+							errorMsg += 'Or <button type="button" class="btn btn-link p-0 align-baseline btn-login-fallback">log in without AJAX</button>.';
+						} else {
+							errorMsg = 'An error occurred. Please try again later.';
+							var resp = xhr.responseText;
+							try {
+								if (typeof resp === 'string' && resp.length > 0) {
+									var response = JSON.parse(resp);
+									if (response && response.message) errorMsg = response.message;
+									if (response && response.error) errorMsg += '<br><small>' + response.error + '</small>';
+								}
+							} catch (e) {
+								if (typeof resp === 'string' && resp.length > 0)
+									errorMsg += '<br><small>Response: ' + resp.substring(0, 200) + '</small>';
 							}
-							if (response.error && response.error.length > 0) {
-								errorMsg += '<br><small>Details: ' + response.error + '</small>';
-							}
-						} catch (e) {
-							// If not JSON, show raw response or status
-							if (xhr.responseText) {
-								errorMsg += '<br><small>Response: ' + xhr.responseText.substring(0, 200) + '</small>';
-							}
-							errorMsg += '<br><small>Status: ' + status + ' | Error: ' + error + '</small>';
+							errorMsg += '<br><small>Status: ' + (xhr.status || status) + (error ? ' | ' + error : '') + '</small>';
 						}
-						
-						console.error('Login Error:', {
-							status: xhr.status,
-							statusText: xhr.statusText,
-							responseText: xhr.responseText,
-							error: error
-						});
-						
+						console.error('Login Error:', { status: xhr.status, statusText: xhr.statusText, responseText: xhr.responseText, error: error });
 						messageDiv.addClass('alert-danger').html('<strong>Error!</strong> ' + errorMsg).fadeIn();
 						submitBtn.prop('disabled', false).text('Sign in');
 					},
@@ -208,6 +213,9 @@ include 'header.php';?>
 						}
 					}
 				});
+			});
+			$(document).on('click', '.btn-login-fallback', function() {
+				document.getElementById('doctor-login-form').submit();
 			});
 		});
 		</script>
