@@ -1,10 +1,11 @@
 <?php
 /**
  * Multi-User Login Handler
- * Handles login for doctors, health-workers, and patients
+ * Handles login for doctors, health-workers, and patients.
+ * Save this file and config.php without BOM so JSON responses are not broken on live.
  */
 
-// Start output buffering to catch any accidental output
+// Start output buffering to catch any accidental output (e.g. from config or whitespace)
 ob_start();
 
 // Turn off error display to prevent warnings from breaking JSON
@@ -21,6 +22,24 @@ if (!file_exists($config_path)) {
     exit;
 }
 require_once $config_path;
+
+/**
+ * Base URL of the site (scheme + host + path to app root) for absolute redirects on live.
+ * When script is at /php/login.php, base is https://example.com. When at /Telerx/php/login.php, base is https://example.com/Telerx.
+ */
+function login_base_url() {
+    $is_https = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off')
+        || (!empty($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] === 'https')
+        || (!empty($_SERVER['HTTP_X_FORWARDED_SSL']) && (strtolower($_SERVER['HTTP_X_FORWARDED_SSL'] ?? '') === 'on' || $_SERVER['HTTP_X_FORWARDED_SSL'] === '1'))
+        || (!empty($_SERVER['SERVER_PORT']) && (int) $_SERVER['SERVER_PORT'] === 443);
+    $host = $_SERVER['HTTP_HOST'] ?? $_SERVER['SERVER_NAME'] ?? 'localhost';
+    $script_dir = dirname($_SERVER['SCRIPT_NAME'] ?? '/');
+    $base_path = dirname($script_dir);
+    if ($base_path === '/' || $base_path === '\\' || $base_path === '.') {
+        $base_path = '';
+    }
+    return ($is_https ? 'https://' : 'http://') . $host . $base_path;
+}
 
 // Clear output buffer and set content type to JSON (must be before any output)
 ob_clean();
@@ -151,7 +170,8 @@ try {
             http_response_code(401);
             echo json_encode(['success' => false, 'message' => 'Invalid email or password']);
         } else {
-            header('Location: login.php?error=1');
+            $fail_redirect = login_base_url() . '/login.php?error=1';
+            header('Location: ' . $fail_redirect);
         }
         exit;
     }
@@ -226,6 +246,8 @@ try {
     // Persist session before sending response (fixes "works locally, not on live" when session isn't written in time)
     session_write_close();
     
+    $base_url = login_base_url();
+    $redirect_absolute = rtrim($base_url, '/') . '/' . ltrim($redirect_url, '/');
     $is_ajax = !empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest';
     if ($is_ajax) {
         http_response_code(200);
@@ -238,10 +260,10 @@ try {
                 'name' => $user_data['name'],
                 'email' => $user_data['email']
             ],
-            'redirect' => $redirect_url
+            'redirect' => $redirect_absolute
         ]);
     } else {
-        header('Location: ' . $redirect_url);
+        header('Location: ' . $redirect_absolute);
         exit;
     }
     
