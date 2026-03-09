@@ -25,6 +25,7 @@ try {
             dp.zip_code,
             dp.district,
             dp.profile_image,
+            dp.gender,
             (SELECT COUNT(*) FROM doctor_experiences de WHERE de.doctor_id = d.id) as experience_count,
             (SELECT COUNT(*) FROM doctor_education ded WHERE ded.doctor_id = d.id) as education_count,
             (SELECT COUNT(*) FROM doctor_awards da WHERE da.doctor_id = d.id) as awards_count
@@ -89,11 +90,22 @@ try {
         }
     }
 
+    // Gender counts for filter (Male, Female, Other)
+    $gender_counts = ['Male' => 0, 'Female' => 0, 'Other' => 0];
+    foreach ($doctors as $d) {
+        $g = isset($d['gender']) && $d['gender'] !== '' ? trim($d['gender']) : 'Other';
+        if (!isset($gender_counts[$g])) {
+            $gender_counts[$g] = 0;
+        }
+        $gender_counts[$g]++;
+    }
+
     $conn->close();
 } catch (Exception $e) {
     error_log("Error fetching doctors: " . $e->getMessage());
     $doctors = [];
     $final_specialities = [];
+    $gender_counts = ['Male' => 0, 'Female' => 0, 'Other' => 0];
 }
 ?>
     <style>                               
@@ -270,24 +282,15 @@ try {
                                 </div>
                                 <div id="collapse2" class="accordion-collapse show" aria-labelledby="heading2">
                                     <div class="accordion-body pt-3">
+                                        <?php foreach (['Male', 'Female'] as $idx => $gender): $cb_id = 'gender-filter-' . strtolower($gender); $count = $gender_counts[$gender] ?? 0; ?>
                                         <div class="d-flex align-items-center justify-content-between mb-2">
                                             <div class="form-check">
-                                                <input class="form-check-input" type="checkbox" value="" id="checkebox-sm11" checked="">
-                                                <label class="form-check-label" for="checkebox-sm11">
-                                                    Male
-                                                </label>
+                                                <input class="form-check-input gender-filter" type="checkbox" value="<?php echo htmlspecialchars($gender); ?>" id="<?php echo $cb_id; ?>">
+                                                <label class="form-check-label" for="<?php echo $cb_id; ?>"><?php echo htmlspecialchars($gender); ?></label>
                                             </div>
-                                            <span class="filter-badge">21</span>
+                                            <span class="filter-badge"><?php echo (int)$count; ?></span>
                                         </div>
-                                        <div class="d-flex align-items-center justify-content-between">
-                                            <div class="form-check">
-                                                <input class="form-check-input" type="checkbox" value="" id="checkebox-sm12">
-                                                <label class="form-check-label" for="checkebox-sm12">
-                                                    Female
-                                                </label>
-                                            </div>
-                                            <span class="filter-badge">21</span>
-                                        </div>
+                                        <?php endforeach; ?>
                                     </div>
                                 </div>
                             </div>
@@ -471,7 +474,7 @@ try {
                                 <div class="text-center"><p>No doctors found.</p></div>
                             <?php else: ?>
                                 <?php foreach ($doctors as $doctor): ?>
-                                    <div class="card doctor-list-card" data-speciality="<?php echo htmlspecialchars($doctor['specialty'] ?? 'General Physician'); ?>">
+                                    <div class="card doctor-list-card" data-speciality="<?php echo htmlspecialchars($doctor['specialty'] ?? 'General Physician'); ?>" data-gender="<?php echo htmlspecialchars($doctor['gender'] ?? 'Other'); ?>">
                                         <div class="d-md-flex align-items-center">
                                             <div class="card-img card-img-hover">
                                                 <a href="doctor-profile.php?id=<?php echo $doctor['id']; ?>">
@@ -542,7 +545,7 @@ try {
                                 $hidden_class = ($doctor_index >= $load_more_initial) ? ' load-more-hidden' : '';
                                 $doctor_index++;
                         ?>
-                                <div class="col-xxl-4 col-md-6 doctor-grid-item<?php echo $hidden_class; ?>" data-speciality="<?php echo htmlspecialchars($doctor['specialty'] ?? 'General Physician'); ?>">
+                                <div class="col-xxl-4 col-md-6 doctor-grid-item<?php echo $hidden_class; ?>" data-speciality="<?php echo htmlspecialchars($doctor['specialty'] ?? 'General Physician'); ?>" data-gender="<?php echo htmlspecialchars($doctor['gender'] ?? 'Other'); ?>">
                                     <div class="card">
                                         <div class="card-img card-img-hover doctor-profile-card-img">
                                             <a href="doctor-profile.php?id=<?php echo $doctor['id']; ?>">
