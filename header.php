@@ -1,12 +1,14 @@
 <?php
 if (session_status() === PHP_SESSION_NONE) {
+    $is_secure = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off')
+        || (!empty($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] === 'https');
     session_set_cookie_params([
         'lifetime' => 0,
         'path' => '/',
-        'domain' => $_SERVER['HTTP_HOST'],
-        'secure' => true,  // HTTPS এ true
+        'domain' => '',
+        'secure' => $is_secure,
         'httponly' => true,
-        'samesite' => 'Strict'
+        'samesite' => 'Lax'
     ]);
     session_start();
 }
@@ -114,7 +116,7 @@ $current_page = basename($_SERVER['PHP_SELF']);
                             <a href="/">Home</a>
                         </li>
                         <li class="<?php echo ($current_page == 'doctors') ? 'active' : ''; ?>">
-                            <a href="doctors">Our Doctors</a>
+                            <a href="doctors.php">Our Doctors</a>
                         </li>
                         <li class="<?php echo ($current_page == 'globalcare') ? 'active' : ''; ?>">
                             <a href="global-care">Global Care</a>
@@ -203,8 +205,8 @@ $current_page = basename($_SERVER['PHP_SELF']);
                                     <a class="dropdown-item" href="doctor-dashboard">Dashboard</a>
                                     <a class="dropdown-item" href="doctor-profile-settings">Profile Settings</a>
                                 <?php elseif($_SESSION['user_type'] == 'healthcare'): ?>
-                                    <a class="dropdown-item" href="health-worker-dashboard">Dashboard</a>
-                                    <a class="dropdown-item" href="health-worker-profile-settings">Profile Settings</a>
+                                    <a class="dropdown-item" href="health-worker-dashboard.php">Dashboard</a>
+                                    <a class="dropdown-item" href="health-worker-profile-settings.php">Profile Settings</a>
                                 <?php elseif($_SESSION['user_type'] == 'patient'): ?>
                                     <a class="dropdown-item" href="patient-dashboard">Dashboard</a>
                                     <a class="dropdown-item" href="patient-profile-settings">Profile Settings</a>

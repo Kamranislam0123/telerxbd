@@ -53,10 +53,31 @@ $blood_pressure = isset($_POST['blood_pressure']) ? trim($_POST['blood_pressure'
 $pulse = isset($_POST['pulse']) ? trim($_POST['pulse']) : '';
 $spo2 = isset($_POST['spo2']) ? trim($_POST['spo2']) : '';
 $rbs_fbs = isset($_POST['rbs_fbs']) ? trim($_POST['rbs_fbs']) : '';
+// Accept TID from either field name (booking form uses booking_telerx_id, JS sends telerx_id)
+$referrer_tid = isset($_POST['telerx_id']) ? trim($_POST['telerx_id']) : (isset($_POST['booking_telerx_id']) ? trim($_POST['booking_telerx_id']) : '');
 
 try {
     $conn = getDBConnection();
     $conn->begin_transaction();
+
+    // If TeleRx ID (TID) provided, validate it belongs to a health worker and use canonical TID from DB
+    if ($referrer_tid !== '') {
+        $tid_check = $conn->prepare("SELECT id, tid FROM healthcare_providers WHERE UPPER(TRIM(tid)) = UPPER(TRIM(?)) LIMIT 1");
+        if ($tid_check) {
+            $tid_check->bind_param("s", $referrer_tid);
+            $tid_check->execute();
+            $tid_res = $tid_check->get_result();
+            if ($tid_res && $tid_res->num_rows > 0) {
+                $tid_row = $tid_res->fetch_assoc();
+                $referrer_tid = $tid_row['tid']; // store canonical TID (e.g. T1001) for dashboard
+            } else {
+                $referrer_tid = '';
+            }
+            $tid_check->close();
+        } else {
+            $referrer_tid = '';
+        }
+    }
 
     // 1) Check slot is in doctor's availability (doctor_availability_ranges for this weekday)
     $day_of_week = (int) $d->format('w'); // 0=Sun, 6=Sat
@@ -90,38 +111,84 @@ try {
     }
     $taken->close();
 
-    // 3) Insert appointment (patient_id 0 for guest booking)
+    // 3) Insert appointment (patient_id 0 for guest booking). Include referrer_tid if column exists.
     $appointment_number = 'APT00000';
     $status = 'confirmed';
-    $ins = $conn->prepare("
-        INSERT INTO appointments (
-            patient_id, doctor_id, appointment_date, slot_time, appointment_time,
-            status, appointment_number, notes, patient_name, mobile, patient_phone,
-            age, weight, body_temperature, blood_pressure, pulse, spo2, rbs_fbs
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-    ");
+    $has_referrer_tid = false;
+    $col_check = $conn->query("SHOW COLUMNS FROM appointments LIKE 'referrer_tid'");
+    if ($col_check && $col_check->num_rows > 0) {
+        $has_referrer_tid = true;
+    }
+    // If we have a valid TID but column missing, add it so health worker dashboard can show referred patients
+    if (!$has_referrer_tid && $referrer_tid !== '') {
+        @$conn->query("ALTER TABLE appointments ADD COLUMN referrer_tid VARCHAR(20) DEFAULT NULL COMMENT 'Health worker TID (e.g. T1001)'");
+        $col_check2 = $conn->query("SHOW COLUMNS FROM appointments LIKE 'referrer_tid'");
+        if ($col_check2 && $col_check2->num_rows > 0) {
+            $has_referrer_tid = true;
+        }
+    }
     $mobile_phone = $mobile;
-    $ins->bind_param(
-        "iissssssssssssssss",
-        $patient_id,
-        $doctor_id,
-        $appointment_date,
-        $slot_time,
-        $slot_time,
-        $status,
-        $appointment_number,
-        $notes,
-        $patient_name,
-        $mobile,
-        $mobile_phone,
-        $age,
-        $weight,
-        $body_temperature,
-        $blood_pressure,
-        $pulse,
-        $spo2,
-        $rbs_fbs
-    );
+
+    if ($has_referrer_tid) {
+        $ins = $conn->prepare("
+            INSERT INTO appointments (
+                patient_id, doctor_id, appointment_date, slot_time, appointment_time,
+                status, appointment_number, notes, patient_name, mobile, patient_phone,
+                age, weight, body_temperature, blood_pressure, pulse, spo2, rbs_fbs, referrer_tid
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        ");
+        $ins->bind_param(
+            "iisssssssssssssssss",
+            $patient_id,
+            $doctor_id,
+            $appointment_date,
+            $slot_time,
+            $slot_time,
+            $status,
+            $appointment_number,
+            $notes,
+            $patient_name,
+            $mobile,
+            $mobile_phone,
+            $age,
+            $weight,
+            $body_temperature,
+            $blood_pressure,
+            $pulse,
+            $spo2,
+            $rbs_fbs,
+            $referrer_tid
+        );
+    } else {
+        $ins = $conn->prepare("
+            INSERT INTO appointments (
+                patient_id, doctor_id, appointment_date, slot_time, appointment_time,
+                status, appointment_number, notes, patient_name, mobile, patient_phone,
+                age, weight, body_temperature, blood_pressure, pulse, spo2, rbs_fbs
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        ");
+        $ins->bind_param(
+            "iissssssssssssssss",
+            $patient_id,
+            $doctor_id,
+            $appointment_date,
+            $slot_time,
+            $slot_time,
+            $status,
+            $appointment_number,
+            $notes,
+            $patient_name,
+            $mobile,
+            $mobile_phone,
+            $age,
+            $weight,
+            $body_temperature,
+            $blood_pressure,
+            $pulse,
+            $spo2,
+            $rbs_fbs
+        );
+    }
     if (!$ins->execute()) {
         $conn->rollback();
         $ins->close();

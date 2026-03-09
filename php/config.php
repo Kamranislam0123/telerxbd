@@ -59,7 +59,18 @@ function getDBConnection() {
 }
 
 // Start session if not already started
+// Cookie path '/' so session works for all app pages (php/ and root) - fixes health-worker-dashboard redirect
 if (session_status() === PHP_SESSION_NONE) {
+    $is_secure = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off')
+        || (!empty($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] === 'https');
+    session_set_cookie_params([
+        'lifetime' => 0,
+        'path' => '/',
+        'domain' => '',
+        'secure' => $is_secure,
+        'httponly' => true,
+        'samesite' => 'Lax'
+    ]);
     session_start();
 }
 

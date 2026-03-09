@@ -75,156 +75,17 @@ try {
     header('Location: login.php');
     exit;
 }
+
+$current_page = 'health-worker-profile-settings.php';
+include 'header.php';
 ?>
-<!DOCTYPE html>
-<html lang="en">
-	<head>
-		<meta charset="utf-8">
-		<title>TeleRx Bangladesh - Health-Worker Profile Settings</title>
-		<meta name="viewport" content="width=device-width, initial-scale=1.0">
-		<meta name="description" content="The responsive professional Doccure template offers many features, like scheduling appointments with  top doctors, clinics, and hospitals via voice, video call & chat.">
-		<meta name="keywords" content="practo clone, doccure, doctor appointment, Practo clone html template, doctor booking template">
-		<meta name="author" content="Practo Clone HTML Template - Doctor Booking Template">
-		
-		<!-- Favicon -->
-		<link rel="shortcut icon" href="assets/img/favicon.png" type="image/x-icon">
-		<link rel="apple-touch-icon" sizes="180x180" href="assets/img/apple-touch-icon.png">
-		
-		<!-- Theme Settings Js -->
-		<script src="assets/js/theme-script.js"></script>
-		
-		<!-- Bootstrap CSS -->
-		<link rel="stylesheet" href="assets/css/bootstrap.min.css">
-		
-		<!-- Fontawesome CSS -->
-		<link rel="stylesheet" href="assets/plugins/fontawesome/css/fontawesome.min.css">
-		<link rel="stylesheet" href="assets/plugins/fontawesome/css/all.min.css">
-		
-		<!-- Iconsax CSS-->
-		<link rel="stylesheet" href="assets/css/iconsax.css">
-		
-		<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-		<link href="https://fonts.googleapis.com/css2?family=Inter:wght@200;300;400;500;600;700;800;900&display=swap" rel="stylesheet">
-		
-		<!-- Feathericon CSS -->
-    	<link rel="stylesheet" href="assets/css/feather.css">
-		
-		<!-- Main CSS -->
-		<link rel="stylesheet" href="assets/css/custom.css">
-	</head>		
-	<body>
-		<!-- Main Wrapper -->
-		<div class="main-wrapper home-one" data-magic-cursor="hide">
-			<!-- Header -->
-			<header class="header header-custom header-fixed header-one home-head-one">
-				<div class="container">
-					<nav class="navbar navbar-expand-lg header-nav">
-						<div class="navbar-header">
-							<a id="mobile_btn" href="javascript:void(0);">
-								<span class="bar-icon">
-									<span></span>
-									<span></span>
-									<span></span>
-								</span>
-							</a>
-							<a href="index.html" class="navbar-brand logo">
-								<img src="assets/img/logo.svg" class="img-fluid" alt="Logo">
-							</a>
-						</div>
-						<div class="main-menu-wrapper">
-							<div class="menu-header">
-								<a href="index.html" class="menu-logo">
-									<img src="assets/img/logo.svg" class="img-fluid" alt="Logo">
-								</a>
-								<a id="menu_close" class="menu-close" href="javascript:void(0);">
-									<i class="fas fa-times"></i>
-								</a>
-							</div>
-							<ul class="main-nav">
-								<li class="has-submenu megamenu active">
-									<a href="index.html">Home</a>
-								</li>
-								<li><a href="doctors.php">Doctor List</a></li>
-								<li><a href="about-us.php">About Us</a></li>
-								<li><a href="contact-us.php">Contact</a></li>
-								<li class="login-link"><a href="php/logout.php">Logout</a></li>
-							</ul>
-						</div>
-						<ul class="nav header-navbar-rht">
-							<!-- User Menu -->
-							<li class="nav-item dropdown has-arrow logged-item">
-								<a href="#" class="nav-link ps-0" data-bs-toggle="dropdown">
-									<span class="user-img">
-										<img class="rounded-circle" src="<?php echo htmlspecialchars($healthcare['profile_image']); ?>" width="31" alt="<?php echo htmlspecialchars($healthcare['name']); ?>">
-									</span>
-								</a>
-								<div class="dropdown-menu dropdown-menu-end">
-									<div class="user-header">
-										<div class="avatar avatar-sm">
-											<img src="<?php echo htmlspecialchars($healthcare['profile_image']); ?>" alt="User Image" class="avatar-img rounded-circle">
-										</div>
-										<div class="user-text">
-											<h6><?php echo htmlspecialchars($healthcare['name']); ?></h6>
-											<p class="text-muted mb-0">Health-Worker</p>
-										</div>
-									</div>
-									<a class="dropdown-item" href="health-worker-profile-settings.php">Profile Settings</a>
-									<a class="dropdown-item" href="php/logout.php">Logout</a>
-								</div>
-							</li>
-						</ul>
-					</nav>
-				</div>
-			</header>
-			<!-- /Header -->
-
-			<!-- Breadcrumb -->
-            <div class="breadcrumb-bar">
-                <div class="container">
-                    <div class="row align-items-center inner-banner">
-                        <div class="col-md-12 col-12 text-center">
-                            <nav aria-label="breadcrumb" class="page-breadcrumb">
-                                <h2 class="breadcrumb-title">About TeleRx Bangladesh</h2>
-                            </nav>
-                        </div>
-                    </div>
+    <!-- Page Content (same structure as doctor-dashboard) -->
+    <div class="content">
+        <div class="container">
+            <div class="row">
+                <?php include 'health-worker-leftside-menu.php'; ?>
                 </div>
-                <div class="breadcrumb-bg">
-                    <img src="assets/img/bg/breadcrumb-bg-01.png" alt="img" class="breadcrumb-bg-01">
-                    <img src="assets/img/bg/breadcrumb-bg-02.png" alt="img" class="breadcrumb-bg-02">
-                    <img src="assets/img/bg/breadcrumb-icon.png" alt="img" class="breadcrumb-bg-03">
-                    <img src="assets/img/bg/breadcrumb-icon.png" alt="img" class="breadcrumb-bg-04">
-                </div>
-            </div>
-            <!-- /Breadcrumb -->
-
-			<!-- Page Content -->
-			<div class="content doctor-content">
-				<div class="container">
-					<div class="row">
-						<div class="col-lg-4 col-xl-3 theiaStickySidebar">
-							<!-- Profile Sidebar -->
-							<div class="profile-sidebar doctor-sidebar profile-sidebar-new">
-								<div class="widget-profile pro-widget-content">
-									<div class="profile-info-widget">
-										<a href="#" class="booking-doc-img">
-											<img src="<?php echo htmlspecialchars($healthcare['profile_image']); ?>" alt="User Image">
-										</a>
-										<div class="profile-det-info">
-											<h3><?php echo htmlspecialchars($healthcare['name']); ?></h3>
-											<div class="patient-details">
-												<h5 class="mb-0"><?php echo htmlspecialchars($healthcare['degrees'] ?: 'Health-Worker'); ?></h5>
-											</div>
-											<?php if (!empty($healthcare['tid'])): ?>
-											<span class="badge doctor-role-badge"><i class="fa-solid fa-circle"></i>TID: <?php echo htmlspecialchars($healthcare['tid']); ?></span>
-											<?php endif; ?>
-										</div>
-									</div>
-								</div>
-							</div>
-							<!-- /Profile Sidebar -->							
-						</div>
-						<div class="col-lg-8 col-xl-9">
+                <div class="col-lg-8 col-xl-9">
 							<!-- Profile Settings -->
 							<div class="dashboard-header">
 								<h3><?php echo htmlspecialchars($healthcare['name']); ?> Profile Settings</h3>
@@ -505,10 +366,8 @@ try {
 						</div>
 					</div>
 				</div>
-			</div>		
-			<!-- /Page Content -->
-
-		</div>
+			</div>
+    <!-- /Page Content -->
 <?php include 'footer.php'; ?>
 		<script>
 		$(document).ready(function() {

@@ -3936,10 +3936,18 @@ $(document).ready(function () {
 		$('#summary_attachment').text('—');
 		var symptoms = $('#booking_symptoms').val() || '';
 		$('#summary_symptoms').text(symptoms.length > 80 ? symptoms.substring(0, 80) + '...' : symptoms || '—');
-		// Advance to payment step
+		// Advance to Check Your Booking Info screen (payment step)
 		var $step = $btn.closest('fieldset');
-		$step.next().fadeIn('slow');
+		var $nextStep = $step.next();
 		$step.css('display', 'none');
+		$nextStep.fadeIn('slow', function() {
+			// Scroll to the booking-card mb-0 section (Check Your Booking Info) for better UX
+			var $target = $nextStep.find('.booking-card.mb-0').first();
+			if (!$target.length) $target = $nextStep.find('.booking-card').first();
+			if ($target.length) {
+				$('html, body').animate({ scrollTop: $target.offset().top - 100 }, 400);
+			}
+		});
 		$('.progress-active').removeClass('progress-active').addClass('progress-activated').next().addClass('progress-active');
 		return false;
 	});
@@ -3977,11 +3985,16 @@ $(document).ready(function () {
 			blood_pressure: $('#booking_blood_pressure').val() || '',
 			pulse: $('#booking_pulse').val() || '',
 			spo2: $('#booking_spo2').val() || '',
-			rbs_fbs: $('#booking_rbs_fbs').val() || ''
+			rbs_fbs: $('#booking_rbs_fbs').val() || '',
+			telerx_id: $('#booking_telerx_id').val() ? $('#booking_telerx_id').val().trim() : ''
 		}, function(r) {
 			if (r && r.success) {
 				showBookingToast('success', r.message || 'Booking confirmed!');
 				$('.booking-id-badge').text(r.booking_number || ('APT' + (r.appointment_id || '')));
+				// Fill confirmation Booking Info with actual booked date & time
+				var dateStr = appointmentDate ? (moment(appointmentDate).format('D MMM YYYY') || appointmentDate) : '—';
+				var timeStr = formatSlotForSummary(slotTime);
+				$('#confirm_date_time').text(timeStr + ', ' + dateStr);
 				var $step = $btn.closest('fieldset');
 				$step.next().fadeIn('slow');
 				$step.css('display', 'none');
@@ -4117,32 +4130,36 @@ if ($('#datetimepickershow').length > 0) {
 
 if($('.viewall-one').length > 0) {
 	$(".viewall-one").hide();
-	$(".viewall-button-one").on("click", function() {
-		 $(this).text($(this).text() === "Less" ? "View More" : "Less");
-		 $(".viewall-one").slideToggle(900);
-	});	  	
 }
+$(document).on("click", ".viewall-button-one", function(e) {
+	e.preventDefault();
+	$(this).text($(this).text() === "Less" ? "View More" : "Less");
+	$(".viewall-one").slideToggle(900);
+});
 if($('.viewall-two').length > 0) {
 	$(".viewall-two").hide();
-	$(".viewall-button-two").on("click", function() {
-		 $(this).text($(this).text() === "Less" ? "View More" : "Less");
-		 $(".viewall-two").slideToggle(900);
-	});	  	
 }
+$(document).on("click", ".viewall-button-two", function(e) {
+	e.preventDefault();
+	$(this).text($(this).text() === "Less" ? "View More" : "Less");
+	$(".viewall-two").slideToggle(900);
+});
 if($('.viewall-3').length > 0) {
 	$(".viewall-3").hide();
-	$(".viewall-button-3").on("click", function() {
-		 $(this).text($(this).text() === "Less" ? "View More" : "Less");
-		 $(".viewall-3").slideToggle(900);
-	});	  	
 }
+$(document).on("click", ".viewall-button-3", function(e) {
+	e.preventDefault();
+	$(this).text($(this).text() === "Less" ? "View More" : "Less");
+	$(".viewall-3").slideToggle(900);
+});
 if($('.viewall-4').length > 0) {
 	$(".viewall-4").hide();
-	$(".viewall-button-4").on("click", function() {
-		 $(this).text($(this).text() === "Less" ? "View More" : "Less");
-		 $(".viewall-4").slideToggle(900);
-	});	  	
 }
+$(document).on("click", ".viewall-button-4", function(e) {
+	e.preventDefault();
+	$(this).text($(this).text() === "Less" ? "View More" : "Less");
+	$(".viewall-4").slideToggle(900);
+});
 
 })(jQuery);
 
