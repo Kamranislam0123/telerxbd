@@ -45,32 +45,25 @@ function format_slot_time_12($t) {
 		<div class="container">
 			<div class="row">
 				<div class="col-lg-10 mx-auto">
+					<?php
+					$booking_steps = [
+						['num' => 1, 'label' => 'Details'],
+						['num' => 2, 'label' => 'Payment'],
+						['num' => 3, 'label' => 'Confirmation'],
+					];
+					?>
 					<div class="booking-wizard">
 						<ul class="form-wizard-steps d-sm-flex align-items-center justify-content-center" id="progressbar2">
-							<li class="progress-active">
+							<?php foreach ($booking_steps as $i => $step): ?>
+							<li class="<?php echo $i === 0 ? 'progress-active' : ''; ?>">
 								<div class="profile-step">
-									<span class="multi-steps">1</span>
+									<span class="multi-steps"><?php echo (int)$step['num']; ?></span>
 									<div class="step-section">
-										<h6>Details</h6>
+										<h6><?php echo htmlspecialchars($step['label']); ?></h6>
 									</div>
 								</div>
 							</li>
-							<li>
-								<div class="profile-step">
-									<span class="multi-steps">5</span>
-									<div class="step-section">
-										<h6>Payment</h6>
-									</div>
-								</div>
-							</li>
-							<li>
-								<div class="profile-step">
-									<span class="multi-steps">6</span>
-									<div class="step-section">
-										<h6>Confirmation</h6>
-									</div>
-								</div>
-							</li>
+							<?php endforeach; ?>
 						</ul>
 					</div>
 					<div class="booking-widget multistep-form mb-5">
@@ -212,7 +205,7 @@ function format_slot_time_12($t) {
 											Back
 										</a>
 										<a href="javascript:void(0);" class="btn btn-md btn-primary-gradient next_btns inline-flex align-items-center rounded-pill">
-											Add Bacic Info
+											Add Basic Info
 											<i class="isax isax-arrow-right-3 ms-1"></i>
 										</a>
 									</div>
@@ -226,14 +219,22 @@ function format_slot_time_12($t) {
 											<div class="card mb-0">
 												<div class="card-body">
 													<div class="d-flex align-items-center flex-wrap rpw-gap-2 mb-4 flex-wrap row-gap-2">
+														<?php if ($doctor): ?>
+														<span class="avatar avatar-xxxl avatar-rounded me-2 flex-shrink-0"><img src="<?php echo htmlspecialchars($doctor['profile_image']); ?>" alt=""></span>
+														<div>
+															<h4 class="mb-1"><?php echo htmlspecialchars($doctor['name']); ?> <span class="badge bg-orange fs-12"><i class="fa-solid fa-star me-1"></i>5.0</span></h4>
+															<p class="text-indigo mb-3 fw-medium"><?php echo htmlspecialchars($doctor['specialty']); ?></p>
+															<p class="mb-0"><i class="isax isax-location me-2"></i><?php echo htmlspecialchars($doctor['location'] ?: '—'); ?></p>
+														</div>
+														<?php else: ?>
 														<span class="avatar avatar-xxxl avatar-rounded me-2 flex-shrink-0"><img src="assets/img/clients/client-15.jpg" alt=""></span>
 														<div>
-															<h4 class="mb-1">Dr. Michael Brown <span class="badge bg-orange fs-12"><i class="fa-solid fa-star me-1"></i>5.0</span></h4>
-															<p class="text-indigo mb-3 fw-medium">Psychologist</p>
-															<p class="mb-0"><i class="isax isax-location me-2"></i>5th Street - 1011 W 5th St, Suite 120, Austin, TX 78703</p>
+															<h4 class="mb-1">Select a doctor</h4>
+															<p class="text-muted mb-0">Complete booking from the first step with a selected doctor.</p>
 														</div>
+														<?php endif; ?>
 													</div>
-													<h6 class="mb-2" style="text-align: center;">Check Your Booking Info</h6>
+													<h6 id="booking-info-heading" class="mb-2" style="text-align: center;">Check Your Booking Info</h6>
 													<div class="row gx-2 gy-3" id="booking-summary">
 														<div class="col-lg-3 col-sm-6">
 															<div>
@@ -366,28 +367,34 @@ function format_slot_time_12($t) {
 										<div class="col-lg-6 d-flex">
 											<div class="card flex-fill mb-0">
 												<div class="card-body">
+													<?php
+													$consultation_fee = $doctor ? (float)($doctor['consultation_fee'] ?? 0) : 0;
+													$tax = 0;
+													$discount = 0;
+													$total_fee = $consultation_fee + $tax - $discount;
+													?>
 													<div>
 														<h6 class="mb-3">Payment Info</h6>
 														<div class="d-flex align-items-center flex-wrap rpw-gap-2 justify-content-between mb-2">
 															<p class="mb-0">Doctor Fee</p>
-															<span class="fw-medium d-block">200/-</span>
+															<span class="fw-medium d-block"><?php echo number_format($consultation_fee, 0); ?>/-</span>
 														</div>
 														<div class="d-flex align-items-center flex-wrap rpw-gap-2 justify-content-between mb-2">
 															<p class="mb-0">Tax</p>
-															<span class="fw-medium d-block">0/-</span>
+															<span class="fw-medium d-block"><?php echo number_format($tax, 0); ?>/-</span>
 														</div>
 														<div class="d-flex align-items-center flex-wrap rpw-gap-2 justify-content-between mb-2">
 															<p class="mb-0">Discount</p>
-															<span class="fw-medium text-danger d-block">-15/-</span>
+															<span class="fw-medium text-danger d-block"><?php echo $discount > 0 ? '-' : ''; ?><?php echo number_format($discount, 0); ?>/-</span>
 														</div>
 													</div>
 													<div class="bg-primary d-flex align-items-center flex-wrap rpw-gap-2 justify-content-between p-3 rounded">
 														<h6 class="text-white">Total</h6>
-														<h6 class="text-white">200/-</h6>
+														<h6 class="text-white"><?php echo number_format($total_fee, 0); ?>/-</h6>
 													</div>
 													<div>
-													<h6 class="mb-3">TeleRx ID (TID)</h6>
-														<input type="text" class="form-control">
+													<h6 class="mb-3 mt-3">TeleRx ID (TID)</h6>
+														<input type="text" class="form-control" name="booking_telerx_id" id="booking_telerx_id" placeholder="Enter health worker's TeleRx ID (optional)">
 													</div>
 												</div>
 											</div>
@@ -422,43 +429,37 @@ function format_slot_time_12($t) {
 														</h5>
 													</div>
 													<div class="card-header d-flex align-items-center flex-wrap rpw-gap-2">
-														<span class="avatar avatar-lg avatar-rounded me-2 flex-shrink-0"><img src="assets/img/clients/client-16.jpg" alt=""></span>
-														<p class="mb-0">Your Booking has been Confirmed with <span class="text-dark">Dr. Michael Brown </span>  be on time before <span class="text-dark">15 Mins </span> From the appointment Time</p>
+														<span class="avatar avatar-lg avatar-rounded me-2 flex-shrink-0"><img src="<?php echo $doctor ? htmlspecialchars($doctor['profile_image']) : 'assets/img/clients/client-16.jpg'; ?>" alt=""></span>
+														<p class="mb-0">Your Booking has been Confirmed with <span class="text-dark"><?php echo $doctor ? htmlspecialchars($doctor['name']) : 'the doctor'; ?></span> — please be on time, at least <span class="text-dark">15 mins</span> before the appointment time.</p>
 													</div>
 													<div class="card-body pb-1">
 														<div class="d-flex align-items-center flex-wrap rpw-gap-2 justify-content-between mb-3">
 															<h6>Booking Info</h6>
-															<a href="javascript:void(0);" class="btn btn-light rounded-pill"><i class="isax isax-calendar me-1"></i>Reschedule</a>
+															<a href="booking.php?doctor_id=<?php echo $doctor ? (int)$doctor['id'] : ''; ?>" class="btn btn-light rounded-pill"><i class="isax isax-calendar me-1"></i>Reschedule</a>
 														</div>
 														<div class="row">
 															<div class="col-md-6">
 																<div class="mb-3">
 																	<label class="form-label">Service</label>
-																	<div class="form-plain-text">Cardiology (30 Mins)</div>
-																</div>
-															</div>
-															<div class="col-md-6">
-																<div class="mb-3">
-																	<label class="form-label">Additional Service</label>
-																	<div class="form-plain-text">Echocardiograms</div>
+																	<div class="form-plain-text" id="confirm_service"><?php echo $doctor ? htmlspecialchars($doctor['specialty'] ?? 'Consultation') : '—'; ?></div>
 																</div>
 															</div>
 															<div class="col-md-6">
 																<div class="mb-3">
 																	<label class="form-label">Date & Time</label>
-																	<div class="form-plain-text">10:00 - 11:00 AM, 15, Oct 2025 </div>
+																	<div class="form-plain-text" id="confirm_date_time">—</div>
 																</div>
 															</div>
 															<div class="col-md-6">
 																<div class="mb-3">
 																	<label class="form-label">Appointment type</label>
-																	<div class="form-plain-text">Clinic </div>
+																	<div class="form-plain-text">Video consultation</div>
 																</div>
 															</div>
 															<div class="col-md-6">
 																<div class="mb-3">
-																	<label class="form-label">Clinic Name & Location</label>
-																	<div class="form-plain-text">Wellness Path <a href="javascript:void(0);" class="text-primary">View Location</a></div>
+																	<label class="form-label">Location</label>
+																	<div class="form-plain-text"><?php echo $doctor ? htmlspecialchars($doctor['location'] ?: 'TeleRx Online') : '—'; ?></div>
 																</div>
 															</div>
 														</div>
@@ -480,7 +481,7 @@ function format_slot_time_12($t) {
 												<div class="card-body d-flex flex-column justify-content-between">
 													<div class="text-center">
 														<h6 class="fs-14 mb-2">Booking Number</h6>
-														<span class="booking-id-badge mb-3">DCRA12565</span>
+														<span class="booking-id-badge mb-3">—</span>
 														<span class="d-block mb-3"><img src="assets/img/icons/payment-qr.svg" alt=""></span>
 														<p>Scan this QR Code to Download the details of Appointment</p>
 													</div>

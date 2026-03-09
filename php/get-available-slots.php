@@ -54,6 +54,17 @@ try {
 
     $slots = rangesToSlotTimes($ranges);
 
+    // For today: exclude slots that are already in the past (e.g. afternoon booking cannot select morning slots)
+    $today = date('Y-m-d');
+    if ($slot_date === $today) {
+        $now = new DateTime();
+        $slots = array_values(array_filter($slots, function ($slot_time) use ($slot_date, $now) {
+            $slot_dt = DateTime::createFromFormat('Y-m-d H:i', $slot_date . ' ' . $slot_time);
+            return $slot_dt && $slot_dt > $now;
+        }));
+        sort($slots);
+    }
+
     // Exclude already booked slots (appointments table)
     $checkApp = $conn->query("SHOW TABLES LIKE 'appointments'");
     if ($checkApp && $checkApp->num_rows > 0) {

@@ -136,5 +136,10 @@
     <!-- Circle Progress JS -->
     <script src="assets/js/circle-progress.min.js"></script>
 
+    <?php if (isset($current_page) && $current_page === 'doctors.php'): ?>
+    <!-- Doctors page: Specialities filter (runs after jQuery) -->
+    <script src="assets/js/doctors-filter.js"></script>
+    <?php endif; ?>
+
 </body>
 </html>

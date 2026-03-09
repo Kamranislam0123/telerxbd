@@ -1,5 +1,6 @@
 <?php
-session_start();
+// Use config so session cookie path is '/' and works for dashboard after login
+require_once __DIR__ . '/php/config.php';
 include 'header.php';?>
 
 <head>

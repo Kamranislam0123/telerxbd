@@ -202,6 +202,9 @@ try {
             break;
     }
     
+    // Regenerate session id so cookie is sent with correct path (fixes dashboard redirect after login)
+    session_regenerate_id(true);
+    
     // Set session cookie expiration (30 days if remember me, 1 day otherwise)
     $cookie_lifetime = $remember_me ? (60 * 60 * 24 * 30) : (60 * 60 * 24);
     $params = session_get_cookie_params();

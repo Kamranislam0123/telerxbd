@@ -122,7 +122,28 @@ try {
         .specialities-scroll::-webkit-scrollbar-thumb:hover {
             background: #15558d;
         }
-        
+
+        /* Doctor profile card image: 612x391 - fill box, focus on center so crop is even */
+        .doctor-profile-card-img {
+            width: 100%;
+            aspect-ratio: 612 / 391;
+            overflow: hidden;
+            border-radius: 10px 10px 0 0;
+            background: #f0f0f0;
+        }
+        .doctor-profile-card-img img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            object-position: center center;
+            display: block;
+            vertical-align: middle;
+        }
+
+        /* Load more: hide items until revealed */
+        .doctor-grid-item.load-more-hidden {
+            display: none !important;
+        }
     </style>
 
     <!-- Breadcrumb -->
@@ -201,11 +222,8 @@ try {
                                         <div class="specialities-scroll">
                                             <?php
                                             if (!empty($final_specialities)):
-                                                $speciality_index = 2; // Starting from checkebox-sm2
-                                                
+                                                $speciality_index = 2;
                                                 arsort($final_specialities);
-                                                
-                                                // Display all specialities
                                                 foreach ($final_specialities as $speciality => $count):
                                                     $checkbox_id = 'checkebox-sm' . $speciality_index;
                                             ?>
@@ -221,9 +239,8 @@ try {
                                                 </div>
                                                 <span class="filter-badge"><?php echo $count; ?></span>
                                             </div>
+                                            <?php $speciality_index++; endforeach; ?>
                                             <?php
-                                                    $speciality_index++;
-                                                endforeach;
                                             else:
                                             ?>
                                             <div class="d-flex align-items-center justify-content-between mb-2">
@@ -238,9 +255,6 @@ try {
                                             <?php endif; ?>
                                         </div>
                                     </div>
-                                        <div class="view-all">
-                                            <a href="javascript:void(0);" class="viewall-button-two text-secondary text-decoration-underline">View More</a>
-                                        </div>
                                 </div>
                             </div>
                             <div class="accordion-item border-bottom">
@@ -450,36 +464,28 @@ try {
                             </div>
                         </div>
                     </div>
+                    <?php if (false): /* LIST DESIGN - commented out, use grid below */ ?>
                     <div class="row">
                         <div class="col-lg-12">
                             <?php if (empty($doctors)): ?>
-                                <div class="text-center">
-                                    <p>No doctors found.</p>
-                                </div>
+                                <div class="text-center"><p>No doctors found.</p></div>
                             <?php else: ?>
                                 <?php foreach ($doctors as $doctor): ?>
-                                    <div class="card doctor-list-card" 
-                                        data-speciality="<?php echo htmlspecialchars($doctor['specialty'] ?? 'General Physician'); ?>">
+                                    <div class="card doctor-list-card" data-speciality="<?php echo htmlspecialchars($doctor['specialty'] ?? 'General Physician'); ?>">
                                         <div class="d-md-flex align-items-center">
                                             <div class="card-img card-img-hover">
                                                 <a href="doctor-profile.php?id=<?php echo $doctor['id']; ?>">
                                                     <img src="<?php echo $doctor['profile_image'] ?? 'assets/img/doctors/default-doctor.jpg'; ?>" alt="<?php echo htmlspecialchars($doctor['name']); ?>">
                                                 </a>
                                                 <div class="grid-overlay-item d-flex align-items-center justify-content-between">
-                                                    <span class="badge bg-orange">
-                                                        <i class="fa-solid fa-star me-1"></i>
-                                                        <?php echo number_format($doctor['average_rating'] ?? 0, 1); ?>
-                                                    </span>
+                                                    <span class="badge bg-orange"><i class="fa-solid fa-star me-1"></i><?php echo number_format($doctor['average_rating'] ?? 0, 1); ?></span>
                                                 </div>
                                             </div>
                                             <div class="card-body p-0">
                                                 <div class="d-flex align-items-center justify-content-between border-bottom p-3">
-                                                    <a href="#" class="text-teal fw-medium fs-14">
-                                                        <?php echo htmlspecialchars($doctor['specialty'] ?? 'General Physician'); ?>
-                                                    </a>
+                                                    <a href="#" class="text-teal fw-medium fs-14"><?php echo htmlspecialchars($doctor['specialty'] ?? 'General Physician'); ?></a>
                                                     <span class="badge <?php echo ($doctor['is_available'] ?? false) ? 'bg-success-light' : 'bg-danger-light'; ?> d-inline-flex align-items-center">
-                                                        <i class="fa-solid fa-circle fs-5 me-1"></i>
-                                                        <?php echo ($doctor['is_available'] ?? false) ? 'Available' : 'Unavailable'; ?>
+                                                        <i class="fa-solid fa-circle fs-5 me-1"></i><?php echo ($doctor['is_available'] ?? false) ? 'Available' : 'Unavailable'; ?>
                                                     </span>
                                                 </div>
                                                 <div class="p-3">
@@ -488,48 +494,18 @@ try {
                                                             <div class="col-sm-6">
                                                                 <div>
                                                                     <h6 class="d-flex align-items-center mb-1">
-                                                                        <a href="doctor-profile.php?id=<?php echo $doctor['id']; ?>">
-                                                                            Dr. <?php echo htmlspecialchars($doctor['name']); ?>
-                                                                        </a>
+                                                                        <a href="doctor-profile.php?id=<?php echo $doctor['id']; ?>">Dr. <?php echo htmlspecialchars($doctor['name']); ?></a>
                                                                         <i class="isax isax-tick-circle5 text-success ms-2"></i>
                                                                     </h6>
-                                                                    <p class="mb-2">
-                                                                        <?php
-                                                                        // Display multiple specialities
-                                                                        $speciality_display = $doctor['specialty'] ?? 'Medical Doctor';
-                                                                        if (!empty($speciality_display)) {
-                                                                            $specialities_array = array_map('trim', explode(',', $speciality_display));
-                                                                            echo htmlspecialchars(implode(', ', $specialities_array));
-                                                                        } else {
-                                                                            echo 'Medical Doctor';
-                                                                        }
-                                                                        ?>
-                                                                    </p>
-                                                                    <p class="d-flex align-items-center mb-0 fs-14">
-                                                                        <i class="isax isax-location me-2"></i>
-                                                                        <?php
-                                                                        $location_parts = array_filter([$doctor['district'] ?? '', $doctor['city'] ?? '', $doctor['state'] ?? '']);
-                                                                        $location_display = !empty($location_parts) ? implode(', ', $location_parts) : 'Dhaka, Bangladesh';
-                                                                        echo htmlspecialchars($location_display);
-                                                                        ?>
-                                                                    </p>
+                                                                    <p class="mb-2"><?php $speciality_display = $doctor['specialty'] ?? 'Medical Doctor'; echo htmlspecialchars(!empty($speciality_display) ? implode(', ', array_map('trim', explode(',', $speciality_display))) : 'Medical Doctor'); ?></p>
+                                                                    <p class="d-flex align-items-center mb-0 fs-14"><i class="isax isax-location me-2"></i><?php $location_parts = array_filter([$doctor['district'] ?? '', $doctor['city'] ?? '', $doctor['state'] ?? '']); echo htmlspecialchars(!empty($location_parts) ? implode(', ', $location_parts) : 'Dhaka, Bangladesh'); ?></p>
                                                                 </div>
                                                             </div>
                                                             <div class="col-sm-6">
                                                                 <div>
-                                                                    <p class="d-flex align-items-center mb-0 fs-14 mb-2">
-                                                                        <i class="isax isax-archive-14 text-dark me-2"></i>
-                                                                        <?php echo $doctor['experience_years'] ?? 5; ?> Years of Experience
-                                                                    </p>
-                                                                    <p class="d-flex align-items-center mb-0 fs-14 mb-2">
-                                                                        <i class="isax isax-like-1 text-dark me-2"></i>
-                                                                        <?php echo number_format($doctor['average_rating'] ?? 0, 1); ?>%
-                                                                        (<?php echo $doctor['total_reviews'] ?? 0; ?> Votes)
-                                                                    </p>
-                                                                    <p class="d-flex align-items-center mb-0 fs-14 mb-2">
-                                                                        <i class="isax isax-language-circle text-dark me-2"></i>
-                                                                        <?php echo htmlspecialchars($doctor['languages_spoken'] ?? 'English, Bengali'); ?>
-                                                                    </p>
+                                                                    <p class="d-flex align-items-center mb-0 fs-14 mb-2"><i class="isax isax-archive-14 text-dark me-2"></i><?php echo $doctor['experience_years'] ?? 5; ?> Years of Experience</p>
+                                                                    <p class="d-flex align-items-center mb-0 fs-14 mb-2"><i class="isax isax-like-1 text-dark me-2"></i><?php echo number_format($doctor['average_rating'] ?? 0, 1); ?>% (<?php echo $doctor['total_reviews'] ?? 0; ?> Votes)</p>
+                                                                    <p class="d-flex align-items-center mb-0 fs-14 mb-2"><i class="isax isax-language-circle text-dark me-2"></i><?php echo htmlspecialchars($doctor['languages_spoken'] ?? 'English, Bengali'); ?></p>
                                                                 </div>
                                                             </div>
                                                         </div>
@@ -537,14 +513,9 @@ try {
                                                     <div class="d-flex align-items-center justify-content-between">
                                                         <div>
                                                             <p class="mb-1">Consultation Fees</p>
-                                                            <h4 class="text-orange">
-                                                                $<?php echo number_format($doctor['consultation_fee'] ?? 100, 0); ?>
-                                                            </h4>
+                                                            <h4 class="text-orange">$<?php echo number_format($doctor['consultation_fee'] ?? 100, 0); ?></h4>
                                                         </div>
-                                                        <a href="booking.php?doctor_id=<?php echo $doctor['id']; ?>" class="btn btn-md btn-dark d-inline-flex align-items-center rounded-pill">
-                                                            <i class="isax isax-calendar-1 me-2"></i>
-                                                            Book Now
-                                                        </a>
+                                                        <a href="booking.php?doctor_id=<?php echo $doctor['id']; ?>" class="btn btn-md btn-dark d-inline-flex align-items-center rounded-pill"><i class="isax isax-calendar-1 me-2"></i>Book Now</a>
                                                     </div>
                                                 </div>
                                             </div>
@@ -554,273 +525,111 @@ try {
                             <?php endif; ?>
                         </div>
                     </div>
-                    <div class="row">
-							<div class="col-xxl-4 col-md-6">
-								<div class="card">
-									<div class="card-img card-img-hover">
-										<a href="doctor-profile.html"><img src="assets/img/doctor-grid/doctor-grid-01.jpg" alt=""></a>
-										<div class="grid-overlay-item d-flex align-items-center justify-content-between">
-											<span class="badge bg-orange"><i class="fa-solid fa-star me-1"></i>5.0</span>
-											<a href="javascript:void(0)" class="fav-icon">
-												<i class="fa fa-heart"></i>
-											</a>
-										</div>
-									</div>
-									<div class="card-body p-0">
-										<div class="d-flex active-bar align-items-center justify-content-between p-3">
-											<a href="#" class="text-indigo fw-medium fs-14">Psychologist</a>
-											<span class="badge bg-success-light d-inline-flex align-items-center">
-												<i class="fa-solid fa-circle fs-5 me-1"></i>
-												Available
-											</span>
-										</div>
-										<div class="p-3 pt-0">
-											<div class="doctor-info-detail mb-3 pb-3">
-												<h3 class="mb-1"><a href="doctor-profile.html">Dr. Michael Brown</a></h3>
-												<div class="d-flex align-items-center">
-													<p class="d-flex align-items-center mb-0 fs-14"><i class="isax isax-location me-2"></i>Minneapolis, MN</p>
-													<i class="fa-solid fa-circle fs-5 text-primary mx-2 me-1"></i>
-													<span class="fs-14 fw-medium">30 Min</span>
-												</div>
-											</div>
-											<div class="d-flex align-items-center justify-content-between">
-												<div>
-													<p class="mb-1">Consultation Fees</p>
-													<h3 class="text-orange">$650</h3>
-												</div>
-												<a href="booking.html" class="btn btn-md btn-dark d-inline-flex align-items-center rounded-pill">
-													<i class="isax isax-calendar-1 me-2"></i>
-													Book Now
-												</a>
-											</div>
-										</div>
-									</div>
-								</div>
-							</div>
-							<div class="col-xxl-4 col-md-6">
-								<div class="card">
-									<div class="card-img card-img-hover">
-										<a href="doctor-profile.html"><img src="assets/img/doctor-grid/doctor-grid-02.jpg" alt=""></a>
-										<div class="grid-overlay-item d-flex align-items-center justify-content-between">
-											<span class="badge bg-orange"><i class="fa-solid fa-star me-1"></i>4.6</span>
-											<a href="javascript:void(0)" class="fav-icon">
-												<i class="fa fa-heart"></i>
-											</a>
-										</div>
-									</div>
-									<div class="card-body p-0">
-										<div class="d-flex active-bar active-bar-pink align-items-center justify-content-between p-3">
-											<a href="#" class="text-pink fw-medium fs-14">Pediatrician</a>
-											<span class="badge bg-success-light d-inline-flex align-items-center">
-												<i class="fa-solid fa-circle fs-5 me-1"></i>
-												Available
-											</span>
-										</div>
-										<div class="p-3 pt-0">
-											<div class="doctor-info-detail mb-3 pb-3">
-												<h3 class="mb-1"><a href="doctor-profile.html">Dr. Nicholas Tello</a></h3>
-												<div class="d-flex align-items-center">
-													<p class="d-flex align-items-center mb-0 fs-14"><i class="isax isax-location me-2"></i>Ogden, IA</p>
-													<i class="fa-solid fa-circle fs-5 text-primary mx-2 me-1"></i>
-													<span class="fs-14 fw-medium">60 Min</span>
-												</div>
-											</div>
-											<div class="d-flex align-items-center justify-content-between">
-												<div>
-													<p class="mb-1">Consultation Fees</p>
-													<h3 class="text-orange">$400</h3>
-												</div>
-												<a href="booking.html" class="btn btn-md btn-dark d-inline-flex align-items-center rounded-pill">
-													<i class="isax isax-calendar-1 me-2"></i>
-													Book Now
-												</a>
-											</div>
-										</div>
-									</div>
-								</div>
-							</div>
-							<div class="col-xxl-4 col-md-6">
-								<div class="card">
-									<div class="card-img card-img-hover">
-										<a href="doctor-profile.html"><img src="assets/img/doctor-grid/doctor-grid-03.jpg" alt=""></a>
-										<div class="grid-overlay-item d-flex align-items-center justify-content-between">
-											<span class="badge bg-orange"><i class="fa-solid fa-star me-1"></i>4.8</span>
-											<a href="javascript:void(0)" class="fav-icon">
-												<i class="fa fa-heart"></i>
-											</a>
-										</div>
-									</div>
-									<div class="card-body p-0">
-										<div class="d-flex active-bar active-bar-teal align-items-center justify-content-between p-3">
-											<a href="#" class="text-teal fw-medium fs-14">Neurologist</a>
-											<span class="badge bg-success-light d-inline-flex align-items-center">
-												<i class="fa-solid fa-circle fs-5 me-1"></i>
-												Available
-											</span>
-										</div>
-										<div class="p-3 pt-0">
-											<div class="doctor-info-detail mb-3 pb-3">
-												<h3 class="mb-1"><a href="doctor-profile.html">Dr. Harold Bryant</a></h3>
-												<div class="d-flex align-items-center">
-													<p class="d-flex align-items-center mb-0 fs-14"><i class="isax isax-location me-2"></i>Winona, MS</p>
-													<i class="fa-solid fa-circle fs-5 text-primary mx-2 me-1"></i>
-													<span class="fs-14 fw-medium">30 Min</span>
-												</div>
-											</div>
-											<div class="d-flex align-items-center justify-content-between">
-												<div>
-													<p class="mb-1">Consultation Fees</p>
-													<h3 class="text-orange">$500</h3>
-												</div>
-												<a href="booking.html" class="btn btn-md btn-dark d-inline-flex align-items-center rounded-pill">
-													<i class="isax isax-calendar-1 me-2"></i>
-													Book Now
-												</a>
-											</div>
-										</div>
-									</div>
-								</div>
-							</div>
-							<div class="col-md-12">
-								<div class="text-center mb-4">
-									<a href="login.html" class="btn btn-md btn-primary-gradient d-inline-flex align-items-center rounded-pill">
-										<i class="isax isax-d-cube-scan5 me-2"></i>
-										Load More 425 Doctors
-									</a>
-								</div>
-							</div>
-						</div>
+                    <?php endif; ?>
+
+                    <!-- Dynamic grid: col-xxl-4 col-md-6 per doctor -->
+                    <div class="row" id="doctors-grid-row">
+                        <?php if (empty($doctors)): ?>
+                            <div class="col-12">
+                                <div class="text-center py-5">
+                                    <p class="mb-0">No doctors found.</p>
+                                </div>
+                            </div>
+                        <?php else:
+                            $load_more_initial = 6;
+                            $doctor_index = 0;
+                            foreach ($doctors as $doctor):
+                                $hidden_class = ($doctor_index >= $load_more_initial) ? ' load-more-hidden' : '';
+                                $doctor_index++;
+                        ?>
+                                <div class="col-xxl-4 col-md-6 doctor-grid-item<?php echo $hidden_class; ?>" data-speciality="<?php echo htmlspecialchars($doctor['specialty'] ?? 'General Physician'); ?>">
+                                    <div class="card">
+                                        <div class="card-img card-img-hover doctor-profile-card-img">
+                                            <a href="doctor-profile.php?id=<?php echo $doctor['id']; ?>">
+                                                <img src="<?php echo htmlspecialchars($doctor['profile_image'] ?? 'assets/img/doctors/default-doctor.jpg'); ?>" alt="<?php echo htmlspecialchars($doctor['name']); ?>">
+                                            </a>
+                                            <div class="grid-overlay-item d-flex align-items-center justify-content-between">
+                                                <span class="badge bg-orange"><i class="fa-solid fa-star me-1"></i><?php echo number_format($doctor['average_rating'] ?? 0, 1); ?></span>
+                                                <a href="javascript:void(0)" class="fav-icon"><i class="fa fa-heart"></i></a>
+                                            </div>
+                                        </div>
+                                        <div class="card-body p-0">
+                                            <div class="d-flex active-bar align-items-center justify-content-between p-3">
+                                                <a href="doctor-profile.php?id=<?php echo $doctor['id']; ?>" class="text-indigo fw-medium fs-14"><?php echo htmlspecialchars($doctor['specialty'] ?? 'General Physician'); ?></a>
+                                                <span class="badge <?php echo ($doctor['is_available'] ?? false) ? 'bg-success-light' : 'bg-danger-light'; ?> d-inline-flex align-items-center">
+                                                    <i class="fa-solid fa-circle fs-5 me-1"></i>
+                                                    <?php echo ($doctor['is_available'] ?? false) ? 'Available' : 'Unavailable'; ?>
+                                                </span>
+                                            </div>
+                                            <div class="p-3 pt-0">
+                                                <div class="doctor-info-detail mb-3 pb-3">
+                                                    <h3 class="mb-1"><a href="doctor-profile.php?id=<?php echo $doctor['id']; ?>">Dr. <?php echo htmlspecialchars($doctor['name']); ?></a></h3>
+                                                    <div class="d-flex align-items-center">
+                                                        <?php
+                                                        $location_parts = array_filter([$doctor['district'] ?? '', $doctor['city'] ?? '', $doctor['state'] ?? '']);
+                                                        $location_display = !empty($location_parts) ? implode(', ', $location_parts) : 'Dhaka, Bangladesh';
+                                                        ?>
+                                                        <p class="d-flex align-items-center mb-0 fs-14"><i class="isax isax-location me-2"></i><?php echo htmlspecialchars($location_display); ?></p>
+                                                        <i class="fa-solid fa-circle fs-5 text-primary mx-2 me-1"></i>
+                                                        <span class="fs-14 fw-medium">30 Min</span>
+                                                    </div>
+                                                </div>
+                                                <div class="d-flex align-items-center justify-content-between">
+                                                    <div>
+                                                        <p class="mb-1">Consultation Fees</p>
+                                                        <h3 class="text-orange">$<?php echo number_format($doctor['consultation_fee'] ?? 100, 0); ?></h3>
+                                                    </div>
+                                                    <a href="booking.php?doctor_id=<?php echo $doctor['id']; ?>" class="btn btn-md btn-dark d-inline-flex align-items-center rounded-pill">
+                                                        <i class="isax isax-calendar-1 me-2"></i>
+                                                        Book Now
+                                                    </a>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            <?php endforeach; ?>
+                            <?php if (count($doctors) > $load_more_initial): ?>
+                            <div class="col-12">
+                                <div class="text-center mt-4 mb-4" id="load-more-doctors-wrap">
+                                    <a href="javascript:void(0);" class="btn btn-md btn-primary-gradient d-inline-flex align-items-center rounded-pill load-more-doctors-btn">
+                                        <i class="isax isax-d-cube-scan5 me-2"></i>
+                                        Load More Doctors
+                                    </a>
+                                </div>
+                            </div>
+                            <?php endif; ?>
+                        <?php endif; ?>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 
+    <script>
+    (function() {
+        var loadMoreBtn = document.querySelector('.load-more-doctors-btn');
+        if (!loadMoreBtn) return;
+        var perPage = 15;
+        loadMoreBtn.addEventListener('click', function() {
+            var hidden = document.querySelectorAll('.doctor-grid-item.load-more-hidden');
+            var toShow = Math.min(perPage, hidden.length);
+            for (var i = 0; i < toShow; i++) {
+                hidden[i].classList.remove('load-more-hidden');
+            }
+            if (document.querySelectorAll('.doctor-grid-item.load-more-hidden').length === 0) {
+                document.getElementById('load-more-doctors-wrap').style.display = 'none';
+            }
+            var visibleCount = document.querySelectorAll('.doctor-grid-item:not(.load-more-hidden)').length;
+            var countEl = document.getElementById('doctor-count');
+            if (countEl) countEl.textContent = visibleCount;
+        });
+    })();
+    </script>
+
     <!-- Rangeslider JS -->
     <script src="assets/plugins/ion-rangeslider/js/ion.rangeSlider.js"></script>
     <script src="assets/plugins/ion-rangeslider/js/custom-rangeslider.js"></script>
     <script src="assets/plugins/ion-rangeslider/js/ion.rangeSlider.min.js"></script>
-    
-    <!-- Speciality Filter Script -->
-    <script>
-    $(document).ready(function() {
-        console.log('✅ Filter script initialized');
-        console.log('📊 Total doctors found:', $('.doctor-list-card').length);
-        console.log('🔍 Total speciality filters found:', $('.speciality-filter').length);
-        
-        // Function to filter doctors by speciality
-        function filterDoctorsBySpeciality() {
-            var selectedSpecialities = [];
-            
-            // Get all checked speciality checkboxes
-            $('.speciality-filter:checked').each(function() {
-                var speciality = $(this).val().trim();
-                if (speciality !== '') {
-                    selectedSpecialities.push(speciality);
-                }
-            });
-            
-            console.log('✅ Selected specialities:', selectedSpecialities);
-            
-            // If no specialities are selected, show all doctors
-            if (selectedSpecialities.length === 0) {
-                $('.doctor-list-card').fadeIn(300);
-                updateDoctorCount();
-                return;
-            }
-            
-            // Filter doctors based on selected specialities
-            $('.doctor-list-card').each(function() {
-                var doctorSpecialityStr = $(this).data('speciality') || '';
-                doctorSpecialityStr = doctorSpecialityStr.trim();
-                
-                if (doctorSpecialityStr === '' || doctorSpecialityStr === 'null') {
-                    doctorSpecialityStr = 'General Physician';
-                }
-                
-                // Split doctor's specialties (e.g. "Cardiologist, Dermatologist" -> ["Cardiologist", "Dermatologist"])
-                var doctorSpecialities = doctorSpecialityStr.split(',').map(function(s) { 
-                    return s.trim(); 
-                }).filter(function(s) { 
-                    return s !== ''; 
-                });
-                
-                if (doctorSpecialities.length === 0) {
-                    doctorSpecialities = ['General Physician'];
-                }
-                
-                console.log('Doctor specialities:', doctorSpecialities, 'Selected:', selectedSpecialities);
-                
-                // Check if any selected speciality matches doctor's specialties
-                var matches = false;
-                for (var i = 0; i < selectedSpecialities.length; i++) {
-                    for (var j = 0; j < doctorSpecialities.length; j++) {
-                        if (doctorSpecialities[j].toLowerCase().trim() === selectedSpecialities[i].toLowerCase().trim()) {
-                            matches = true;
-                            break;
-                        }
-                    }
-                    if (matches) break;
-                }
-                
-                // Show or hide based on match
-                if (matches) {
-                    $(this).fadeIn(300);
-                } else {
-                    $(this).fadeOut(300);
-                }
-            });
-            
-            updateDoctorCount();
-        }
-        
-        // Function to update the doctor count
-        function updateDoctorCount() {
-            var visibleCount = $('.doctor-list-card:visible').length;
-            $('#doctor-count').text(visibleCount);
-            
-            // Show message if no doctors match the filter
-            if (visibleCount === 0) {
-                if ($('.no-doctors-message').length === 0) {
-                    $('.col-lg-12').append(
-                        '<div class="text-center no-doctors-message mt-4">' +
-                        '<p class="text-muted">No doctors found matching the selected specialities.</p>' +
-                        '</div>'
-                    );
-                }
-            } else {
-                $('.no-doctors-message').remove();
-            }
-        }
-        
-        // Handle speciality checkbox changes
-        $(document).on('change', '.speciality-filter', function() {
-            console.log('🔄 Checkbox changed:', $(this).val(), 'Checked:', $(this).is(':checked'));
-            filterDoctorsBySpeciality();
-        });
-        
-        // Handle "Clear All" link
-        $(document).on('click', '.clear-all-filters', function(e) {
-            e.preventDefault();
-            console.log('🧹 Clear All clicked');
-            
-            // Uncheck all speciality filters
-            $('.speciality-filter').prop('checked', false);
-            
-            // Show all doctors
-            $('.doctor-list-card').fadeIn(300);
-            
-            // Update count
-            updateDoctorCount();
-        });
-        
-        // Initialize - show all doctors by default
-        updateDoctorCount();
-        
-        // Log all doctor specialities for debugging
-        $('.doctor-list-card').each(function(index) {
-            console.log(`👨‍⚕️ Doctor ${index + 1} data-speciality:`, $(this).data('speciality'));
-        });
-    });
-    </script>
 
 <?php include 'footer.php'; ?>
