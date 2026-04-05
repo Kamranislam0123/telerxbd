@@ -46,3 +46,9 @@
 [05-Mar-2026 11:21:55 Asia/Dhaka] Profile image upload errors for doctor 9: Upload error: 4
 [05-Mar-2026 11:22:07 Asia/Dhaka] Profile image upload errors for doctor 9: Upload error: 4
 [07-Mar-2026 15:09:23 Asia/Dhaka] Profile image upload errors for doctor 10: Upload error: 4
+[21-Mar-2026 20:40:42 Asia/Dhaka] PHP Warning:  Cannot modify header information - headers already sent by (output started at /home/telerxb2/public_html/php/config.php:142) in /home/telerxb2/public_html/php/logout.php on line 47
+[21-Mar-2026 20:40:42 Asia/Dhaka] PHP Warning:  Cannot modify header information - headers already sent by (output started at /home/telerxb2/public_html/php/config.php:142) in /home/telerxb2/public_html/php/logout.php on line 54
+[04-Apr-2026 10:31:08 Asia/Dhaka] PHP Warning:  Cannot modify header information - headers already sent by (output started at /home/telerxb2/public_html/php/config.php:142) in /home/telerxb2/public_html/php/logout.php on line 47
+[04-Apr-2026 10:31:08 Asia/Dhaka] PHP Warning:  Cannot modify header information - headers already sent by (output started at /home/telerxb2/public_html/php/config.php:142) in /home/telerxb2/public_html/php/logout.php on line 54
+[04-Apr-2026 10:50:12 Asia/Dhaka] PHP Warning:  Cannot modify header information - headers already sent by (output started at /home/telerxb2/public_html/php/config.php:142) in /home/telerxb2/public_html/php/logout.php on line 47
+[04-Apr-2026 10:50:12 Asia/Dhaka] PHP Warning:  Cannot modify header information - headers already sent by (output started at /home/telerxb2/public_html/php/config.php:142) in /home/telerxb2/public_html/php/logout.php on line 54
