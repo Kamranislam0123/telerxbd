@@ -4199,6 +4199,8 @@ kbd {
   background: rgba(17, 14, 253, 0.1);
   color: #110EFD;
 }
+
+/* three-dot menu removed */
 .badge.badge-outline-info {
   border: 1px solid #110EFD;
   color: #110EFD;
@@ -60592,6 +60594,127 @@ ul li {
 }
 .header-margin {
     margin-top: 60px;
+}
+
+/* Contact + ⋮: Contact is direct <li><a> so header-one padding/line-height match Home, About, etc. */
+/* Desktop: inline-block + vertical-align (flex on <li> was shifting the row vs sibling block-only <li>s) */
+@media (min-width: 992px) {
+  .header .header-nav .main-nav > li.nav-item-contact-more {
+    display: block !important;
+    position: relative;
+    white-space: nowrap;
+  }
+  .header .header-nav .main-nav > li.nav-item-contact-more > a[href*="contact"] {
+    display: inline-block !important;
+    vertical-align: middle;
+    margin-right: 2px;
+  }
+  .header .header-nav .main-nav > li.nav-item-contact-more .nav-more-hover {
+    display: inline-block;
+    vertical-align: middle;
+    line-height: 0;
+  }
+  .header .header-nav .main-nav > li.nav-item-contact-more .nav-more-ellipsis {
+    vertical-align: middle;
+  }
+}
+@media (max-width: 991.98px) {
+  .header .header-nav .main-nav > li.nav-item-contact-more {
+    display: flex !important;
+    flex-flow: row nowrap;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 4px;
+  }
+  .header .header-nav .main-nav > li.nav-item-contact-more > a[href*="contact"] {
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+  .header .header-nav .main-nav > li.nav-item-contact-more .nav-more-hover {
+    display: inline-flex;
+    align-items: center;
+    flex-shrink: 0;
+    line-height: 0;
+    padding-right: 12px;
+  }
+  .header .header-nav .main-nav > li.nav-item-contact-more .nav-more-ellipsis {
+    color: #ff6b6b;
+    padding: 8px 10px;
+  }
+}
+.header .header-nav .main-nav .nav-more-ellipsis {
+  display: inline-flex !important;
+  align-items: center;
+  justify-content: center;
+  min-width: 28px;
+  min-height: 28px;
+  line-height: 1;
+  color: #dc3545;
+  text-decoration: none;
+  opacity: 0.88;
+  border-radius: 6px;
+  transition: color 0.2s ease, opacity 0.2s ease, background-color 0.2s ease;
+}
+@media (min-width: 992px) {
+  .header-one .main-menu-wrapper .main-nav > li.nav-item-contact-more .nav-more-ellipsis {
+    color: #dc3545;
+  }
+}
+.header .header-nav .main-nav .nav-more-ellipsis:hover,
+.header .header-nav .main-nav .nav-more-ellipsis:focus {
+  opacity: 1;
+  color: #b02a37;
+  outline: none;
+}
+/* Global Care link: override broad .main-nav li a rules from header-one */
+.header-one .main-menu-wrapper .main-nav .nav-more-dropdown a.dropdown-item {
+  display: block;
+  line-height: 1.5;
+  padding: 0.5rem 1rem;
+  font-size: 14px;
+  font-weight: 500;
+  color: #2d3b48;
+}
+.header .header-nav .main-nav .nav-more-dropdown .dropdown-item:hover,
+.header .header-nav .main-nav .nav-more-dropdown .dropdown-item:focus {
+  color: #09dca4;
+}
+@media (min-width: 992px) {
+  .header .header-nav .main-nav .nav-more-hover .dropdown-menu.nav-more-dropdown {
+    display: none;
+    margin-top: 0;
+    padding: 6px 0;
+    min-width: 11rem;
+    border: 1px solid #e8e8e8;
+    box-shadow: 0 8px 24px rgba(45, 59, 72, 0.12);
+    z-index: 1050;
+  }
+  .header .header-nav .main-nav .nav-more-hover:hover .dropdown-menu.nav-more-dropdown,
+  .header .header-nav .main-nav .nav-more-hover:focus-within .dropdown-menu.nav-more-dropdown {
+    display: block;
+  }
+}
+@media (max-width: 991.98px) {
+  .header .header-nav .main-nav .nav-more-hover .dropdown-menu.nav-more-dropdown {
+    position: static !important;
+    transform: none !important;
+    flex: 1 1 100%;
+    margin-top: 10px;
+    margin-bottom: 0;
+    width: 100%;
+    border: 0;
+    box-shadow: none;
+    background: rgba(0, 0, 0, 0.15);
+  }
+  .header .header-nav .main-nav .nav-more-hover .dropdown-menu.nav-more-dropdown .dropdown-item {
+    color: #ffffff;
+    padding-left: 28px;
+  }
+  .header .header-nav .main-nav .nav-more-hover .dropdown-menu.nav-more-dropdown .dropdown-item:hover,
+  .header .header-nav .main-nav .nav-more-hover .dropdown-menu.nav-more-dropdown .dropdown-item:focus {
+    background: rgba(255, 255, 255, 0.08);
+    color: #09dca4;
+  }
 }
 
 /*# sourceMappingURL=custom.css.map */

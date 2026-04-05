@@ -25,9 +25,32 @@ if (!$profile_doctor_id) {
 try {
     $conn = getDBConnection();
 
-    // Fetch doctor basic information
+    // Fetch doctor + profile (explicit columns — matches profile settings / doctors list)
     $stmt = $conn->prepare("
-        SELECT d.*, dp.*
+        SELECT
+            d.id,
+            d.name,
+            d.email,
+            d.phone,
+            d.bmdc_no,
+            d.created_at,
+            dp.bio,
+            dp.specialty,
+            dp.languages_spoken,
+            dp.consultation_fee,
+            dp.experience_years,
+            dp.total_appointments,
+            dp.total_reviews,
+            dp.average_rating,
+            dp.is_available,
+            dp.address,
+            dp.city,
+            dp.state,
+            dp.zip_code,
+            dp.district,
+            dp.present_address,
+            dp.profile_image,
+            dp.gender
         FROM doctors d
         LEFT JOIN doctor_profiles dp ON d.id = dp.doctor_id
         WHERE d.id = ?
@@ -53,10 +76,31 @@ try {
     $doctor['total_reviews'] = $doctor['total_reviews'] ?? 0;
     $doctor['average_rating'] = $doctor['average_rating'] ?? 0.00;
     $doctor['is_available'] = $doctor['is_available'] ?? true;
-    $doctor['address'] = $doctor['address'] ?? 'Dhaka, Bangladesh';
-    $doctor['city'] = $doctor['city'] ?? 'Dhaka';
-    $doctor['state'] = $doctor['state'] ?? 'Dhaka';
     $doctor['profile_image'] = $doctor['profile_image'] ?? 'assets/img/doctors/doc-profile-02.jpg';
+
+    // Location from DB only (present_address is what doctor-profile-settings saves)
+    $present = trim((string) ($doctor['present_address'] ?? ''));
+    $addr = trim((string) ($doctor['address'] ?? ''));
+    $district = trim((string) ($doctor['district'] ?? ''));
+    $city = trim((string) ($doctor['city'] ?? ''));
+    $state = trim((string) ($doctor['state'] ?? ''));
+    $zip = trim((string) ($doctor['zip_code'] ?? ''));
+    if ($present !== '') {
+        $doctor_location_display = $present;
+        foreach ([$district, $city, $state, $zip] as $seg) {
+            if ($seg !== '' && stripos($doctor_location_display, $seg) === false) {
+                $doctor_location_display .= ', ' . $seg;
+            }
+        }
+    } else {
+        $segs = array_unique(array_filter([$addr, $district, $city, $state, $zip], function ($s) {
+            return $s !== '';
+        }));
+        $doctor_location_display = implode(', ', $segs);
+    }
+    $doctor_location_maps_url = $doctor_location_display !== ''
+        ? 'https://www.google.com/maps/search/?api=1&query=' . rawurlencode($doctor_location_display)
+        : '';
 
     // Fetch doctor's experiences
     $stmt = $conn->prepare("
@@ -145,7 +189,13 @@ try {
 										<h4 class="doc-name"><?php echo htmlspecialchars($doctor['name']); ?> <img src="assets/img/icons/badge-check.svg" alt="Img"><span class="badge doctor-role-badge"><i class="fa-solid fa-circle"></i>Doctor</span></h4>
 										<p><?php echo htmlspecialchars($doctor['specialty']); ?> - BMDC: <?php echo htmlspecialchars($doctor['bmdc_no']); ?></p>
 										<p>Speaks : <?php echo htmlspecialchars($doctor['languages_spoken']); ?></p>
-										<p class="address-detail"><span class="loc-icon"><i class="feather-map-pin"></i></span><?php echo htmlspecialchars($doctor['address'] . ', ' . $doctor['city'] . ', ' . $doctor['state']); ?> <span class="view-text">( View Location )</span></p>
+										<?php if ($doctor_location_display !== ''): ?>
+										<p class="address-detail">
+											<span class="loc-icon"><i class="feather-map-pin"></i></span>
+											<?php echo htmlspecialchars($doctor_location_display); ?>
+											<a href="<?php echo htmlspecialchars($doctor_location_maps_url); ?>" target="_blank" rel="noopener noreferrer" class="view-text">( View on map )</a>
+										</p>
+										<?php endif; ?>
 									</div>
 								</div>
 								<div class="doc-info-right">

@@ -46,7 +46,7 @@ include 'header.php';?>
                                 </li>
                                 <li class="nav-item" role="presentation">
                                     <button class="nav-link" id="doctor-tab" data-bs-toggle="tab" data-bs-target="#doctor" type="button" role="tab" aria-controls="doctor" aria-selected="false">
-                                        <i class="isax isax-stethoscope me-1"></i>Doctor
+                                        <i class="isax isax-health me-1"></i>Doctor
                                     </button>
                                 </li>
                                 <li class="nav-item" role="presentation">
@@ -68,13 +68,13 @@ include 'header.php';?>
                                             <input type="text" class="form-control" name="name" id="patient-name" placeholder="Enter your full name" required>
                                         </div>
                                         <div class="mb-3">
-                                            <label class="form-label">Email Address</label>
-                                            <input type="email" class="form-control" name="email" id="patient-email" placeholder="Enter your email address" required>
-                                        </div>
-                                        <div class="mb-3">
                                             <label class="form-label">Mobile Number</label>
                                             <input type="text" class="form-control" name="phone" id="patient-phone" placeholder="Enter your mobile number (e.g., 01712345678)" required>
-                                            <small class="form-text text-muted">You can login with email or mobile number</small>
+                                            <small class="form-text text-muted">Mobile number</small>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label">Email Address</label>
+                                            <input type="email" class="form-control" name="email" id="patient-email" placeholder="Enter your email address" required>
                                         </div>
                                         <div class="mb-3">
                                             <div class="form-group-flex">
@@ -100,12 +100,12 @@ include 'header.php';?>
                                             <input type="text" class="form-control" name="name" id="doctor-name" placeholder="Enter your full name" required>
                                         </div>
                                         <div class="mb-3">
-                                            <label class="form-label">Email Address</label>
-                                            <input type="email" class="form-control" name="email" id="doctor-email" placeholder="Enter your email address" required>
-                                        </div>
-                                        <div class="mb-3">
                                             <label class="form-label">Phone Number</label>
                                             <input class="form-control form-control-lg group_formcontrol form-control-phone" id="doctor-phone" name="phone" type="text" placeholder="Enter your phone number" required>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label">Email Address</label>
+                                            <input type="email" class="form-control" name="email" id="doctor-email" placeholder="Enter your email address" required>
                                         </div>
                                         <div class="mb-3">
                                             <label class="form-label">BMDC Registration Number</label>
@@ -135,12 +135,12 @@ include 'header.php';?>
                                             <input type="text" class="form-control" name="name" id="health-worker-name" placeholder="Enter your full name" required>
                                         </div>
                                         <div class="mb-3">
-                                            <label class="form-label">Email Address</label>
-                                            <input type="email" class="form-control" name="email" id="health-worker-email" placeholder="Enter your email address" required>
-                                        </div>
-                                        <div class="mb-3">
                                             <label class="form-label">Mobile Number</label>
                                             <input type="text" class="form-control" name="phone" id="health-worker-phone" placeholder="Enter your mobile number" required>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label">Email Address</label>
+                                            <input type="email" class="form-control" name="email" id="health-worker-email" placeholder="Enter your email address" required>
                                         </div>
                                         <div class="mb-3">
                                             <label class="form-label">NID Number</label>

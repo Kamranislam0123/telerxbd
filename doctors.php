@@ -295,7 +295,7 @@ try {
                                 </div>
                             </div>
                             
-                            <div class="accordion-item border-bottom">
+                            <!-- <div class="accordion-item border-bottom">
                                 <div class="accordion-header" id="heading5">
                                     <div class="accordion-button" data-bs-toggle="collapse" data-bs-target="#collapse5" aria-controls="collapse5" role="button">
                                         <div class="d-flex align-items-center w-100">
@@ -349,7 +349,7 @@ try {
                                         </div>
                                     </div>
                                 </div>
-                            </div>
+                            </div> -->
                             
                             <div class="accordion-item">
                                 <div class="accordion-header" id="heading9">
@@ -476,9 +476,14 @@ try {
                                 <?php foreach ($doctors as $doctor): ?>
                                     <div class="card doctor-list-card" data-speciality="<?php echo htmlspecialchars($doctor['specialty'] ?? 'General Physician'); ?>" data-gender="<?php echo htmlspecialchars($doctor['gender'] ?? 'Other'); ?>">
                                         <div class="d-md-flex align-items-center">
+                                            <?php
+                                                $doctorImage = trim($doctor['profile_image'] ?? '') !== ''
+                                                    ? $doctor['profile_image']
+                                                    : 'assets/img/doctors/default-doctor.png';
+                                            ?>
                                             <div class="card-img card-img-hover">
                                                 <a href="doctor-profile.php?id=<?php echo $doctor['id']; ?>">
-                                                    <img src="<?php echo $doctor['profile_image'] ?? 'assets/img/doctors/default-doctor.jpg'; ?>" alt="<?php echo htmlspecialchars($doctor['name']); ?>">
+                                                    <img src="<?php echo htmlspecialchars($doctorImage); ?>" alt="<?php echo htmlspecialchars($doctor['name']); ?>">
                                                 </a>
                                                 <div class="grid-overlay-item d-flex align-items-center justify-content-between">
                                                     <span class="badge bg-orange"><i class="fa-solid fa-star me-1"></i><?php echo number_format($doctor['average_rating'] ?? 0, 1); ?></span>
@@ -539,7 +544,7 @@ try {
                                 </div>
                             </div>
                         <?php else:
-                            $load_more_initial = 6;
+                            $load_more_initial = 12;
                             $doctor_index = 0;
                             foreach ($doctors as $doctor):
                                 $hidden_class = ($doctor_index >= $load_more_initial) ? ' load-more-hidden' : '';
@@ -548,8 +553,13 @@ try {
                                 <div class="col-xxl-4 col-md-6 doctor-grid-item<?php echo $hidden_class; ?>" data-speciality="<?php echo htmlspecialchars($doctor['specialty'] ?? 'General Physician'); ?>" data-gender="<?php echo htmlspecialchars($doctor['gender'] ?? 'Other'); ?>">
                                     <div class="card">
                                         <div class="card-img card-img-hover doctor-profile-card-img">
+                                            <?php
+                                                $doctorImage = trim($doctor['profile_image'] ?? '') !== ''
+                                                    ? $doctor['profile_image']
+                                                    : 'assets/img/doctors/default-doctor.png';
+                                            ?>
                                             <a href="doctor-profile.php?id=<?php echo $doctor['id']; ?>">
-                                                <img src="<?php echo htmlspecialchars($doctor['profile_image'] ?? 'assets/img/doctors/default-doctor.jpg'); ?>" alt="<?php echo htmlspecialchars($doctor['name']); ?>">
+                                                <img src="<?php echo htmlspecialchars($doctorImage); ?>" alt="<?php echo htmlspecialchars($doctor['name']); ?>">
                                             </a>
                                             <div class="grid-overlay-item d-flex align-items-center justify-content-between">
                                                 <span class="badge bg-orange"><i class="fa-solid fa-star me-1"></i><?php echo number_format($doctor['average_rating'] ?? 0, 1); ?></span>
@@ -613,7 +623,7 @@ try {
     (function() {
         var loadMoreBtn = document.querySelector('.load-more-doctors-btn');
         if (!loadMoreBtn) return;
-        var perPage = 15;
+        var perPage = 12;
         loadMoreBtn.addEventListener('click', function() {
             var hidden = document.querySelectorAll('.doctor-grid-item.load-more-hidden');
             var toShow = Math.min(perPage, hidden.length);
