@@ -316,7 +316,7 @@ try {
 								<div class="card">
 									<div class="card-img card-img-hover">
 										<a href="doctor-profile.php?id=<?php echo $doctor['id']; ?>">
-											<img src="<?php echo $doctor['profile_image'] ?? 'assets/img/doctors/default-doctor.jpg'; ?>" alt="<?php echo htmlspecialchars($doctor['name']); ?>">
+											<img src="<?php echo $doctor['profile_image'] ?? 'assets/img/doctors/default-doctor.png'; ?>" alt="<?php echo htmlspecialchars($doctor['name']); ?>">
 										</a>
 										<div class="grid-overlay-item d-flex align-items-center justify-content-between">
 											<span class="badge bg-orange">

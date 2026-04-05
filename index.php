@@ -155,7 +155,7 @@ try {
                             <div class="doc-pro-img">
                                 <a href="doctor-profile.php?id=<?php echo $doctor['id']; ?>">
                                     <div class="doctor-profile-img">
-                                        <img src="<?php echo htmlspecialchars($doctor['profile_image'] ?? 'assets/img/doctors/default-doctor.jpg'); ?>" class="img-fluid" alt="<?php echo htmlspecialchars($doctor['name']); ?>">
+                                        <img src="<?php echo htmlspecialchars($doctor['profile_image'] ?? 'assets/img/doctors/default-doctor.png'); ?>" class="img-fluid" alt="<?php echo htmlspecialchars($doctor['name']); ?>">
                                     </div>
                                 </a>
                                 <div class="doctor-amount">
