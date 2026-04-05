@@ -142,14 +142,14 @@ include 'header.php';
 														</div>
 														<div class="col-lg-6">
 															<div class="health-records icon-amber">
-																<span><i class="fa-solid fa-temperature-high"></i>Body Temprature</span>
+																<span><i class="fa-solid fa-temperature-high"></i>Body Temperature </span>
 																<h3>37.5 C</h3>
 															</div>
 														</div>
 														<div class="col-lg-6">
 															<div class="health-records icon-dark-blue">
 																<span><i class="fa-solid fa-notes-medical"></i>Glucose Level</span>
-																<h3>70 - 90<sup> 6%</sup></h3>
+																<h3>70 - 90<sup> 7%</sup></h3>
 															</div>
 														</div>
 														<div class="col-lg-6">
