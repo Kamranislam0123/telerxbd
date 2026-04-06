@@ -205,8 +205,8 @@ include 'header.php';
 												<div class="header-title">
 													<h5>Upcoming Appointments</h5>
 												</div>
-												<div class="card-view-link">
-													<a href="patient-appointments.php">View All</a>
+													<div class="card-view-link">
+													<a href="<?php echo (defined('APP_BASE') && APP_BASE) ? APP_BASE . '/patient-appointments.php' : 'patient-appointments.php'; ?>">View All</a>
 												</div>
 											</div>
 											<div class="dashboard-card-body">
