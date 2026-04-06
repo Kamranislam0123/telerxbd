@@ -211,14 +211,14 @@ $current_page = basename($_SERVER['PHP_SELF']);
                                 </div>
 
                                 <?php if($_SESSION['user_type'] == 'doctor'): ?>
-                                    <a class="dropdown-item" href="doctor-dashboard">Dashboard</a>
-                                    <a class="dropdown-item" href="doctor-profile-settings">Profile Settings</a>
+                                    <a class="dropdown-item" href="doctor-dashboard.php">Dashboard</a>
+                                    <a class="dropdown-item" href="doctor-profile-settings.php">Profile Settings</a>
                                 <?php elseif($_SESSION['user_type'] == 'healthcare'): ?>
                                     <a class="dropdown-item" href="health-worker-dashboard.php">Dashboard</a>
                                     <a class="dropdown-item" href="health-worker-profile-settings.php">Profile Settings</a>
                                 <?php elseif($_SESSION['user_type'] == 'patient'): ?>
-                                    <a class="dropdown-item" href="patient-dashboard">Dashboard</a>
-                                    <a class="dropdown-item" href="patient-profile-settings">Profile Settings</a>
+                                    <a class="dropdown-item" href="patient-dashboard.php">Dashboard</a>
+                                    <a class="dropdown-item" href="patient-profile-settings.php">Profile Settings</a>
                                 <?php endif; ?>
 
                                 <a class="dropdown-item" href="php/logout.php">Logout</a>
@@ -227,7 +227,7 @@ $current_page = basename($_SERVER['PHP_SELF']);
                     <?php else: ?>
                         <!-- Guest/Non-logged in menu -->
                         <li class="register-btn">
-                            <a href="registration" class="btn btn-dark reg-btn">
+                            <a href="registration.php" class="btn btn-dark reg-btn">
                                 <i class="isax isax-user"></i>Register
                             </a>
                         </li>

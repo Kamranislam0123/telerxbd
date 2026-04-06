@@ -80,6 +80,15 @@ if (session_status() === PHP_SESSION_NONE) {
 // Set timezone (adjust according to your location)
 date_default_timezone_set('Asia/Dhaka');
 
+// Compute application base path for building absolute links that work from subfolders
+// Example: if app is served from http://localhost/Telerx, APP_BASE will be '/Telerx'
+$script_dir = dirname($_SERVER['SCRIPT_NAME'] ?? '/');
+$app_base = dirname($script_dir);
+if ($app_base === '/' || $app_base === '\\' || $app_base === '.') {
+    $app_base = '';
+}
+if (!defined('APP_BASE')) define('APP_BASE', $app_base);
+
 // Error reporting (disable in production)
 // Note: display_errors is set per-file for API endpoints to prevent breaking JSON
 error_reporting(E_ALL);

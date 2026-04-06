@@ -38,19 +38,63 @@ try {
     $patient = $result->fetch_assoc();
     $stmt->close();
 
-    // Set default values if profile data is missing
-    $patient['profile_image'] = $patient['profile_image'] ?? 'assets/img/doctors-dashboard/profile-06.jpg';
+	// Set default values if profile data is missing
+	$patient['profile_image'] = $patient['profile_image'] ?? 'assets/img/doctors-dashboard/profile-06.jpg';
 
-    // TODO: Fetch appointments from appointments table when it exists
-    // For now, we'll show an empty state
-    $appointments = [];
+	// Fetch appointments for this patient (if appointments table exists)
+	$appointments = [];
+	$upcoming_appointments = [];
+	$cancelled_appointments = [];
+	$completed_appointments = [];
 
-    $conn->close();
+	$apt_stmt = $conn->prepare(
+		"SELECT a.*, d.name AS doctor_name, d.email AS doctor_email, d.phone AS doctor_phone, dp.profile_image AS doctor_image, dp.specialty AS doctor_specialty
+		 FROM appointments a
+		 LEFT JOIN doctors d ON d.id = a.doctor_id
+		 LEFT JOIN doctor_profiles dp ON dp.doctor_id = d.id
+		 WHERE a.patient_id = ?
+		 ORDER BY a.appointment_date DESC, a.slot_time DESC"
+	);
+	if ($apt_stmt) {
+		$apt_stmt->bind_param("i", $patient_id);
+		if (!$apt_stmt->execute()) {
+			throw new Exception("Execute failed: (" . $apt_stmt->errno . ") " . $apt_stmt->error);
+		}
+		$apt_result = $apt_stmt->get_result();
+		$today = date('Y-m-d');
+		while ($row = $apt_result->fetch_assoc()) {
+			// Normalise / fallback values
+			$row['appointment_number'] = $row['appointment_number'] ?? ('APT' . str_pad($row['id'], 5, '0', STR_PAD_LEFT));
+			$row['doctor_image'] = $row['doctor_image'] ?: 'assets/img/doctors/doctor-01.jpg';
+			// appointment_type may not exist on older schemas
+			$row['appointment_type'] = $row['appointment_type'] ?? ($row['visit_type'] ?? 'Consultation');
+
+			$appointments[] = $row;
+
+			$status = strtolower(trim($row['status'] ?? ''));
+			$upcoming_statuses = ['upcoming', 'pending', 'confirmed', 'scheduled', 'booked'];
+			if ($status === 'cancelled') {
+				$cancelled_appointments[] = $row;
+			} elseif (in_array($status, $upcoming_statuses, true) || (!empty($row['appointment_date']) && $row['appointment_date'] >= $today)) {
+				$upcoming_appointments[] = $row;
+			} else {
+				$completed_appointments[] = $row;
+			}
+		}
+		$apt_stmt->close();
+	}
+
+	$conn->close();
 
 } catch (Exception $e) {
     error_log("Patient appointments error: " . $e->getMessage());
-    header('Location: login.php');
-    exit;
+    // If we're already logged in, don't redirect to login.php, just show the error.
+    if (isset($_SESSION['logged_in']) && $_SESSION['logged_in'] === true) {
+        die("An error occurred while loading your appointments. Please contact support. Error: " . htmlspecialchars($e->getMessage()));
+    } else {
+        header('Location: login.php');
+        exit;
+    }
 }
 
 include 'header.php';
@@ -59,6 +103,17 @@ include 'header.php';
 <!DOCTYPE html>
 <html lang="en">
 <body>
+	<style>
+	.appointment-action ul li .btn-sm {
+		padding: 4px 10px;
+		font-size: 12px;
+		line-height: 1.5;
+		border-radius: 4px;
+		min-width: unset;
+		height: auto;
+		white-space: nowrap;
+	}
+	</style>
 
     <!-- Breadcrumb -->
     <div class="breadcrumb-bar">
@@ -101,13 +156,13 @@ include 'header.php';
 								<div class="appointment-tabs">
 									<ul class="nav nav-pills inner-tab" id="pills-tab" role="tablist">
 										<li class="nav-item" role="presentation">
-											<button class="nav-link active" id="pills-upcoming-tab" data-bs-toggle="tab" data-bs-target="#pills-upcoming" type="button" role="tab" aria-controls="pills-upcoming" aria-selected="true">Upcoming<span>0</span></button>
+											<button class="nav-link active" id="pills-upcoming-tab" data-bs-toggle="tab" data-bs-target="#pills-upcoming" type="button" role="tab" aria-controls="pills-upcoming" aria-selected="true">Upcoming<span><?php echo count($upcoming_appointments); ?></span></button>
 										</li>	
 										<li class="nav-item" role="presentation">
-											<button class="nav-link" id="pills-cancel-tab" data-bs-toggle="tab" data-bs-target="#pills-cancel" type="button" role="tab" aria-controls="pills-cancel" aria-selected="false">Cancelled<span>0</span></button>
+											<button class="nav-link" id="pills-cancel-tab" data-bs-toggle="tab" data-bs-target="#pills-cancel" type="button" role="tab" aria-controls="pills-cancel" aria-selected="false">Cancelled<span><?php echo count($cancelled_appointments); ?></span></button>
 										</li>
 										<li class="nav-item" role="presentation">
-											<button class="nav-link" id="pills-complete-tab" data-bs-toggle="tab" data-bs-target="#pills-complete" type="button" role="tab" aria-controls="pills-complete" aria-selected="false">Completed<span>0</span></button>
+											<button class="nav-link" id="pills-complete-tab" data-bs-toggle="tab" data-bs-target="#pills-complete" type="button" role="tab" aria-controls="pills-complete" aria-selected="false">Completed<span><?php echo count($completed_appointments); ?></span></button>
 										</li>
 									</ul>
 								</div>
@@ -128,11 +183,6 @@ include 'header.php';
 													</div>
 												</div>
 												<div class="dashboard-card-body">
-													<?php 
-													$upcoming_appointments = array_filter($appointments, function($apt) {
-														return isset($apt['status']) && in_array(strtolower($apt['status']), ['upcoming', 'pending', 'confirmed', 'scheduled']);
-													});
-													?>
 													<?php if (empty($upcoming_appointments)): ?>
 														<div class="text-center py-5">
 															<i class="isax isax-calendar-1" style="font-size: 64px; color: #ccc; margin-bottom: 20px;"></i>
@@ -141,54 +191,59 @@ include 'header.php';
 															<a href="search.php" class="btn btn-primary-gradient mt-3">Book Appointment</a>
 														</div>
 													<?php else: ?>
-														<div class="table-responsive">
-															<table class="table dashboard-table appoint-table">
-																<thead>
-																	<tr>
-																		<th>Doctor</th>
-																		<th>Date & Time</th>
-																		<th>Type</th>
-																		<th>Status</th>
-																		<th>Action</th>
-																	</tr>
-																</thead>
-																<tbody>
-																	<?php foreach ($upcoming_appointments as $appointment): ?>
-																		<tr>
-																			<td>
-																				<div class="patient-info-profile">
-																					<a href="#" class="table-avatar">
-																						<img src="<?php echo htmlspecialchars($appointment['doctor_image'] ?? 'assets/img/doctors/doctor-01.jpg'); ?>" alt="Doctor">
-																					</a>
-																					<div class="patient-name-info">
-																						<span>#<?php echo htmlspecialchars($appointment['appointment_id'] ?? 'N/A'); ?></span>
-																						<h5><a href="#"><?php echo htmlspecialchars($appointment['doctor_name'] ?? 'Doctor'); ?></a></h5>
-																					</div>
-																				</div>
-																			</td>
-																			<td>
-																				<div class="appointment-date-created">
-																					<h6><?php echo isset($appointment['appointment_date']) ? date('d M Y h:i A', strtotime($appointment['appointment_date'])) : 'N/A'; ?></h6>
-																					<span class="badge table-badge"><?php echo htmlspecialchars($appointment['appointment_type'] ?? 'N/A'); ?></span>
-																				</div>
-																			</td>
-																			<td><?php echo htmlspecialchars($appointment['appointment_type'] ?? 'N/A'); ?></td>
-																			<td>
-																				<span class="badge badge-success">
-																					<?php echo ucfirst($appointment['status'] ?? 'Upcoming'); ?>
-																				</span>
-																			</td>
-																			<td>
-																				<div class="apponiment-actions d-flex align-items-center">
-																					<a href="#" class="text-success-icon me-2" title="View"><i class="fa-solid fa-eye"></i></a>
-																					<a href="#" class="text-danger-icon" title="Cancel"><i class="fa-solid fa-xmark"></i></a>
-																				</div>
-																			</td>
-																		</tr>
-																	<?php endforeach; ?>
-																</tbody>
-															</table>
-														</div>
+														<?php foreach ($upcoming_appointments as $appointment): ?>
+															<!-- Appointment List -->
+															<div class="appointment-wrap">
+																<ul>
+																	<li>
+																		<div class="patinet-information">
+																			<a href="appointment-detail.php?id=<?php echo (int)$appointment['id']; ?>">
+																				<img src="<?php echo htmlspecialchars($appointment['doctor_image'] ?? 'assets/img/doctors/doctor-01.jpg'); ?>" alt="Doctor Image">
+																			</a>
+																			<div class="patient-info">
+																				<p>#<?php echo htmlspecialchars($appointment['appointment_number'] ?? ('APT' . str_pad($appointment['id'] ?? 0, 5, '0', STR_PAD_LEFT))); ?></p>
+																				<h6><a href="appointment-detail.php?id=<?php echo (int)$appointment['id']; ?>"><?php echo htmlspecialchars($appointment['doctor_name'] ?? 'Doctor'); ?></a></h6>
+																			</div>
+																		</div>
+																	</li>
+																	<li class="appointment-info">
+																		<p><i class="isax isax-clock5"></i><?php echo isset($appointment['appointment_date']) ? date('d M Y h:i A', strtotime($appointment['appointment_date'])) : 'N/A'; ?></p>
+																		<ul class="d-flex apponitment-types">
+																			<li><?php echo htmlspecialchars($appointment['appointment_type'] ?? 'Consultation'); ?></li>
+																			<li>Video Call</li>
+																		</ul>												
+																	</li>
+																	<li class="mail-info-patient">
+																		<ul>
+																			<li><i class="isax isax-sms5"></i><?php echo htmlspecialchars($appointment['doctor_email'] ?? 'N/A'); ?></li>
+																			<li><i class="isax isax-call5"></i><?php echo htmlspecialchars($appointment['doctor_phone'] ?? 'N/A'); ?></li>
+																		</ul>
+																	</li>
+																	<li class="appointment-action">
+																		<ul>
+																			<li>
+																				<a href="appointment-detail.php?id=<?php echo (int)$appointment['id']; ?>" title="View"><i class="isax isax-eye4"></i></a>
+																			</li>
+																			<li>
+																				<a href="chat.php?doctor_id=<?php echo (int)$appointment['doctor_id']; ?>" title="Chat"><i class="isax isax-messages-25"></i></a>
+																			</li>
+																			<li>
+																				<a href="javascript:void(0);" class="cancel-appointment" data-id="<?php echo (int)$appointment['id']; ?>" title="Cancel"><i class="isax isax-close-circle5"></i></a>
+																			</li>
+																		</ul>
+																		<?php if (!empty($appointment['prescription_path'])): ?>
+																		<div class="mt-2 text-center">
+																			<a href="<?php echo htmlspecialchars($appointment['prescription_path']); ?>" target="_blank" class="btn btn-sm btn-outline-success btn-prescription btn-block w-100"><i class="isax isax-document-text me-1"></i>View Prescription</a>
+																		</div>
+																		<?php endif; ?>
+																	</li>
+																	<li class="appointment-detail-btn">
+																		<a href="video-call.php?id=<?php echo (int)$appointment['id']; ?>" class="btn btn-md btn-primary-gradient"><i class="isax isax-calendar-tick5 me-1"></i>Attend</a>
+																	</li>
+																</ul>
+															</div>
+															<!-- /Appointment List -->
+														<?php endforeach; ?>
 													<?php endif; ?>
 												</div>
 											</div>
@@ -208,11 +263,6 @@ include 'header.php';
 													</div>
 												</div>
 												<div class="dashboard-card-body">
-													<?php 
-													$cancelled_appointments = array_filter($appointments, function($apt) {
-														return isset($apt['status']) && strtolower($apt['status']) == 'cancelled';
-													});
-													?>
 													<?php if (empty($cancelled_appointments)): ?>
 														<div class="text-center py-5">
 															<i class="isax isax-calendar-1" style="font-size: 64px; color: #ccc; margin-bottom: 20px;"></i>
@@ -220,53 +270,53 @@ include 'header.php';
 															<p class="text-muted">You don't have any cancelled appointments.</p>
 														</div>
 													<?php else: ?>
-														<div class="table-responsive">
-															<table class="table dashboard-table appoint-table">
-																<thead>
-																	<tr>
-																		<th>Doctor</th>
-																		<th>Date & Time</th>
-																		<th>Type</th>
-																		<th>Status</th>
-																		<th>Action</th>
-																	</tr>
-																</thead>
-																<tbody>
-																	<?php foreach ($cancelled_appointments as $appointment): ?>
-																		<tr>
-																			<td>
-																				<div class="patient-info-profile">
-																					<a href="#" class="table-avatar">
-																						<img src="<?php echo htmlspecialchars($appointment['doctor_image'] ?? 'assets/img/doctors/doctor-01.jpg'); ?>" alt="Doctor">
-																					</a>
-																					<div class="patient-name-info">
-																						<span>#<?php echo htmlspecialchars($appointment['appointment_id'] ?? 'N/A'); ?></span>
-																						<h5><a href="#"><?php echo htmlspecialchars($appointment['doctor_name'] ?? 'Doctor'); ?></a></h5>
-																					</div>
-																				</div>
-																			</td>
-																			<td>
-																				<div class="appointment-date-created">
-																					<h6><?php echo isset($appointment['appointment_date']) ? date('d M Y h:i A', strtotime($appointment['appointment_date'])) : 'N/A'; ?></h6>
-																					<span class="badge table-badge"><?php echo htmlspecialchars($appointment['appointment_type'] ?? 'N/A'); ?></span>
-																				</div>
-																			</td>
-																			<td><?php echo htmlspecialchars($appointment['appointment_type'] ?? 'N/A'); ?></td>
-																			<td>
-																				<span class="badge badge-danger">
-																					<?php echo ucfirst($appointment['status'] ?? 'Cancelled'); ?>
-																				</span>
-																			</td>
-																			<td>
-																				<div class="apponiment-actions d-flex align-items-center">
-																					<a href="#" class="text-success-icon me-2" title="View"><i class="fa-solid fa-eye"></i></a>
-																				</div>
-																			</td>
-																		</tr>
-																	<?php endforeach; ?>
-																</tbody>
-															</table>
-														</div>
+														<?php foreach ($cancelled_appointments as $appointment): ?>
+															<!-- Appointment List -->
+															<div class="appointment-wrap">
+																<ul>
+																	<li>
+																		<div class="patinet-information">
+																			<a href="appointment-detail.php?id=<?php echo (int)$appointment['id']; ?>">
+																				<img src="<?php echo htmlspecialchars($appointment['doctor_image'] ?? 'assets/img/doctors/doctor-01.jpg'); ?>" alt="Doctor Image">
+																			</a>
+																			<div class="patient-info">
+																				<p>#<?php echo htmlspecialchars($appointment['appointment_number'] ?? ('APT' . str_pad($appointment['id'] ?? 0, 5, '0', STR_PAD_LEFT))); ?></p>
+																				<h6><a href="appointment-detail.php?id=<?php echo (int)$appointment['id']; ?>"><?php echo htmlspecialchars($appointment['doctor_name'] ?? 'Doctor'); ?></a></h6>
+																			</div>
+																		</div>
+																	</li>
+																	<li class="appointment-info">
+																		<p><i class="isax isax-clock5"></i><?php echo isset($appointment['appointment_date']) ? date('d M Y h:i A', strtotime($appointment['appointment_date'])) : 'N/A'; ?></p>
+																		<ul class="d-flex apponitment-types">
+																			<li><?php echo htmlspecialchars($appointment['appointment_type'] ?? 'Consultation'); ?></li>
+																			<li>Video Call</li>
+																		</ul>												
+																	</li>
+																	<li class="mail-info-patient">
+																		<ul>
+																			<li><i class="isax isax-sms5"></i><?php echo htmlspecialchars($appointment['doctor_email'] ?? 'N/A'); ?></li>
+																			<li><i class="isax isax-call5"></i><?php echo htmlspecialchars($appointment['doctor_phone'] ?? 'N/A'); ?></li>
+																		</ul>
+																	</li>
+																	<li class="appointment-action">
+																		<ul>
+																			<li>
+																				<a href="appointment-detail.php?id=<?php echo (int)$appointment['id']; ?>" title="View"><i class="isax isax-eye4"></i></a>
+																			</li>
+																			<li>
+																				<span class="badge badge-danger"><?php echo ucfirst($appointment['status'] ?? 'Cancelled'); ?></span>
+																			</li>
+																		</ul>
+																		<?php if (!empty($appointment['prescription_path'])): ?>
+																		<div class="mt-2 text-center">
+																			<a href="<?php echo htmlspecialchars($appointment['prescription_path']); ?>" target="_blank" class="btn btn-sm btn-outline-success btn-prescription btn-block w-100"><i class="isax isax-document-text me-1"></i>View Prescription</a>
+																		</div>
+																		<?php endif; ?>
+																	</li>
+																</ul>
+															</div>
+															<!-- /Appointment List -->
+														<?php endforeach; ?>
 													<?php endif; ?>
 												</div>
 											</div>
@@ -286,11 +336,6 @@ include 'header.php';
 													</div>
 												</div>
 												<div class="dashboard-card-body">
-													<?php 
-													$completed_appointments = array_filter($appointments, function($apt) {
-														return isset($apt['status']) && strtolower($apt['status']) == 'completed';
-													});
-													?>
 													<?php if (empty($completed_appointments)): ?>
 														<div class="text-center py-5">
 															<i class="isax isax-calendar-1" style="font-size: 64px; color: #ccc; margin-bottom: 20px;"></i>
@@ -298,54 +343,57 @@ include 'header.php';
 															<p class="text-muted">You don't have any completed appointments yet.</p>
 														</div>
 													<?php else: ?>
-														<div class="table-responsive">
-															<table class="table dashboard-table appoint-table">
-																<thead>
-																	<tr>
-																		<th>Doctor</th>
-																		<th>Date & Time</th>
-																		<th>Type</th>
-																		<th>Status</th>
-																		<th>Action</th>
-																	</tr>
-																</thead>
-																<tbody>
-																	<?php foreach ($completed_appointments as $appointment): ?>
-																		<tr>
-																			<td>
-																				<div class="patient-info-profile">
-																					<a href="#" class="table-avatar">
-																						<img src="<?php echo htmlspecialchars($appointment['doctor_image'] ?? 'assets/img/doctors/doctor-01.jpg'); ?>" alt="Doctor">
-																					</a>
-																					<div class="patient-name-info">
-																						<span>#<?php echo htmlspecialchars($appointment['appointment_id'] ?? 'N/A'); ?></span>
-																						<h5><a href="#"><?php echo htmlspecialchars($appointment['doctor_name'] ?? 'Doctor'); ?></a></h5>
-																					</div>
-																				</div>
-																			</td>
-																			<td>
-																				<div class="appointment-date-created">
-																					<h6><?php echo isset($appointment['appointment_date']) ? date('d M Y h:i A', strtotime($appointment['appointment_date'])) : 'N/A'; ?></h6>
-																					<span class="badge table-badge"><?php echo htmlspecialchars($appointment['appointment_type'] ?? 'N/A'); ?></span>
-																				</div>
-																			</td>
-																			<td><?php echo htmlspecialchars($appointment['appointment_type'] ?? 'N/A'); ?></td>
-																			<td>
-																				<span class="badge badge-success">
-																					<?php echo ucfirst($appointment['status'] ?? 'Completed'); ?>
-																				</span>
-																			</td>
-																			<td>
-																				<div class="apponiment-actions d-flex align-items-center">
-																					<a href="#" class="text-success-icon me-2" title="View"><i class="fa-solid fa-eye"></i></a>
-																					<a href="#" class="text-info-icon" title="View Prescription"><i class="fa-solid fa-prescription"></i></a>
-																				</div>
-																			</td>
-																		</tr>
-																	<?php endforeach; ?>
-																</tbody>
-															</table>
-														</div>
+														<?php foreach ($completed_appointments as $appointment): ?>
+															<!-- Appointment List -->
+															<div class="appointment-wrap">
+																<ul>
+																	<li>
+																		<div class="patinet-information">
+																			<a href="appointment-detail.php?id=<?php echo (int)$appointment['id']; ?>">
+																				<img src="<?php echo htmlspecialchars($appointment['doctor_image'] ?? 'assets/img/doctors/doctor-01.jpg'); ?>" alt="Doctor Image">
+																			</a>
+																			<div class="patient-info">
+																				<p>#<?php echo htmlspecialchars($appointment['appointment_number'] ?? ('APT' . str_pad($appointment['id'] ?? 0, 5, '0', STR_PAD_LEFT))); ?></p>
+																				<h6><a href="appointment-detail.php?id=<?php echo (int)$appointment['id']; ?>"><?php echo htmlspecialchars($appointment['doctor_name'] ?? 'Doctor'); ?></a></h6>
+																			</div>
+																		</div>
+																	</li>
+																	<li class="appointment-info">
+																		<p><i class="isax isax-clock5"></i><?php echo isset($appointment['appointment_date']) ? date('d M Y h:i A', strtotime($appointment['appointment_date'])) : 'N/A'; ?></p>
+																		<ul class="d-flex apponitment-types">
+																			<li><?php echo htmlspecialchars($appointment['appointment_type'] ?? 'Consultation'); ?></li>
+																			<li>Video Call</li>
+																		</ul>												
+																	</li>
+																	<li class="mail-info-patient">
+																		<ul>
+																			<li><i class="isax isax-sms5"></i><?php echo htmlspecialchars($appointment['doctor_email'] ?? 'N/A'); ?></li>
+																			<li><i class="isax isax-call5"></i><?php echo htmlspecialchars($appointment['doctor_phone'] ?? 'N/A'); ?></li>
+																		</ul>
+																	</li>
+																	<li class="appointment-action">
+																		<ul>
+																			<li>
+																				<a href="appointment-detail.php?id=<?php echo (int)$appointment['id']; ?>" title="View"><i class="isax isax-eye4"></i></a>
+																			</li>
+																			<?php if (!empty($appointment['prescription_path'])): ?>
+																			<li>
+																				<a href="<?php echo htmlspecialchars($appointment['prescription_path']); ?>" target="_blank" class="btn btn-sm btn-outline-success btn-prescription"><i class="isax isax-document-text me-1"></i>View Prescription</a>
+																			</li>
+																			<?php else: ?>
+																			<li>
+																				<span class="badge bg-light text-muted">No Prescription</span>
+																			</li>
+																			<?php endif; ?>
+																			<li>
+																				<span class="badge badge-success"><?php echo ucfirst($appointment['status'] ?? 'Completed'); ?></span>
+																			</li>
+																		</ul>
+																	</li>
+																</ul>
+															</div>
+															<!-- /Appointment List -->
+														<?php endforeach; ?>
 													<?php endif; ?>
 												</div>
 											</div>

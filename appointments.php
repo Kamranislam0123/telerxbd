@@ -96,7 +96,7 @@ try {
     $upcoming_appointments = [];
     $cancelled_appointments = [];
     $completed_appointments = [];
-    $apt_stmt = $conn->prepare("SELECT id, appointment_number, patient_name, mobile, appointment_date, slot_time, status, notes, created_at FROM appointments WHERE doctor_id = ? ORDER BY appointment_date DESC, slot_time DESC");
+    $apt_stmt = $conn->prepare("SELECT id, appointment_number, patient_name, mobile, appointment_date, slot_time, status, notes, created_at, prescription_path FROM appointments WHERE doctor_id = ? ORDER BY appointment_date DESC, slot_time DESC");
     if ($apt_stmt) {
         $apt_stmt->bind_param("i", $doctor_id);
         $apt_stmt->execute();
@@ -135,6 +135,18 @@ include 'header.php';
 <html lang="en">
 
 <body>
+		<style>
+		.appointment-action ul li .btn-sm,
+		.appointment-wrap .btn-prescription {
+			padding: 4px 10px;
+			font-size: 12px;
+			line-height: 1.5;
+			border-radius: 4px;
+			min-width: unset;
+			height: auto;
+			white-space: nowrap;
+		}
+		</style>
             <!-- Breadcrumb -->
             <div class="breadcrumb-bar">
                 <div class="container">
@@ -401,11 +413,18 @@ include 'header.php';
 											<li class="appointment-action">
 												<ul>
 													<li>
-														<a href="appointment-detail.php?id=<?php echo (int)$a['id']; ?>"><i class="isax isax-eye4"></i></a>
+														<a href="appointment-detail.php?id=<?php echo (int)$a['id']; ?>" title="View"><i class="isax isax-eye4"></i></a>
 													</li>
-													<li><a href="#"><i class="isax isax-messages-25"></i></a></li>
-													<li><a href="#"><i class="isax isax-close-circle5"></i></a></li>
+													<li><a href="#" title="Chat"><i class="isax isax-messages-25"></i></a></li>
+													<li><a href="#" class="text-danger-icon" title="Cancel"><i class="isax isax-close-circle5"></i></a></li>
 												</ul>
+												<div class="mt-2 text-center">
+													<?php if (!empty($a['prescription_path'])): ?>
+														<a href="<?php echo htmlspecialchars($a['prescription_path']); ?>" target="_blank" class="btn btn-sm btn-outline-success btn-prescription w-100"><i class="isax isax-document-text me-1"></i>View Prescription</a>
+													<?php else: ?>
+														<a href="javascript:void(0);" class="btn btn-sm btn-outline-primary upload-prescription btn-prescription w-100" data-id="<?php echo (int)$a['id']; ?>"><i class="isax isax-export me-1"></i>Upload Prescription</a>
+													<?php endif; ?>
+												</div>
 											</li>
 											<li class="appointment-start">
 												<a href="doctor-appointment-start.html" class="start-link">Start Now</a>
@@ -448,6 +467,11 @@ include 'header.php';
 											</li>
 											<li class="appointment-detail-btn">
 												<a href="appointment-detail.php?id=<?php echo (int)$a['id']; ?>" class="start-link">View Details</a>
+												<?php if (!empty($a['prescription_path'])): ?>
+													<a href="<?php echo htmlspecialchars($a['prescription_path']); ?>" target="_blank" class="btn btn-sm btn-outline-success btn-prescription ms-2"><i class="isax isax-document-text me-1"></i>View Prescription</a>
+												<?php else: ?>
+													<a href="javascript:void(0);" class="btn btn-sm btn-outline-primary upload-prescription btn-prescription ms-2" data-id="<?php echo (int)$a['id']; ?>"><i class="isax isax-export me-1"></i>Upload Prescription</a>
+												<?php endif; ?>
 											</li>
 										</ul>
 									</div>
@@ -487,6 +511,11 @@ include 'header.php';
 											</li>
 											<li class="appointment-detail-btn">
 												<a href="appointment-detail.php?id=<?php echo (int)$a['id']; ?>" class="start-link">View Details</a>
+												<?php if (!empty($a['prescription_path'])): ?>
+													<a href="<?php echo htmlspecialchars($a['prescription_path']); ?>" target="_blank" class="btn btn-sm btn-outline-success btn-prescription ms-2"><i class="isax isax-document-text me-1"></i>View Prescription</a>
+												<?php else: ?>
+													<a href="javascript:void(0);" class="btn btn-sm btn-outline-primary upload-prescription btn-prescription ms-2" data-id="<?php echo (int)$a['id']; ?>"><i class="isax isax-export me-1"></i>Upload Prescription</a>
+												<?php endif; ?>
 											</li>
 										</ul>
 									</div>
@@ -572,6 +601,64 @@ include 'header.php';
 		
 		<!-- Custom JS -->
 		<script src="assets/js/script.js"></script>
+
+		<!-- Prescription Upload Handler -->
+		<script>
+		$(document).ready(function() {
+			// Create a hidden file input
+			var $fileInput = $('<input type="file" id="prescription_input" style="display:none;" accept=".pdf,.jpg,.jpeg,.png">');
+			$('body').append($fileInput);
+			var currentAppointmentId = null;
+
+			$('.upload-prescription').on('click', function() {
+				currentAppointmentId = $(this).data('id');
+				$fileInput.trigger('click');
+			});
+
+			$fileInput.on('change', function() {
+				var file = this.files[0];
+				if (!file || !currentAppointmentId) return;
+
+				var formData = new FormData();
+				formData.append('prescription_file', file);
+				formData.append('appointment_id', currentAppointmentId);
+
+				// Show loading or disable button
+				var $btn = $('.upload-prescription[data-id="' + currentAppointmentId + '"]');
+				$btn.html('<i class="fa-solid fa-spinner fa-spin"></i>');
+
+				$.ajax({
+					url: 'php/upload-prescription.php',
+					type: 'POST',
+					data: formData,
+					processData: false,
+					contentType: false,
+					dataType: 'json',
+					success: function(response) {
+						if (response.success) {
+							// Check if it's in the action list (Upcoming) or standard list (Cancelled/Completed)
+							if ($btn.closest('.appointment-action').length) {
+								$btn.replaceWith('<a href="' + response.prescription_path + '" target="_blank" class="btn btn-sm btn-outline-success btn-prescription"><i class="isax isax-document-text me-1"></i>View Prescription</a>');
+							} else {
+								$btn.replaceWith('<a href="' + response.prescription_path + '" target="_blank" class="btn btn-sm btn-outline-success btn-prescription ms-2"><i class="isax isax-document-text me-1"></i>View Prescription</a>');
+							}
+							alert('Prescription uploaded successfully!');
+						} else {
+							alert('Upload failed: ' + response.message);
+							$btn.html('<i class="isax isax-export me-1"></i>Upload Prescription');
+						}
+					},
+					error: function() {
+						alert('An error occurred during upload.');
+						$btn.html('<i class="isax isax-export me-1"></i>Upload Prescription');
+					},
+					complete: function() {
+						$fileInput.val('');
+					}
+				});
+			});
+		});
+		</script>
 		
 	</body>
 </html>
