@@ -238,7 +238,7 @@ include 'header.php';
 																		<?php endif; ?>
 																	</li>
 																	<li class="appointment-detail-btn">
-																		<a href="video-call.php?id=<?php echo (int)$appointment['id']; ?>" class="btn btn-md btn-primary-gradient"><i class="isax isax-calendar-tick5 me-1"></i>Attend</a>
+																		<a href="video-call.php?appointment_id=<?php echo (int)$appointment['id']; ?>" class="btn btn-md btn-primary-gradient"><i class="isax isax-calendar-tick5 me-1"></i>Attend</a>
 																	</li>
 																</ul>
 															</div>

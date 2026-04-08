@@ -1,3 +1,34 @@
+<?php
+require_once 'php/config.php';
+
+// Check if user is logged in
+if (!isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true) {
+    header("Location: login.php");
+    exit;
+}
+
+// Get appointment ID from URL
+$appointment_id = $_GET['appointment_id'] ?? null;
+$channel_name = $appointment_id ? "appointment_" . $appointment_id : "general_call";
+
+// Assign unique UID for Agora (simple mapping for now)
+if ($_SESSION['user_type'] === 'doctor' && isset($_SESSION['doctor_id'])) {
+    $uid = 1000 + (int)$_SESSION['doctor_id'];
+    $user_name = $_SESSION['doctor_name'] ?? 'Doctor';
+} else if ($_SESSION['user_type'] === 'patient' && isset($_SESSION['patient_id'])) {
+    $uid = 2000 + (int)$_SESSION['patient_id'];
+    $user_name = $_SESSION['patient_name'] ?? 'Patient';
+} else if ($_SESSION['user_type'] === 'healthcare' && isset($_SESSION['healthcare_id'])) {
+    $uid = 3000 + (int)$_SESSION['healthcare_id'];
+    $user_name = $_SESSION['healthcare_name'] ?? 'Health Worker';
+} else {
+    $uid = rand(4000, 5000);
+    $user_name = 'User';
+}
+
+// Include required scripts for Agora Token generation if needed on frontend via AJAX
+// or we can generate it here if we want but AJAX is cleaner for keeping credentials hidden.
+?>
 <!DOCTYPE html> 
 <html lang="en">
 	<head>
@@ -38,6 +69,80 @@
 
 		<!-- Iconsax CSS-->
 		<link rel="stylesheet" href="assets/css/iconsax.css">
+
+		<style>
+			#local-video {
+				width: 100%;
+				height: 100%;
+				background: #000;
+				border-radius: 10px;
+			}
+			#remote-video {
+				width: 100%;
+				height: 100%;
+				background: #2e2e2e;
+				border-radius: 10px;
+			}
+			.call-content-wrap {
+				position: relative;
+			}
+			.user-video {
+				width: 100%;
+				height: 500px;
+				overflow: hidden;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+			}
+			.my-video {
+				position: absolute;
+				bottom: 20px;
+				right: 20px;
+				width: 150px;
+				height: 120px;
+				z-index: 10;
+				border: 2px solid #fff;
+				border-radius: 10px;
+				overflow: hidden;
+			}
+			.call-footer {
+				position: absolute;
+				bottom: 0;
+				width: 100%;
+				background: rgba(0,0,0,0.5);
+				padding: 20px;
+				z-index: 100;
+				display: flex;
+				justify-content: center;
+			}
+			#video-toggle, #audio-toggle, #leave-btn {
+				display: none;
+			}
+			.call-item .call-end {
+				background-color: #f00 !important;
+				color: #fff !important;
+				border-radius: 50%;
+				width: 50px;
+				height: 50px;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+			}
+			#join-btn-container {
+				position: absolute;
+				top: 50%;
+				left: 50%;
+				transform: translate(-50%, -50%);
+				z-index: 100;
+			}
+			#join-btn {
+				padding: 15px 40px;
+				font-size: 18px;
+			}
+			.call-item a.call-end {
+				background-color: #ff3b30 !important;
+			}
+		</style>
 
 		<!-- Feathericon CSS -->
     	<link rel="stylesheet" href="assets/css/feather.css">
@@ -629,13 +734,13 @@
 																</a>
 															</div>
 															<div class="user-info float-start">
-																<a href="patient-profile.html"><span>Charlene Reed</span></a>
-																<span class="last-seen">Online</span>
+																<a href="javascript:void(0);"><span><?php echo htmlspecialchars($user_name); ?></span></a>
+																<span class="last-seen">UID: <?php echo $uid; ?></span>
 															</div>
 														</div>
 														<ul class="nav float-end custom-menu">
-															<li class="nav-item dropdown dropdown-action">
-																<a href="#" class="user-icon"><i class="isax isax-user-add"></i></a>
+															<li class="nav-item">
+																<span class="badge bg-success">Channel: <?php echo htmlspecialchars($channel_name); ?></span>
 															</li>
 														</ul>
 													</div>
@@ -646,14 +751,13 @@
 												<div class="call-contents">
 													<div class="call-content-wrap">
 														<div class="user-video">
-															<img src="assets/img/video-call.jpg" alt="User Image">
+															<div id="join-btn-container">
+																<button id="join-btn" class="btn btn-success rounded-pill border-0 px-4 py-2">Start Consultation</button>
+															</div>
+															<div id="remote-video"></div>
 														</div>
 														<div class="my-video">
-															<ul>
-																<li>
-																	<img src="assets/img/patients/patient1.jpg" class="img-fluid" alt="User Image">
-																</li>
-															</ul>
+															<div id="local-video"></div>
 														</div>
 													</div>
 												</div>
@@ -664,17 +768,17 @@
 													<div class="call-icons">
 														<ul class="call-items">
 															<li class="call-item">
-																<a href="javascript:void(0)" class="mute-video" title="Enable Video" data-placement="top" data-bs-toggle="tooltip">
+																<a href="javascript:void(0)" class="mute-video" id="video-toggle" title="Disable Video" data-placement="top" data-bs-toggle="tooltip">
 																	<i class="isax isax-video"></i>
 																</a>
 															</li>
 															<li class="call-item">
-																<a href="javascript:void(0)" class="call-end">
+																<a href="javascript:void(0)" class="call-end" id="leave-btn">
 																	<i class="isax isax-call"></i>
 																</a>
 															</li>
 															<li class="call-item">
-																<a href="javascript:void(0)" class="mute-bt" title="Mute" data-placement="top" data-bs-toggle="tooltip">
+																<a href="javascript:void(0)" class="mute-bt" id="audio-toggle" title="Mute" data-placement="top" data-bs-toggle="tooltip">
 																	<i class="isax isax-microphone-2"></i>
 																</a>
 															</li>
@@ -835,10 +939,152 @@
 		<!-- jQuery -->
 		<script src="assets/js/jquery-3.7.1.min.js"></script>
 		
+		<!-- Agora Web SDK -->
+		<script src="https://download.agora.io/sdk/release/AgoraRTC_N.js"></script>
+		
 		<!-- Bootstrap Core JS -->
 		<script src="assets/js/bootstrap.bundle.min.js"></script>
 		
 		<!-- Custom JS -->
+		<script>
+		$(document).ready(function() {
+			const options = {
+				appId: "d4ab628137c74b519e71dec351b83c34",
+				channel: "<?php echo $channel_name; ?>",
+				uid: <?php echo $uid; ?>,
+				token: null // Will be generated via server-side logic if needed
+			};
+
+			const client = AgoraRTC.createClient({ mode: "rtc", codec: "vp8" });
+			let localTracks = {
+				videoTrack: null,
+				audioTrack: null
+			};
+			let remoteUsers = {};
+
+			const joinCall = async () => {
+				// We call the server to get a valid token
+				try {
+					const response = await $.ajax({
+						url: 'php/generate-agora-token.php',
+						type: 'POST',
+						data: { channel: options.channel, uid: options.uid },
+						dataType: 'json'
+					}).fail(function(jqXHR, textStatus, errorThrown) {
+						console.error("AJAX Error Details:", {
+							status: jqXHR.status,
+							responseText: jqXHR.responseText,
+							textStatus: textStatus,
+							errorThrown: errorThrown
+						});
+					});
+
+					if (response.success) {
+						options.token = response.token;
+						
+						console.log("Token received:", options.token);
+						
+						// Subscribe to events
+						client.on("user-published", async (user, mediaType) => {
+							await client.subscribe(user, mediaType);
+							if (mediaType === "video") {
+								remoteUsers[user.uid] = user;
+								$("#remote-video").html("");
+								user.videoTrack.play("remote-video");
+							}
+							if (mediaType === "audio") {
+								user.audioTrack.play();
+							}
+						});
+
+						client.on("user-unpublished", user => {
+							delete remoteUsers[user.uid];
+							$("#remote-video").html("");
+						});
+
+						// Join and Publish local media
+						await client.join(options.appId, options.channel, options.token, options.uid);
+						
+						localTracks.audioTrack = await AgoraRTC.createMicrophoneAudioTrack();
+						localTracks.videoTrack = await AgoraRTC.createCameraVideoTrack();
+						
+						localTracks.videoTrack.play("local-video");
+						await client.publish([localTracks.audioTrack, localTracks.videoTrack]);
+						
+						$("#join-btn-container").hide();
+						$("#video-toggle, #audio-toggle, #leave-btn").show();
+					} else {
+						alert("Could not start call: " + response.message);
+					}
+				} catch (err) {
+					console.error(err);
+				}
+			};
+
+			const leaveCall = async () => {
+				for (let trackName in localTracks) {
+					let track = localTracks[trackName];
+					if (track) {
+						track.stop();
+						track.close();
+						localTracks[trackName] = null;
+					}
+				}
+				await client.leave();
+				$("#local-video").html("");
+				$("#remote-video").html("");
+				$("#join-btn-container").show();
+				
+				// Handle redirect after ending the call
+				<?php 
+				$redirect_url = 'index.php';
+				if (isset($_SESSION['user_type'])) {
+					if ($_SESSION['user_type'] === 'doctor') {
+						$redirect_url = 'doctor-dashboard.php';
+					} else if ($_SESSION['user_type'] === 'patient') {
+						$redirect_url = 'patient-dashboard.php';
+					}
+				}
+				?>
+				window.location.href = "<?php echo $redirect_url; ?>";
+			};
+
+			$("#join-btn").click(function() {
+				joinCall();
+			});
+
+			$("#leave-btn").click(function() {
+				leaveCall();
+			});
+
+			let isVideoMuted = false;
+			$("#video-toggle").click(function() {
+				if (!isVideoMuted) {
+					localTracks.videoTrack.setEnabled(false);
+					isVideoMuted = true;
+					$(this).find('i').removeClass('isax-video').addClass('isax-video-slash');
+				} else {
+					localTracks.videoTrack.setEnabled(true);
+					isVideoMuted = false;
+					$(this).find('i').removeClass('isax-video-slash').addClass('isax-video');
+				}
+			});
+
+			let isAudioMuted = false;
+			$("#audio-toggle").click(function() {
+				if (!isAudioMuted) {
+					localTracks.audioTrack.setEnabled(false);
+					isAudioMuted = true;
+					$(this).find('i').removeClass('isax-microphone-2').addClass('isax-microphone-slash');
+				} else {
+					localTracks.audioTrack.setEnabled(true);
+					isAudioMuted = false;
+					$(this).find('i').removeClass('isax-microphone-slash').addClass('isax-microphone-2');
+				}
+			});
+
+		});
+		</script>
 		<script src="assets/js/script.js"></script>
 		
 	</body>

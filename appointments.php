@@ -427,7 +427,7 @@ include 'header.php';
 												</div>
 											</li>
 											<li class="appointment-start">
-												<a href="doctor-appointment-start.html" class="start-link">Start Now</a>
+												<a href="video-call.php?appointment_id=<?php echo (int)$a['id']; ?>" class="start-link">Start Now</a>
 											</li>
 										</ul>
 									</div>

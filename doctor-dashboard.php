@@ -234,6 +234,7 @@ include 'header.php';
 													</td>
 													<td>
 														<div class="apponiment-actions d-flex align-items-center">
+															<a href="video-call.php?appointment_id=<?php echo (int)$apt['id']; ?>" class="text-info-icon me-2" title="Video Call"><i class="fa-solid fa-video"></i></a>
 															<a href="appointments.php" class="text-success-icon me-2" title="View"><i class="fa-solid fa-eye"></i></a>
 														</div>
 													</td>
