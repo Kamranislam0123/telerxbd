@@ -225,7 +225,10 @@ include 'header.php';
 																				<a href="appointment-detail.php?id=<?php echo (int)$appointment['id']; ?>" title="View"><i class="isax isax-eye4"></i></a>
 																			</li>
 																			<li>
-																				<a href="chat.php?doctor_id=<?php echo (int)$appointment['doctor_id']; ?>" title="Chat"><i class="isax isax-messages-25"></i></a>
+																				<a href="chat.php?doctor_id=<?php echo (int)$appointment['doctor_id']; ?>&appointment_id=<?php echo (int)$appointment['id']; ?>" title="Chat"><i class="isax isax-messages-25"></i></a>
+																			</li>
+																			<li>
+																				<a href="chat.php?doctor_id=<?php echo (int)$appointment['doctor_id']; ?>&appointment_id=<?php echo (int)$appointment['id']; ?>" title="Chat"><i class="isax isax-messages-25"></i></a>
 																			</li>
 																			<li>
 																				<a href="javascript:void(0);" class="cancel-appointment" data-id="<?php echo (int)$appointment['id']; ?>" title="Cancel"><i class="isax isax-close-circle5"></i></a>
@@ -302,6 +305,9 @@ include 'header.php';
 																		<ul>
 																			<li>
 																				<a href="appointment-detail.php?id=<?php echo (int)$appointment['id']; ?>" title="View"><i class="isax isax-eye4"></i></a>
+																			</li>
+																			<li>
+																				<a href="chat.php?doctor_id=<?php echo (int)$appointment['doctor_id']; ?>&appointment_id=<?php echo (int)$appointment['id']; ?>" title="Chat"><i class="isax isax-messages-25"></i></a>
 																			</li>
 																			<li>
 																				<span class="badge badge-danger"><?php echo ucfirst($appointment['status'] ?? 'Cancelled'); ?></span>
