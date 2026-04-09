@@ -415,7 +415,9 @@ include 'header.php';
 													<li>
 														<a href="appointment-detail.php?id=<?php echo (int)$a['id']; ?>" title="View"><i class="isax isax-eye4"></i></a>
 													</li>
-													<li><a href="#" title="Chat"><i class="isax isax-messages-25"></i></a></li>
+													<li>
+														<a href="chat-doctor.php?appointment_id=<?php echo (int)$a['id']; ?>" title="Chat"><i class="isax isax-messages-25"></i></a>
+													</li>
 													<li><a href="#" class="text-danger-icon" title="Cancel"><i class="isax isax-close-circle5"></i></a></li>
 												</ul>
 												<div class="mt-2 text-center">
@@ -465,6 +467,19 @@ include 'header.php';
 													<li>Video Call</li>
 												</ul>
 											</li>
+											<li class="appointment-action">
+												<ul>
+													<li>
+														<a href="appointment-detail.php?id=<?php echo (int)$a['id']; ?>" title="View"><i class="isax isax-eye4"></i></a>
+													</li>
+													<li>
+														<a href="chat-doctor.php?appointment_id=<?php echo (int)$a['id']; ?>" title="Chat"><i class="isax isax-messages-25"></i></a>
+													</li>
+													<li>
+														<span class="badge badge-danger">Cancelled</span>
+													</li>
+												</ul>
+											</li>
 											<li class="appointment-detail-btn">
 												<a href="appointment-detail.php?id=<?php echo (int)$a['id']; ?>" class="start-link">View Details</a>
 												<?php if (!empty($a['prescription_path'])): ?>
@@ -507,6 +522,16 @@ include 'header.php';
 												<ul class="d-flex apponitment-types">
 													<li>Consultation</li>
 													<li>Video Call</li>
+												</ul>
+											</li>
+											<li class="appointment-action">
+												<ul>
+													<li>
+														<a href="appointment-detail.php?id=<?php echo (int)$a['id']; ?>" title="View"><i class="isax isax-eye4"></i></a>
+													</li>
+													<li>
+														<a href="chat-doctor.php?appointment_id=<?php echo (int)$a['id']; ?>" title="Chat"><i class="isax isax-messages-25"></i></a>
+													</li>
 												</ul>
 											</li>
 											<li class="appointment-detail-btn">
