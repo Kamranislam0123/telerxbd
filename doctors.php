@@ -3,11 +3,53 @@ session_start();
 include 'header.php';
 require_once 'php/config.php';
 
+$search_keyword = isset($_GET['search']) ? trim((string)$_GET['search']) : '';
+$location_filter = isset($_GET['location']) ? trim((string)$_GET['location']) : '';
+$date_selected = isset($_GET['date']) ? trim((string)$_GET['date']) : '';
+
 try {
     $conn = getDBConnection();
 
-    // Fetch all doctors with their profiles for list view
-    $stmt = $conn->prepare("
+    // Fetch doctors with optional search and location filtering
+    $where_clauses = ['1=1'];
+    $params = [];
+    $types = '';
+
+    if ($search_keyword !== '') {
+        $where_clauses[] = "(
+            d.name LIKE ? OR
+            dp.specialty LIKE ? OR
+            dp.bio LIKE ? OR
+            dp.languages_spoken LIKE ?
+        )";
+        $like_search = "%{$search_keyword}%";
+        $params[] = $like_search;
+        $params[] = $like_search;
+        $params[] = $like_search;
+        $params[] = $like_search;
+        $types .= 'ssss';
+    }
+
+    if ($location_filter !== '') {
+        $where_clauses[] = "(
+            dp.district LIKE ? OR
+            dp.city LIKE ? OR
+            dp.state LIKE ? OR
+            dp.address LIKE ?
+        )";
+        $like_location = "%{$location_filter}%";
+        $params[] = $like_location;
+        $params[] = $like_location;
+        $params[] = $like_location;
+        $params[] = $like_location;
+        $types .= 'ssss';
+    }
+
+    if ($date_selected !== '') {
+        $where_clauses[] = 'dp.is_available = 1';
+    }
+
+    $sql = "
         SELECT
             d.*,
             dp.bio,
@@ -31,8 +73,14 @@ try {
             (SELECT COUNT(*) FROM doctor_awards da WHERE da.doctor_id = d.id) as awards_count
         FROM doctors d
         LEFT JOIN doctor_profiles dp ON d.id = dp.doctor_id
+        WHERE " . implode(' AND ', $where_clauses) . "
         ORDER BY d.created_at DESC
-    ");
+    ";
+
+    $stmt = $conn->prepare($sql);
+    if (!empty($params)) {
+        $stmt->bind_param($types, ...$params);
+    }
     $stmt->execute();
     $doctors = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
     $stmt->close();
@@ -92,12 +140,18 @@ try {
 
     // Gender counts for filter (Male, Female, Other)
     $gender_counts = ['Male' => 0, 'Female' => 0, 'Other' => 0];
+    $district_counts = [];
     foreach ($doctors as $d) {
         $g = isset($d['gender']) && $d['gender'] !== '' ? trim($d['gender']) : 'Other';
         if (!isset($gender_counts[$g])) {
             $gender_counts[$g] = 0;
         }
         $gender_counts[$g]++;
+
+        $dist = isset($d['district']) && $d['district'] !== '' ? trim($d['district']) : '';
+        if ($dist !== '') {
+            $district_counts[$dist] = ($district_counts[$dist] ?? 0) + 1;
+        }
     }
 
     $conn->close();
@@ -106,6 +160,7 @@ try {
     $doctors = [];
     $final_specialities = [];
     $gender_counts = ['Male' => 0, 'Female' => 0, 'Other' => 0];
+    $district_counts = [];
 }
 ?>
     <style>                               
@@ -170,23 +225,23 @@ try {
             </div>
             <div class="bg-primary-gradient rounded-pill doctors-search-box">
                 <div class="search-box-one rounded-pill">
-                    <form action="doctors.php">
+                    <form action="doctors.php" method="GET">
                         <div class="search-input search-line">
                             <i class="isax isax-hospital5 bficon"></i>
                             <div class=" mb-0">
-                                <input type="text" class="form-control" placeholder="Search for Doctors">
+                                <input type="text" name="search" class="form-control" placeholder="Search for Doctors" value="<?php echo htmlspecialchars($search_keyword); ?>">
                             </div>
                         </div>
                         <div class="search-input search-map-line">
                             <i class="isax isax-location5"></i>
                             <div class=" mb-0">
-                                <input type="text" class="form-control" placeholder="Location">
+                                <input type="text" name="location" class="form-control" placeholder="Location" value="<?php echo htmlspecialchars($location_filter); ?>">
                             </div>
                         </div>
                         <div class="search-input search-calendar-line">
                             <i class="isax isax-calendar-tick5"></i>
                             <div class=" mb-0">
-                                <input type="text" class="form-control datetimepicker" placeholder="Date">
+                                <input type="text" name="date" class="form-control datetimepicker" placeholder="Date" value="<?php echo htmlspecialchars($date_selected); ?>">
                             </div>
                         </div>
                         <div class="form-search-btn">
@@ -291,6 +346,54 @@ try {
                                             <span class="filter-badge"><?php echo (int)$count; ?></span>
                                         </div>
                                         <?php endforeach; ?>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="accordion-item border-bottom">
+                                <div class="accordion-header" id="headingDistrict">
+                                    <div class="accordion-button" data-bs-toggle="collapse" data-bs-target="#collapseDistrict" aria-controls="collapseDistrict" role="button">
+                                        <div class="d-flex align-items-center w-100">
+                                            <h5>District</h5>
+                                            <div class="ms-auto">
+                                                <span><i class="fas fa-chevron-down"></i></span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div id="collapseDistrict" class="accordion-collapse show" aria-labelledby="headingDistrict">
+                                    <div class="accordion-body pt-3">
+                                        <div class="specialities-scroll">
+                                            <?php
+                                            if (!empty($district_counts)):
+                                                ksort($district_counts);
+                                                $dist_idx = 1;
+                                                foreach ($district_counts as $district => $count):
+                                                    $cb_id = 'district-filter-' . $dist_idx;
+                                            ?>
+                                            <div class="d-flex align-items-center justify-content-between mb-2">
+                                                <div class="form-check">
+                                                    <input class="form-check-input district-filter" type="checkbox" 
+                                                        value="<?php echo htmlspecialchars($district); ?>" 
+                                                        id="<?php echo $cb_id; ?>">
+                                                    <label class="form-check-label" for="<?php echo $cb_id; ?>">
+                                                        <?php echo htmlspecialchars($district); ?>
+                                                    </label>
+                                                </div>
+                                                <span class="filter-badge"><?php echo $count; ?></span>
+                                            </div>
+                                            <?php $dist_idx++; endforeach; ?>
+                                            <?php else: ?>
+                                            <div class="d-flex align-items-center justify-content-between mb-2">
+                                                <div class="form-check">
+                                                    <label class="form-check-label">
+                                                        No districts available
+                                                    </label>
+                                                </div>
+                                                <span class="filter-badge">0</span>
+                                            </div>
+                                            <?php endif; ?>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -521,7 +624,7 @@ try {
                                                     <div class="d-flex align-items-center justify-content-between">
                                                         <div>
                                                             <p class="mb-1">Consultation Fees</p>
-                                                            <h4 class="text-orange">$<?php echo number_format($doctor['consultation_fee'] ?? 100, 0); ?></h4>
+                                                            <h4 class="text-orange">৳<?php echo number_format($doctor['consultation_fee'] ?? 100, 0); ?></h4>
                                                         </div>
                                                         <a href="booking.php?doctor_id=<?php echo $doctor['id']; ?>" class="btn btn-md btn-dark d-inline-flex align-items-center rounded-pill"><i class="isax isax-calendar-1 me-2"></i>Book Now</a>
                                                     </div>
@@ -550,7 +653,10 @@ try {
                                 $hidden_class = ($doctor_index >= $load_more_initial) ? ' load-more-hidden' : '';
                                 $doctor_index++;
                         ?>
-                                <div class="col-xxl-4 col-md-6 doctor-grid-item<?php echo $hidden_class; ?>" data-speciality="<?php echo htmlspecialchars($doctor['specialty'] ?? 'General Physician'); ?>" data-gender="<?php echo htmlspecialchars($doctor['gender'] ?? 'Other'); ?>">
+                                <div class="col-xxl-4 col-md-6 doctor-grid-item<?php echo $hidden_class; ?>" 
+                                    data-speciality="<?php echo htmlspecialchars($doctor['specialty'] ?? 'General Physician'); ?>" 
+                                    data-gender="<?php echo htmlspecialchars($doctor['gender'] ?? 'Other'); ?>"
+                                    data-district="<?php echo htmlspecialchars($doctor['district'] ?? ''); ?>">
                                     <div class="card">
                                         <div class="card-img card-img-hover doctor-profile-card-img">
                                             <?php
@@ -590,7 +696,7 @@ try {
                                                 <div class="d-flex align-items-center justify-content-between">
                                                     <div>
                                                         <p class="mb-1">Consultation Fees</p>
-                                                        <h3 class="text-orange">$<?php echo number_format($doctor['consultation_fee'] ?? 100, 0); ?></h3>
+                                                        <h3 class="text-orange">৳<?php echo number_format($doctor['consultation_fee'] ?? 100, 0); ?></h3>
                                                     </div>
                                                     <a href="booking.php?doctor_id=<?php echo $doctor['id']; ?>" class="btn btn-md btn-dark d-inline-flex align-items-center rounded-pill">
                                                         <i class="isax isax-calendar-1 me-2"></i>
@@ -644,5 +750,176 @@ try {
     <script src="assets/plugins/ion-rangeslider/js/ion.rangeSlider.js"></script>
     <script src="assets/plugins/ion-rangeslider/js/custom-rangeslider.js"></script>
     <script src="assets/plugins/ion-rangeslider/js/ion.rangeSlider.min.js"></script>
+
+    <style>
+    .search-suggestion-dropdown {
+        position: absolute;
+        top: calc(100% + 4px);
+        left: 0;
+        right: 0;
+        background: #fff;
+        border: 1px solid #e2e8f0;
+        border-radius: 10px;
+        box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+        z-index: 9999;
+        overflow: hidden;
+        max-height: 280px;
+        overflow-y: auto;
+    }
+    .search-suggestion-dropdown .suggestion-item {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 9px 14px;
+        cursor: pointer;
+        font-size: 14px;
+        color: #2d3748;
+        transition: background 0.15s;
+    }
+    .search-suggestion-dropdown .suggestion-item:hover,
+    .search-suggestion-dropdown .suggestion-item.active {
+        background: #f0f7ff;
+        color: #0c77c9;
+    }
+    .search-suggestion-dropdown .suggestion-item mark {
+        background: transparent;
+        color: #0c77c9;
+        font-weight: 600;
+        padding: 0;
+    }
+    .search-input {
+        position: relative;
+    }
+    </style>
+
+    <script>
+    (function() {
+        var debounceTimers = {};
+
+        var iconMap = {
+            doctor:   'fa-user-doctor',
+            specialty:'fa-stethoscope',
+            district: 'fa-map-marker-alt',
+            city:     'fa-city'
+        };
+
+        function escapeHtml(str) {
+            return str.replace(/[&<>"']/g, function(c) {
+                return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];
+            });
+        }
+
+        function highlightMatch(text, query) {
+            var escaped = query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+            return escapeHtml(text).replace(new RegExp('(' + escaped + ')', 'gi'), '<mark>$1</mark>');
+        }
+
+        function createDropdown(inputEl) {
+            var existing = inputEl.parentNode.querySelector('.search-suggestion-dropdown');
+            if (existing) return existing;
+            var drop = document.createElement('div');
+            drop.className = 'search-suggestion-dropdown';
+            drop.style.display = 'none';
+            inputEl.parentNode.style.position = 'relative';
+            inputEl.parentNode.appendChild(drop);
+            return drop;
+        }
+
+        function showDropdown(drop, items, query, onSelect) {
+            if (!items.length) { drop.style.display = 'none'; return; }
+            drop.innerHTML = '';
+
+            items.forEach(function(item) {
+                var div = document.createElement('div');
+                div.className = 'suggestion-item';
+                div.innerHTML = '<span>' + highlightMatch(item.label, query) + '</span>';
+                div.addEventListener('mousedown', function(e) {
+                    e.preventDefault();
+                    onSelect(item.label);
+                });
+                drop.appendChild(div);
+            });
+
+            drop.style.display = 'block';
+            drop._activeIdx = -1;
+        }
+
+        function hideDropdown(drop) {
+            drop.style.display = 'none';
+            drop._activeIdx = -1;
+        }
+
+        function initAutocomplete(inputEl, apiType) {
+            var drop = createDropdown(inputEl);
+            var form = inputEl.closest('form');
+
+            inputEl.addEventListener('input', function() {
+                var q = this.value.trim();
+                clearTimeout(debounceTimers[apiType]);
+                if (q.length < 2) { hideDropdown(drop); return; }
+
+                debounceTimers[apiType] = setTimeout(function() {
+                    fetch('api/search-suggestions.php?type=' + apiType + '&q=' + encodeURIComponent(q))
+                        .then(function(r) { return r.json(); })
+                        .then(function(items) {
+                            showDropdown(drop, items, q, function(val) {
+                                inputEl.value = val;
+                                hideDropdown(drop);
+                                if (form) form.submit();
+                            });
+                        })
+                        .catch(function() { hideDropdown(drop); });
+                }, 220);
+            });
+
+            inputEl.addEventListener('keydown', function(e) {
+                if (drop.style.display === 'none') return;
+                var items = drop.querySelectorAll('.suggestion-item');
+                var idx = drop._activeIdx !== undefined ? drop._activeIdx : -1;
+
+                if (e.key === 'ArrowDown') {
+                    e.preventDefault();
+                    idx = Math.min(idx + 1, items.length - 1);
+                } else if (e.key === 'ArrowUp') {
+                    e.preventDefault();
+                    idx = Math.max(idx - 1, -1);
+                } else if (e.key === 'Enter') {
+                    if (idx >= 0 && items[idx]) {
+                        e.preventDefault();
+                        inputEl.value = items[idx].textContent.trim();
+                        hideDropdown(drop);
+                        if (form) form.submit();
+                        return;
+                    }
+                    hideDropdown(drop);
+                    return;
+                } else if (e.key === 'Escape') {
+                    hideDropdown(drop);
+                    return;
+                } else { return; }
+
+                items.forEach(function(el, i) {
+                    el.classList.toggle('active', i === idx);
+                });
+                drop._activeIdx = idx;
+            });
+
+            inputEl.addEventListener('blur', function() {
+                setTimeout(function() { hideDropdown(drop); }, 150);
+            });
+
+            inputEl.addEventListener('focus', function() {
+                if (this.value.trim().length >= 2) this.dispatchEvent(new Event('input'));
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            var searchInput   = document.querySelector('.doctors-search-box input[name="search"]');
+            var locationInput = document.querySelector('.doctors-search-box input[name="location"]');
+            if (searchInput)   initAutocomplete(searchInput,   'search');
+            if (locationInput) initAutocomplete(locationInput, 'location');
+        });
+    })();
+    </script>
 
 <?php include 'footer.php'; ?>

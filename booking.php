@@ -1,5 +1,17 @@
 <?php
 session_start();
+
+// Require patient login before allowing booking
+if (!isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true || ($_SESSION['user_type'] ?? '') !== 'patient') {
+    $booking_doctor_id = isset($_GET['doctor_id']) ? (int)$_GET['doctor_id'] : (isset($_GET['id']) ? (int)$_GET['id'] : 0);
+    $redirectUrl = 'registration.php';
+    if ($booking_doctor_id > 0) {
+        $redirectUrl .= '?redirect=' . urlencode('booking.php?doctor_id=' . $booking_doctor_id);
+    }
+    header('Location: ' . $redirectUrl);
+    exit;
+}
+
 include 'header.php';
 
 $booking_doctor_id = isset($_GET['doctor_id']) ? (int)$_GET['doctor_id'] : (isset($_GET['id']) ? (int)$_GET['id'] : 0);
@@ -341,8 +353,16 @@ function format_slot_time_12($t) {
 																	<div class="tab-pane fade" id="pills-profile" role="tabpanel">
 																		<div>
 																			<label class="form-label">Tearms & Conditions</label>
-																			<p>1. Monthly two (2) Times Applicable</p>
+																			<p>1. Monthly two (2) Times Applicable using one TID</p>
 																			<p>2. Fake NID strickly not allowed</p>
+																		</div>
+																		<div class="mb-3">
+																			<label class="form-label">TeleRx ID (TID) <span class="text-danger">*</span></label>
+																			<div class="input-group">
+																				<input type="text" class="form-control" name="welfare_tid" id="welfare_tid" placeholder="Enter TID">
+																				<button class="btn btn-primary" type="button" id="btn_check_welfare">Check</button>
+																			</div>
+																			<div id="welfare_status" class="mt-2" style="display:none; font-size: 13px; font-weight: 500;"></div>
 																		</div>
 																		<div class="mb-3">
 																			<label class="form-label">National ID Number</label>
@@ -392,8 +412,8 @@ function format_slot_time_12($t) {
 														<h6 class="text-white">Total</h6>
 														<h6 class="text-white"><?php echo number_format($total_fee, 0); ?>/-</h6>
 													</div>
-													<div>
-													<h6 class="mb-3 mt-3">TeleRx ID (TID)</h6>
+													<div id="optional_tid_wrapper">
+														<h6 class="mb-3 mt-3">TeleRx ID (TID)</h6>
 														<input type="text" class="form-control" name="booking_telerx_id" id="booking_telerx_id" placeholder="Enter health worker's TeleRx ID (optional)">
 													</div>
 												</div>

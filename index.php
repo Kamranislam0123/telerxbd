@@ -71,23 +71,23 @@ try {
                     </div>
                     <h1 class="display-5">Discover Health: Find Your Trusted <span class="banner-icon"><img src="assets/img/icons/video.svg" alt="img"></span> <span class="text-gradient">Doctors</span> Today</h1>
                     <div class="search-box-one aos" data-aos="fade-up">
-                        <form action="doctors.php">
+                        <form action="doctors.php" method="GET">
                             <div class="search-input search-line">
                                 <i class="isax isax-hospital5 bficon"></i>
                                 <div class=" mb-0">
-                                    <input type="text" class="form-control" placeholder="Search doctors, clinics, hospitals, etc">
+                                    <input type="text" name="search" class="form-control" placeholder="Search doctors, clinics, hospitals, etc">
                                 </div>
                             </div>
                             <div class="search-input search-map-line">
                                 <i class="isax isax-location5"></i>
                                 <div class=" mb-0">
-                                    <input type="text" class="form-control" placeholder="Location">
+                                    <input type="text" name="location" class="form-control" placeholder="Location">
                                 </div>
                             </div>
                             <div class="search-input search-calendar-line">
                                 <i class="isax isax-calendar-tick5"></i>
                                 <div class=" mb-0">
-                                    <input type="text" class="form-control datetimepicker" placeholder="Date">
+                                    <input type="text" name="date" class="form-control datetimepicker" placeholder="Date">
                                 </div>
                             </div>
                             <div class="form-search-btn">
@@ -159,7 +159,7 @@ try {
                                     </div>
                                 </a>
                                 <div class="doctor-amount">
-                                    <span>$<?php echo number_format($doctor['consultation_fee'] ?? 0, 0); ?></span>
+                                    <span>৳<?php echo number_format($doctor['consultation_fee'] ?? 0, 0); ?></span>
                                 </div>
                             </div>
                             <div class="doc-content">
@@ -355,5 +355,134 @@ try {
 <?php include 'testimonial.php'; ?>
 
 <?php include 'footer-banner.php'; ?>
+
+<style>
+.search-suggestion-dropdown {
+    position: absolute;
+    top: calc(100% + 4px);
+    left: 0;
+    right: 0;
+    background: #fff;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+    z-index: 9999;
+    overflow: hidden;
+    max-height: 280px;
+    overflow-y: auto;
+}
+.search-suggestion-dropdown .suggestion-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 9px 14px;
+    cursor: pointer;
+    font-size: 14px;
+    color: #2d3748;
+    transition: background 0.15s;
+}
+.search-suggestion-dropdown .suggestion-item:hover,
+.search-suggestion-dropdown .suggestion-item.active {
+    background: #f0f7ff;
+    color: #0c77c9;
+}
+.search-suggestion-dropdown .suggestion-item mark {
+    background: transparent;
+    color: #0c77c9;
+    font-weight: 600;
+    padding: 0;
+}
+.search-input { position: relative; }
+</style>
+
+<script>
+(function() {
+    var debounceTimers = {};
+    var iconMap = { doctor:'fa-user-doctor', specialty:'fa-stethoscope', district:'fa-map-marker-alt', city:'fa-city' };
+
+    function escapeHtml(str) {
+        return str.replace(/[&<>"']/g, function(c) {
+            return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];
+        });
+    }
+    function highlightMatch(text, query) {
+        var escaped = query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        return escapeHtml(text).replace(new RegExp('(' + escaped + ')', 'gi'), '<mark>$1</mark>');
+    }
+    function createDropdown(inputEl) {
+        var existing = inputEl.parentNode.querySelector('.search-suggestion-dropdown');
+        if (existing) return existing;
+        var drop = document.createElement('div');
+        drop.className = 'search-suggestion-dropdown';
+        drop.style.display = 'none';
+        inputEl.parentNode.style.position = 'relative';
+        inputEl.parentNode.appendChild(drop);
+        return drop;
+    }
+    function showDropdown(drop, items, query, onSelect) {
+        if (!items.length) { drop.style.display = 'none'; return; }
+        drop.innerHTML = '';
+        items.forEach(function(item) {
+            var div = document.createElement('div');
+            div.className = 'suggestion-item';
+            div.innerHTML = '<span>' + highlightMatch(item.label, query) + '</span>';
+            div.addEventListener('mousedown', function(e) { e.preventDefault(); onSelect(item.label); });
+            drop.appendChild(div);
+        });
+        drop.style.display = 'block';
+        drop._activeIdx = -1;
+    }
+    function hideDropdown(drop) { drop.style.display = 'none'; drop._activeIdx = -1; }
+
+    function initAutocomplete(inputEl, apiType) {
+        var drop = createDropdown(inputEl);
+        var form = inputEl.closest('form');
+        inputEl.addEventListener('input', function() {
+            var q = this.value.trim();
+            clearTimeout(debounceTimers[apiType + inputEl.name]);
+            if (q.length < 2) { hideDropdown(drop); return; }
+            debounceTimers[apiType + inputEl.name] = setTimeout(function() {
+                fetch('api/search-suggestions.php?type=' + apiType + '&q=' + encodeURIComponent(q))
+                    .then(function(r) { return r.json(); })
+                    .then(function(items) {
+                        showDropdown(drop, items, q, function(val) {
+                            inputEl.value = val;
+                            hideDropdown(drop);
+                            if (form) form.submit();
+                        });
+                    }).catch(function() { hideDropdown(drop); });
+            }, 220);
+        });
+        inputEl.addEventListener('keydown', function(e) {
+            if (drop.style.display === 'none') return;
+            var items = drop.querySelectorAll('.suggestion-item');
+            var idx = drop._activeIdx !== undefined ? drop._activeIdx : -1;
+            if (e.key === 'ArrowDown') { e.preventDefault(); idx = Math.min(idx + 1, items.length - 1); }
+            else if (e.key === 'ArrowUp') { e.preventDefault(); idx = Math.max(idx - 1, -1); }
+            else if (e.key === 'Enter') {
+                if (idx >= 0 && items[idx]) {
+                    e.preventDefault();
+                    inputEl.value = items[idx].textContent.trim();
+                    hideDropdown(drop);
+                    if (form) form.submit();
+                    return;
+                }
+                hideDropdown(drop); return;
+            } else if (e.key === 'Escape') { hideDropdown(drop); return; } else return;
+            items.forEach(function(el, i) { el.classList.toggle('active', i === idx); });
+            drop._activeIdx = idx;
+        });
+        inputEl.addEventListener('blur', function() { setTimeout(function() { hideDropdown(drop); }, 150); });
+        inputEl.addEventListener('focus', function() { if (this.value.trim().length >= 2) this.dispatchEvent(new Event('input')); });
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        var searchInput   = document.querySelector('.banner-section input[name="search"]');
+        var locationInput = document.querySelector('.banner-section input[name="location"]');
+        if (searchInput)   initAutocomplete(searchInput,   'search');
+        if (locationInput) initAutocomplete(locationInput, 'location');
+    });
+})();
+</script>
 
 <?php include 'footer.php'; ?>

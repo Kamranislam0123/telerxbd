@@ -3952,6 +3952,42 @@ $(document).ready(function () {
 		return false;
 	});
 
+	// Handle Payment Tab Switching
+	$('#pills-home-tab').on('click', function() {
+		$('#optional_tid_wrapper').slideDown();
+	});
+	$('#pills-profile-tab').on('click', function() {
+		$('#optional_tid_wrapper').slideUp();
+	});
+
+	// Handle Welfare TID Check
+	$('#btn_check_welfare').on('click', function() {
+		var tid = $('#welfare_tid').val().trim();
+		if (!tid) {
+			$('#welfare_status').show().removeClass('text-success').addClass('text-danger').text('Please enter a TID first.');
+			return;
+		}
+		
+		var $btn = $(this);
+		$btn.prop('disabled', true).html('<i class="fa fa-spinner fa-spin"></i>');
+		
+		$.post('php/check-welfare.php', { tid: tid }, function(r) {
+			if (r && r.success) {
+				$('#welfare_status').show().removeClass('text-danger').addClass('text-success').text(r.message);
+				// Mark as validated (optional, you could use a data attribute)
+				$('#welfare_tid').data('validated', true);
+			} else {
+				$('#welfare_status').show().removeClass('text-success').addClass('text-danger').text(r && r.message ? r.message : 'Invalid TID.');
+				$('#welfare_tid').data('validated', false);
+			}
+			$btn.prop('disabled', false).text('Check');
+		}, 'json').fail(function() {
+			$('#welfare_status').show().removeClass('text-success').addClass('text-danger').text('Error checking TID. Please try again.');
+			$('#welfare_tid').data('validated', false);
+			$btn.prop('disabled', false).text('Check');
+		});
+	});
+
 	// Confirm & Pay: save booking to DB, then go to confirmation step
 	$('#booking_confirm_pay_btn').on('click', function(e) {
 		e.preventDefault();
@@ -3962,6 +3998,12 @@ $(document).ready(function () {
 		var slotTime = $('input[name="appointment_slot"]:checked').val() || $('#booking_slot_time').val();
 		var fullName = $('#booking_full_name').val();
 		var mobile = $('#booking_mobile').val();
+		
+		var isWelfare = $('#pills-profile-tab').hasClass('active');
+		var paymentMethod = isWelfare ? 'welfare' : 'bkash';
+		var telerxId = isWelfare ? $('#welfare_tid').val() : $('#booking_telerx_id').val();
+		if (telerxId) telerxId = telerxId.trim();
+
 		if (!doctorId || !appointmentDate || !slotTime) {
 			showBookingToast('danger', 'Please select a date and a time slot.');
 			return false;
@@ -3970,6 +4012,11 @@ $(document).ready(function () {
 			showBookingToast('danger', 'Please enter Full Name and Mobile Number.');
 			return false;
 		}
+		if (isWelfare && !telerxId) {
+			showBookingToast('danger', 'Please enter a TeleRx ID (TID) for welfare booking.');
+			return false;
+		}
+
 		showBookingToast('success', 'Confirming your booking...');
 		$btn.prop('disabled', true).html('<i class="fa fa-spinner fa-spin me-2"></i>Confirming...');
 		$.post('php/book-appointment.php', {
@@ -3986,7 +4033,8 @@ $(document).ready(function () {
 			pulse: $('#booking_pulse').val() || '',
 			spo2: $('#booking_spo2').val() || '',
 			rbs_fbs: $('#booking_rbs_fbs').val() || '',
-			telerx_id: $('#booking_telerx_id').val() ? $('#booking_telerx_id').val().trim() : ''
+			telerx_id: telerxId,
+			payment_method: paymentMethod
 		}, function(r) {
 			if (r && r.success) {
 				showBookingToast('success', r.message || 'Booking confirmed!');

@@ -1035,6 +1035,13 @@ if ($_SESSION['user_type'] === 'doctor' && isset($_SESSION['doctor_id'])) {
 				$("#remote-video").html("");
 				$("#join-btn-container").show();
 				
+				// Mark as completed on backend
+				try {
+					await $.post('php/complete-appointment.php', { appointment_id: "<?php echo (int)$appointment_id; ?>" });
+				} catch (err) {
+					console.error("Failed to mark appointment as completed:", err);
+				}
+
 				// Handle redirect after ending the call
 				<?php 
 				$redirect_url = 'index.php';

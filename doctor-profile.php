@@ -257,7 +257,7 @@ try {
 									</li>
 								</ul>
 								<div class="bottom-book-btn">
-									<p><span>Consultation Fee : $<?php echo number_format($doctor['consultation_fee'], 0); ?> </span> for a Session</p>
+									<p><span>Consultation Fee : ৳<?php echo number_format($doctor['consultation_fee'], 0); ?> </span> for a Session</p>
 									<div class="clinic-booking">
 										<a class="apt-btn" href="booking.php?doctor_id=<?php echo $profile_doctor_id; ?>">Book Appointment</a>
 									</div>
