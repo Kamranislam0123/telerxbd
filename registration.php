@@ -147,6 +147,10 @@ include 'header.php';?>
                                             <input type="text" class="form-control" name="nid_number" id="health-worker-nid" placeholder="Enter your National ID number" required>
                                         </div>
                                         <div class="mb-3">
+                                            <label class="form-label">TID Number</label>
+                                            <input type="text" class="form-control" name="tid" id="health-worker-tid" placeholder="TID will be auto-generated" readonly>
+                                        </div>
+                                        <div class="mb-3">
                                             <div class="form-group-flex">
                                                 <label class="form-label">Create Password</label>
                                             </div>
@@ -195,6 +199,8 @@ include 'header.php';?>
             // Silently ignore - intlTelInput is optional
         }
 
+        var registrationRedirect = (new URLSearchParams(window.location.search)).get('redirect') || '';
+
         // Patient Registration Form Handler
         $('#patient-register-btn').on('click', function(e) {
             e.preventDefault();
@@ -218,6 +224,9 @@ include 'header.php';?>
                 phone: $('#patient-phone').val(),
                 password: $('#patient-password').val()
             };
+            if (registrationRedirect) {
+                formData.redirect = registrationRedirect;
+            }
 
             // Validate form data
             if (!formData.name || !formData.email || !formData.phone || !formData.password) {
@@ -307,6 +316,9 @@ include 'header.php';?>
                 bmdc_no: $('#doctor-bmdc_no').val(),
                 password: $('#doctor-password').val()
             };
+            if (registrationRedirect) {
+                formData.redirect = registrationRedirect;
+            }
 
             // Submit via AJAX
             $.ajax({
@@ -362,6 +374,16 @@ include 'header.php';?>
             var phone = $('#health-worker-phone').val().trim();
             var nid_number = $('#health-worker-nid').val().trim();
             var password = $('#health-worker-password').val();
+
+            // Auto-generate TID field value visually (optional but good for UX)
+            $('#health-worker-phone').on('input', function() {
+                var phoneVal = $(this).val().replace(/\D/g, '');
+                if (phoneVal) {
+                    $('#health-worker-tid').val('TID' + phoneVal);
+                } else {
+                    $('#health-worker-tid').val('');
+                }
+            });
 
             // Client-side validation
             var clientErrors = [];

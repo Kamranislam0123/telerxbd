@@ -41,7 +41,19 @@ $phone = isset($_POST['phone']) ? trim($_POST['phone']) : '';
 $bmdc_no = isset($_POST['bmdc_no']) ? trim($_POST['bmdc_no']) : '';
 $nid_number = isset($_POST['nid_number']) ? trim($_POST['nid_number']) : '';
 $password = isset($_POST['password']) ? trim($_POST['password']) : '';
+$redirect = isset($_POST['redirect']) ? trim($_POST['redirect']) : '';
 
+// Normalize redirect to allow only local paths
+$sanitized_redirect = '';
+if ($redirect !== '') {
+    $parsed = parse_url($redirect);
+    if (!isset($parsed['scheme']) && !isset($parsed['host']) && isset($parsed['path'])) {
+        $sanitized_redirect = ltrim($parsed['path'], '/');
+        if (isset($parsed['query']) && $parsed['query'] !== '') {
+            $sanitized_redirect .= '?' . $parsed['query'];
+        }
+    }
+}
 
 // Validate user type
 $valid_user_types = ['patient', 'doctor', 'healthcare'];
@@ -294,7 +306,7 @@ try {
                 }
                 $stmt->bind_param("sss", $name, $email, $hashed_password);
             }
-            $redirect_url = 'login.php';
+            $redirect_url = $sanitized_redirect !== '' ? $sanitized_redirect : 'login.php';
             break;
 
         case 'doctor':
@@ -310,18 +322,14 @@ try {
             $tid_check_col = $conn->query("SHOW COLUMNS FROM healthcare_providers LIKE 'tid'");
             $has_tid = $tid_check_col && $tid_check_col->num_rows > 0;
 
-            // Generate TID (TeleRx ID) - Format: T1001, T1002, T1003... (only when tid column exists)
-            $tid = 'T1001';
-            if ($has_tid) {
-                $tid_res = $conn->query("SELECT COALESCE(MAX(CAST(SUBSTRING(tid, 2) AS UNSIGNED)), 1000) + 1 AS next_num FROM healthcare_providers WHERE tid REGEXP '^T[0-9]+\$'");
-                if ($tid_res && $row = $tid_res->fetch_assoc()) {
-                    $tid = 'T' . (int) $row['next_num'];
-                }
-            }
+            // Generate TID (TeleRx ID) - Format: TIDMobileNumber (e.g., TID01711122233)
+            // Use the original phone number provided during registration
+            $phone_clean = !empty($phone) ? preg_replace('/[^0-9]/', '', $phone) : '';
+            $tid = 'TID' . $phone_clean;
             
             if ($has_phone && $has_tid) {
                 $stmt = $conn->prepare("INSERT INTO healthcare_providers (name, email, phone, nid_number, password, tid) VALUES (?, ?, ?, ?, ?, ?)");
-                $stmt->bind_param("ssssss", $name, $email, $phone, $nid_number, $hashed_password, $tid);
+                $stmt->bind_param("ssssss", $name, $email, $phone_clean, $nid_number, $hashed_password, $tid);
             } elseif ($has_phone) {
                 $stmt = $conn->prepare("INSERT INTO healthcare_providers (name, email, phone, nid_number, password) VALUES (?, ?, ?, ?, ?)");
                 $stmt->bind_param("sssss", $name, $email, $phone, $nid_number, $hashed_password);

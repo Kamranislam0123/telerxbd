@@ -55,6 +55,7 @@ $spo2 = isset($_POST['spo2']) ? trim($_POST['spo2']) : '';
 $rbs_fbs = isset($_POST['rbs_fbs']) ? trim($_POST['rbs_fbs']) : '';
 // Accept TID from either field name (booking form uses booking_telerx_id, JS sends telerx_id)
 $referrer_tid = isset($_POST['telerx_id']) ? trim($_POST['telerx_id']) : (isset($_POST['booking_telerx_id']) ? trim($_POST['booking_telerx_id']) : '');
+$payment_method = isset($_POST['payment_method']) ? trim($_POST['payment_method']) : 'bkash';
 
 try {
     $conn = getDBConnection();
@@ -111,6 +112,48 @@ try {
     }
     $taken->close();
 
+    // Ensure payment_method column exists, it may cause implicit commit, so do it cautiously
+    $has_payment_method = false;
+    $pm_check = $conn->query("SHOW COLUMNS FROM appointments LIKE 'payment_method'");
+    if ($pm_check && $pm_check->num_rows > 0) {
+        $has_payment_method = true;
+    }
+    if (!$has_payment_method) {
+        @$conn->query("ALTER TABLE appointments ADD COLUMN payment_method VARCHAR(50) DEFAULT 'bkash' COMMENT 'bkash or welfare'");
+        $pm_check2 = $conn->query("SHOW COLUMNS FROM appointments LIKE 'payment_method'");
+        if ($pm_check2 && $pm_check2->num_rows > 0) {
+            $has_payment_method = true;
+        }
+    }
+
+    // If welfare payment, enforce the limits server-side
+    if ($payment_method === 'welfare') {
+        if ($referrer_tid === '') {
+            $conn->rollback();
+            $conn->close();
+            echo json_encode(['success' => false, 'message' => 'TID is required for Welfare bookings.']);
+            exit;
+        }
+
+        if ($has_payment_method) {
+            $usage = $conn->prepare("SELECT COUNT(id) AS usage_count FROM appointments WHERE patient_id = ? AND UPPER(TRIM(referrer_tid)) = UPPER(TRIM(?)) AND payment_method = 'welfare' AND MONTH(appointment_date) = MONTH(CURRENT_DATE()) AND YEAR(appointment_date) = YEAR(CURRENT_DATE()) AND (status IS NULL OR status != 'cancelled')");
+        } else {
+            $usage = $conn->prepare("SELECT COUNT(id) AS usage_count FROM appointments WHERE patient_id = ? AND UPPER(TRIM(referrer_tid)) = UPPER(TRIM(?)) AND MONTH(appointment_date) = MONTH(CURRENT_DATE()) AND YEAR(appointment_date) = YEAR(CURRENT_DATE()) AND (status IS NULL OR status != 'cancelled')");
+        }
+        $usage->bind_param("is", $patient_id, $referrer_tid);
+        $usage->execute();
+        $usage_res = $usage->get_result();
+        $usage_count = $usage_res && $usage_res->num_rows > 0 ? (int)$usage_res->fetch_assoc()['usage_count'] : 0;
+        $usage->close();
+
+        if ($usage_count >= 2) {
+            $conn->rollback();
+            $conn->close();
+            echo json_encode(['success' => false, 'message' => 'Welfare limit exceeded for this month with this TID.']);
+            exit;
+        }
+    }
+
     // 3) Insert appointment (patient_id 0 for guest booking). Include referrer_tid if column exists.
     $appointment_number = 'APT00000';
     $status = 'confirmed';
@@ -129,7 +172,38 @@ try {
     }
     $mobile_phone = $mobile;
 
-    if ($has_referrer_tid) {
+    if ($has_referrer_tid && $has_payment_method) {
+        $ins = $conn->prepare("
+            INSERT INTO appointments (
+                patient_id, doctor_id, appointment_date, slot_time, appointment_time,
+                status, appointment_number, notes, patient_name, mobile, patient_phone,
+                age, weight, body_temperature, blood_pressure, pulse, spo2, rbs_fbs, referrer_tid, payment_method
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        ");
+        $ins->bind_param(
+            "iissssssssssssssssss",
+            $patient_id,
+            $doctor_id,
+            $appointment_date,
+            $slot_time,
+            $slot_time,
+            $status,
+            $appointment_number,
+            $notes,
+            $patient_name,
+            $mobile,
+            $mobile_phone,
+            $age,
+            $weight,
+            $body_temperature,
+            $blood_pressure,
+            $pulse,
+            $spo2,
+            $rbs_fbs,
+            $referrer_tid,
+            $payment_method
+        );
+    } else if ($has_referrer_tid) {
         $ins = $conn->prepare("
             INSERT INTO appointments (
                 patient_id, doctor_id, appointment_date, slot_time, appointment_time,

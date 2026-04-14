@@ -92,25 +92,16 @@ try {
     $clinics = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
     $stmt->close();
 
-    // Fetch doctor's appointments (all), then split by status/date
-    $upcoming_appointments = [];
-    $cancelled_appointments = [];
-    $completed_appointments = [];
+    // Fetch doctor's appointments (all), ordered by date desc
+    $appointments = [];
     $apt_stmt = $conn->prepare("SELECT id, appointment_number, patient_name, mobile, appointment_date, slot_time, status, notes, created_at, prescription_path FROM appointments WHERE doctor_id = ? ORDER BY appointment_date DESC, slot_time DESC");
     if ($apt_stmt) {
         $apt_stmt->bind_param("i", $doctor_id);
         $apt_stmt->execute();
         $apt_result = $apt_stmt->get_result();
-        $today = date('Y-m-d');
         while ($row = $apt_result->fetch_assoc()) {
             $row['appointment_number'] = $row['appointment_number'] ?? ('APT' . str_pad($row['id'], 5, '0', STR_PAD_LEFT));
-            if (isset($row['status']) && strtolower($row['status']) === 'cancelled') {
-                $cancelled_appointments[] = $row;
-            } elseif ($row['appointment_date'] >= $today) {
-                $upcoming_appointments[] = $row;
-            } else {
-                $completed_appointments[] = $row;
-            }
+            $appointments[] = $row;
         }
         $apt_stmt->close();
     }
@@ -210,16 +201,10 @@ include 'header.php';
 							</div>
 							<div class="appointment-tab-head">
 								<div class="appointment-tabs">
-									<ul class="nav nav-pills inner-tab " id="pills-tab" role="tablist">
-										<li class="nav-item" role="presentation">
-											<button class="nav-link active" id="pills-upcoming-tab" data-bs-toggle="pill" data-bs-target="#pills-upcoming" type="button" role="tab" aria-controls="pills-upcoming" aria-selected="false">Upcoming<span><?php echo count($upcoming_appointments); ?></span></button>
+									<ul class="nav nav-pills inner-tab ">
+										<li class="nav-item">
+											<button class="nav-link active">All Appointments<span><?php echo count($appointments); ?></span></button>
 										</li>	
-										<li class="nav-item" role="presentation">
-											<button class="nav-link" id="pills-cancel-tab" data-bs-toggle="pill" data-bs-target="#pills-cancel" type="button" role="tab" aria-controls="pills-cancel" aria-selected="true">Cancelled<span><?php echo count($cancelled_appointments); ?></span></button>
-										</li>
-										<li class="nav-item" role="presentation">
-											<button class="nav-link" id="pills-complete-tab" data-bs-toggle="pill" data-bs-target="#pills-complete" type="button" role="tab" aria-controls="pills-complete" aria-selected="true">Completed<span><?php echo count($completed_appointments); ?></span></button>
-										</li>
 									</ul>
 								</div>
 								<div class="filter-head">
@@ -375,15 +360,28 @@ include 'header.php';
 							</div>
 
 							<div class="tab-content appointment-tab-content">
-								<div class="tab-pane fade show active" id="pills-upcoming" role="tabpanel" aria-labelledby="pills-upcoming-tab">
+								<div class="tab-pane fade show active">
 									<?php
 									$profile_imgs = ['profile-01.jpg', 'profile-02.jpg', 'profile-03.jpg', 'profile-04.jpg', 'profile-05.jpg', 'profile-06.jpg', 'profile-07.jpg', 'profile-08.jpg'];
-									foreach ($upcoming_appointments as $idx => $a):
+									foreach ($appointments as $idx => $a):
 										$apt_date = $a['appointment_date'];
 										$slot = $a['slot_time'] ?? '';
+										$status = strtolower(trim($a['status'] ?? 'pending'));
 										$time_display = $slot ? date('g.i A', strtotime($slot)) : '';
 										$date_display = $apt_date ? date('d M Y', strtotime($apt_date)) . ($time_display ? ' ' . $time_display : '') : '';
 										$img = 'assets/img/doctors-dashboard/' . ($profile_imgs[$idx % count($profile_imgs)]);
+										
+										// Determine badge color and label
+										$badge_class = 'bg-primary-light';
+										$display_status = ucfirst($status);
+										if ($status === 'completed') {
+											$badge_class = 'bg-success-light';
+										} elseif ($status === 'cancelled') {
+											$badge_class = 'bg-danger-light';
+										} elseif (in_array($status, ['confirmed', 'booked', 'pending'])) {
+											$badge_class = 'bg-info-light';
+											$display_status = 'Upcoming';
+										}
 									?>
 									<div class="appointment-wrap">
 										<ul>
@@ -401,8 +399,8 @@ include 'header.php';
 											<li class="appointment-info">
 												<p><i class="isax isax-clock5"></i><?php echo htmlspecialchars($date_display); ?></p>
 												<ul class="d-flex apponitment-types">
-													<li>Consultation</li>
 													<li>Video Call</li>
+													<li><span class="badge <?php echo $badge_class; ?>"><?php echo $display_status; ?></span></li>
 												</ul>
 											</li>
 											<li class="mail-info-patient">
@@ -413,144 +411,42 @@ include 'header.php';
 											<li class="appointment-action">
 												<ul>
 													<li>
-														<a href="appointment-detail.php?id=<?php echo (int)$a['id']; ?>" title="View"><i class="isax isax-eye4"></i></a>
+														<a href="appointment-detail.php?id=<?php echo (int)$a['id']; ?>" class="text-primary-icon" title="View"><i class="isax isax-eye4"></i></a>
 													</li>
 													<li>
-														<a href="chat-doctor.php?appointment_id=<?php echo (int)$a['id']; ?>" title="Chat"><i class="isax isax-messages-25"></i></a>
+														<a href="chat-doctor.php?appointment_id=<?php echo (int)$a['id']; ?>" class="text-info-icon" title="Chat"><i class="isax isax-messages-25"></i></a>
 													</li>
+													<?php if ($status !== 'cancelled' && $status !== 'completed'): ?>
 													<li><a href="#" class="text-danger-icon" title="Cancel"><i class="isax isax-close-circle5"></i></a></li>
+													<?php endif; ?>
 												</ul>
-												<div class="mt-2 text-center">
-													<?php if (!empty($a['prescription_path'])): ?>
-														<a href="<?php echo htmlspecialchars($a['prescription_path']); ?>" target="_blank" class="btn btn-sm btn-outline-success btn-prescription w-100"><i class="isax isax-document-text me-1"></i>View Prescription</a>
-													<?php else: ?>
-														<a href="javascript:void(0);" class="btn btn-sm btn-outline-primary upload-prescription btn-prescription w-100" data-id="<?php echo (int)$a['id']; ?>"><i class="isax isax-export me-1"></i>Upload Prescription</a>
+												<div class="mt-2 text-center d-flex gap-1 flex-column">
+													<?php if ($status === 'completed'): ?>
+														<?php if (!empty($a['prescription_path'])): ?>
+															<a href="<?php echo htmlspecialchars($a['prescription_path']); ?>" target="_blank" class="btn btn-sm btn-outline-success btn-prescription w-100"><i class="isax isax-document-text me-1"></i>View Prescription</a>
+														<?php else: ?>
+															<a href="javascript:void(0);" class="btn btn-sm btn-outline-primary upload-prescription btn-prescription w-100" data-id="<?php echo (int)$a['id']; ?>"><i class="isax isax-export me-1"></i>Upload Prescription</a>
+														<?php endif; ?>
 													<?php endif; ?>
 												</div>
 											</li>
 											<li class="appointment-start">
+												<?php if ($status !== 'cancelled' && $status !== 'completed'): ?>
 												<a href="video-call.php?appointment_id=<?php echo (int)$a['id']; ?>" class="start-link">Start Now</a>
-											</li>
-										</ul>
-									</div>
-									<?php endforeach; ?>
-									<?php if (empty($upcoming_appointments)): ?>
-									<div class="appointment-wrap"><p class="text-muted mb-0 p-3">No upcoming appointments.</p></div>
-									<?php endif; ?>
-								</div>
-								<div class="tab-pane fade" id="pills-cancel" role="tabpanel" aria-labelledby="pills-cancel-tab">
-									<?php
-									foreach ($cancelled_appointments as $idx => $a):
-										$apt_date = $a['appointment_date'];
-										$slot = $a['slot_time'] ?? '';
-										$time_display = $slot ? date('g.i A', strtotime($slot)) : '';
-										$date_display = $apt_date ? date('d M Y', strtotime($apt_date)) . ($time_display ? ' ' . $time_display : '') : '';
-										$img = 'assets/img/doctors-dashboard/' . ($profile_imgs[$idx % count($profile_imgs)]);
-									?>
-									<div class="appointment-wrap">
-										<ul>
-											<li>
-												<div class="patinet-information">
-													<a href="appointment-detail.php?id=<?php echo (int)$a['id']; ?>">
-														<img src="<?php echo htmlspecialchars($img); ?>" alt="User Image">
-													</a>
-													<div class="patient-info">
-														<p>#<?php echo htmlspecialchars($a['appointment_number']); ?></p>
-														<h6><a href="appointment-detail.php?id=<?php echo (int)$a['id']; ?>"><?php echo htmlspecialchars($a['patient_name'] ?? 'Patient'); ?></a></h6>
-													</div>
-												</div>
-											</li>
-											<li class="appointment-info">
-												<p><i class="isax isax-clock5"></i><?php echo htmlspecialchars($date_display); ?></p>
-												<ul class="d-flex apponitment-types">
-													<li>Consultation</li>
-													<li>Video Call</li>
-												</ul>
-											</li>
-											<li class="appointment-action">
-												<ul>
-													<li>
-														<a href="appointment-detail.php?id=<?php echo (int)$a['id']; ?>" title="View"><i class="isax isax-eye4"></i></a>
-													</li>
-													<li>
-														<a href="chat-doctor.php?appointment_id=<?php echo (int)$a['id']; ?>" title="Chat"><i class="isax isax-messages-25"></i></a>
-													</li>
-													<li>
-														<span class="badge badge-danger">Cancelled</span>
-													</li>
-												</ul>
-											</li>
-											<li class="appointment-detail-btn">
-												<a href="appointment-detail.php?id=<?php echo (int)$a['id']; ?>" class="start-link">View Details</a>
-												<?php if (!empty($a['prescription_path'])): ?>
-													<a href="<?php echo htmlspecialchars($a['prescription_path']); ?>" target="_blank" class="btn btn-sm btn-outline-success btn-prescription ms-2"><i class="isax isax-document-text me-1"></i>View Prescription</a>
 												<?php else: ?>
-													<a href="javascript:void(0);" class="btn btn-sm btn-outline-primary upload-prescription btn-prescription ms-2" data-id="<?php echo (int)$a['id']; ?>"><i class="isax isax-export me-1"></i>Upload Prescription</a>
+												<a href="appointment-detail.php?id=<?php echo (int)$a['id']; ?>" class="start-link">View Details</a>
 												<?php endif; ?>
 											</li>
 										</ul>
 									</div>
 									<?php endforeach; ?>
-									<?php if (empty($cancelled_appointments)): ?>
-									<div class="appointment-wrap"><p class="text-muted mb-0 p-3">No cancelled appointments.</p></div>
+									<?php if (empty($appointments)): ?>
+									<div class="appointment-wrap"><p class="text-muted mb-0 p-3">No appointments found.</p></div>
 									<?php endif; ?>
-								</div>
-								<div class="tab-pane fade" id="pills-complete" role="tabpanel" aria-labelledby="pills-complete-tab">
-									<?php
-									foreach ($completed_appointments as $idx => $a):
-										$apt_date = $a['appointment_date'];
-										$slot = $a['slot_time'] ?? '';
-										$time_display = $slot ? date('g.i A', strtotime($slot)) : '';
-										$date_display = $apt_date ? date('d M Y', strtotime($apt_date)) . ($time_display ? ' ' . $time_display : '') : '';
-										$img = 'assets/img/doctors-dashboard/' . ($profile_imgs[$idx % count($profile_imgs)]);
-									?>
-									<div class="appointment-wrap">
-										<ul>
-											<li>
-												<div class="patinet-information">
-													<a href="appointment-detail.php?id=<?php echo (int)$a['id']; ?>">
-														<img src="<?php echo htmlspecialchars($img); ?>" alt="User Image">
-													</a>
-													<div class="patient-info">
-														<p>#<?php echo htmlspecialchars($a['appointment_number']); ?></p>
-														<h6><a href="appointment-detail.php?id=<?php echo (int)$a['id']; ?>"><?php echo htmlspecialchars($a['patient_name'] ?? 'Patient'); ?></a></h6>
-													</div>
-												</div>
-											</li>
-											<li class="appointment-info">
-												<p><i class="isax isax-clock5"></i><?php echo htmlspecialchars($date_display); ?></p>
-												<ul class="d-flex apponitment-types">
-													<li>Consultation</li>
-													<li>Video Call</li>
-												</ul>
-											</li>
-											<li class="appointment-action">
-												<ul>
-													<li>
-														<a href="appointment-detail.php?id=<?php echo (int)$a['id']; ?>" title="View"><i class="isax isax-eye4"></i></a>
-													</li>
-													<li>
-														<a href="chat-doctor.php?appointment_id=<?php echo (int)$a['id']; ?>" title="Chat"><i class="isax isax-messages-25"></i></a>
-													</li>
-												</ul>
-											</li>
-											<li class="appointment-detail-btn">
-												<a href="appointment-detail.php?id=<?php echo (int)$a['id']; ?>" class="start-link">View Details</a>
-												<?php if (!empty($a['prescription_path'])): ?>
-													<a href="<?php echo htmlspecialchars($a['prescription_path']); ?>" target="_blank" class="btn btn-sm btn-outline-success btn-prescription ms-2"><i class="isax isax-document-text me-1"></i>View Prescription</a>
-												<?php else: ?>
-													<a href="javascript:void(0);" class="btn btn-sm btn-outline-primary upload-prescription btn-prescription ms-2" data-id="<?php echo (int)$a['id']; ?>"><i class="isax isax-export me-1"></i>Upload Prescription</a>
-												<?php endif; ?>
-											</li>
-										</ul>
-									</div>
-									<?php endforeach; ?>
-									<?php if (empty($completed_appointments)): ?>
-									<div class="appointment-wrap"><p class="text-muted mb-0 p-3">No completed appointments.</p></div>
-									<?php endif; ?>
-
 								</div>
 							</div>
+						</div>
+					</div>
 						</div>
 					</div>
 

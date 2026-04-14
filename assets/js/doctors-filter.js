@@ -23,14 +23,25 @@
         return selected;
     }
 
+    function getSelectedDistricts() {
+        var selected = [];
+        jQuery('.district-filter:checked').each(function() {
+            var d = jQuery(this).val().trim();
+            if (d !== '') selected.push(d);
+        });
+        return selected;
+    }
+
     function filterDoctors() {
         var selectedSpecialities = getSelectedSpecialities();
         var selectedGenders = getSelectedGenders();
+        var selectedDistricts = getSelectedDistricts();
 
         jQuery(doctorCardSelector).each(function() {
             var $card = jQuery(this);
             var showBySpeciality = true;
             var showByGender = true;
+            var showByDistrict = true;
 
             if (selectedSpecialities.length > 0) {
                 var doctorSpecialityStr = ($card.data('speciality') || '').trim();
@@ -54,7 +65,12 @@
                 showByGender = selectedGenders.indexOf(doctorGender) !== -1;
             }
 
-            if (showBySpeciality && showByGender) {
+            if (selectedDistricts.length > 0) {
+                var doctorDistrict = ($card.data('district') || '').trim();
+                showByDistrict = selectedDistricts.indexOf(doctorDistrict) !== -1;
+            }
+
+            if (showBySpeciality && showByGender && showByDistrict) {
                 $card.fadeIn(300);
             } else {
                 $card.fadeOut(300);
@@ -84,9 +100,10 @@
     jQuery(document).ready(function() {
         jQuery(document).on('change', '.speciality-filter', filterDoctors);
         jQuery(document).on('change', '.gender-filter', filterDoctors);
+        jQuery(document).on('change', '.district-filter', filterDoctors);
         jQuery(document).on('click', '.clear-all-filters', function(e) {
             e.preventDefault();
-            jQuery('.speciality-filter, .gender-filter').prop('checked', false);
+            jQuery('.speciality-filter, .gender-filter, .district-filter').prop('checked', false);
             jQuery(doctorCardSelector).each(function() {
                 var $el = jQuery(this);
                 if ($el.hasClass('load-more-hidden')) $el.hide();
