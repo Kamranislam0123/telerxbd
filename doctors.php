@@ -6,6 +6,8 @@ require_once 'php/config.php';
 $search_keyword = isset($_GET['search']) ? trim((string)$_GET['search']) : '';
 $location_filter = isset($_GET['location']) ? trim((string)$_GET['location']) : '';
 $date_selected = isset($_GET['date']) ? trim((string)$_GET['date']) : '';
+$availability_filter = isset($_GET['availability']) ? (int)$_GET['availability'] : 0;
+$sort_by = isset($_GET['sort']) ? trim((string)$_GET['sort']) : '';
 
 try {
     $conn = getDBConnection();
@@ -45,8 +47,16 @@ try {
         $types .= 'ssss';
     }
 
-    if ($date_selected !== '') {
+    if ($date_selected !== '' || $availability_filter === 1) {
         $where_clauses[] = 'dp.is_available = 1';
+    }
+
+    // Determine sorting
+    $order_by = 'd.created_at DESC'; // Default
+    if ($sort_by === 'price_low') {
+        $order_by = 'dp.consultation_fee ASC';
+    } elseif ($sort_by === 'price_high') {
+        $order_by = 'dp.consultation_fee DESC';
     }
 
     $sql = "
@@ -74,7 +84,7 @@ try {
         FROM doctors d
         LEFT JOIN doctor_profiles dp ON d.id = dp.doctor_id
         WHERE " . implode(' AND ', $where_clauses) . "
-        ORDER BY d.created_at DESC
+        ORDER BY " . $order_by . "
     ";
 
     $stmt = $conn->prepare($sql);
@@ -550,20 +560,28 @@ try {
                                 <div class="doctor-filter-availability me-3">
                                     <p>Availability</p>
                                     <div class="status-toggle status-tog">
-                                        <input type="checkbox" id="status_6" class="check">
+                                        <input type="checkbox" id="status_6" class="check" <?php echo ($availability_filter === 1) ? 'checked' : ''; ?>>
                                         <label for="status_6" class="checktoggle">checkbox</label>
                                     </div>
                                 </div>
                                 <div class="dropdown header-dropdown me-2">
                                     <a class="dropdown-toggle sort-dropdown" data-bs-toggle="dropdown" href="javascript:void(0);" aria-expanded="false">
-                                        <span>Sort By</span>Price (Low to High)
+                                        <span>Sort By</span>
+                                        <?php 
+                                            if ($sort_by === 'price_low') echo 'Price (Low to High)';
+                                            elseif ($sort_by === 'price_high') echo 'Price (High to Low)';
+                                            else echo 'Latest';
+                                        ?>
                                     </a>
                                     <div class="dropdown-menu dropdown-menu-end">
-                                        <a href="javascript:void(0);" class="dropdown-item">
+                                        <a href="javascript:void(0);" class="dropdown-item sort-item" data-sort="price_low">
                                             Price (Low to High)
                                         </a>
-                                        <a href="javascript:void(0);" class="dropdown-item">
+                                        <a href="javascript:void(0);" class="dropdown-item sort-item" data-sort="price_high">
                                             Price (High to Low)
+                                        </a>
+                                        <a href="javascript:void(0);" class="dropdown-item sort-item" data-sort="latest">
+                                            Latest
                                         </a>
                                     </div>
                                 </div>
@@ -918,6 +936,35 @@ try {
             var locationInput = document.querySelector('.doctors-search-box input[name="location"]');
             if (searchInput)   initAutocomplete(searchInput,   'search');
             if (locationInput) initAutocomplete(locationInput, 'location');
+
+            // --- Availability & Sort Logic ---
+            var availabilityToggle = document.getElementById('status_6');
+            var sortItems = document.querySelectorAll('.sort-item');
+
+            function updateUrl(params) {
+                var url = new URL(window.location.href);
+                for (var key in params) {
+                    if (params[key] === null) {
+                        url.searchParams.delete(key);
+                    } else {
+                        url.searchParams.set(key, params[key]);
+                    }
+                }
+                window.location.href = url.toString();
+            }
+
+            if (availabilityToggle) {
+                availabilityToggle.addEventListener('change', function() {
+                    updateUrl({ availability: this.checked ? 1 : null });
+                });
+            }
+
+            sortItems.forEach(function(item) {
+                item.addEventListener('click', function() {
+                    var sortVal = this.getAttribute('data-sort');
+                    updateUrl({ sort: sortVal === 'latest' ? null : sortVal });
+                });
+            });
         });
     })();
     </script>
