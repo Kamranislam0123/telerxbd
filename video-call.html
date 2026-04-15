@@ -1,127 +1,3 @@
-<?php
-require_once 'php/config.php';
-
-// Check if user is logged in
-if (!isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true) {
-    header("Location: login.php");
-    exit;
-}
-
-// Get appointment ID from URL
-$appointment_id = $_GET['appointment_id'] ?? null;
-$channel_name = $appointment_id ? "appointment_" . $appointment_id : "general_call";
-
-// Assign unique UID for Agora (simple mapping for now)
-if ($_SESSION['user_type'] === 'doctor' && isset($_SESSION['doctor_id'])) {
-    $uid = 1000 + (int)$_SESSION['doctor_id'];
-    $user_name = $_SESSION['doctor_name'] ?? 'Doctor';
-} else if ($_SESSION['user_type'] === 'patient' && isset($_SESSION['patient_id'])) {
-    $uid = 2000 + (int)$_SESSION['patient_id'];
-    $user_name = $_SESSION['patient_name'] ?? 'Patient';
-} else if ($_SESSION['user_type'] === 'healthcare' && isset($_SESSION['healthcare_id'])) {
-    $uid = 3000 + (int)$_SESSION['healthcare_id'];
-    $user_name = $_SESSION['healthcare_name'] ?? 'Health Worker';
-} else {
-    $uid = rand(4000, 5000);
-    $user_name = 'User';
-}
-
-$other_party_name = 'User';
-$other_party_image = 'assets/img/patients/patient1.jpg';
-$details_html = '';
-
-if ($appointment_id) {
-    try {
-        $conn = getDBConnection();
-        $stmt = $conn->prepare("SELECT * FROM appointments WHERE id = ?");
-        $stmt->bind_param("i", $appointment_id);
-        $stmt->execute();
-        $res = $stmt->get_result();
-        if ($res->num_rows > 0) {
-            $appointment = $res->fetch_assoc();
-            
-            $stmt_d = $conn->prepare("SELECT * FROM doctors WHERE id = ?");
-            $stmt_d->bind_param("i", $appointment['doctor_id']);
-            $stmt_d->execute();
-            $doctor = $stmt_d->get_result()->fetch_assoc();
-
-            if ($_SESSION['user_type'] === 'doctor' || $_SESSION['user_type'] === 'healthcare') {
-                $other_party_name = $appointment['patient_name'] ?? 'Patient';
-                $other_party_image = 'assets/img/patients/patient.jpg'; // We don't have patient image from patient table directly in the same way here, we can use default
-                
-                $details_html = '
-                    <div class="card mt-4" id="details-section" style="display:none;">
-                        <div class="card-header">
-                            <h4 class="card-title">Patient & Appointment Details</h4>
-                        </div>
-                        <div class="card-body">
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <ul class="list-unstyled">
-                                        <li class="mb-2"><strong>Appointment No:</strong> #' . htmlspecialchars($appointment['appointment_number'] ?? 'N/A') . '</li>
-                                        <li class="mb-2"><strong>Patient Name:</strong> ' . htmlspecialchars($appointment['patient_name'] ?? 'N/A') . '</li>
-                                        <li class="mb-2"><strong>Mobile:</strong> ' . htmlspecialchars($appointment['mobile'] ?? 'N/A') . '</li>
-                                        <li class="mb-2"><strong>Date & Time:</strong> ' . htmlspecialchars($appointment['appointment_date'] ?? 'N/A') . ' ' . htmlspecialchars($appointment['slot_time'] ?? 'N/A') . '</li>
-                                        <li class="mb-2"><strong>Age:</strong> ' . htmlspecialchars($appointment['age'] ?? 'N/A') . '</li>
-                                    </ul>
-                                </div>
-                                <div class="col-md-6">
-                                    <ul class="list-unstyled">
-                                        <li class="mb-2"><strong>Weight:</strong> ' . htmlspecialchars($appointment['weight'] ?? 'N/A') . ' kg</li>
-                                        <li class="mb-2"><strong>Body Temp:</strong> ' . htmlspecialchars($appointment['body_temperature'] ?? 'N/A') . ' &deg;F</li>
-                                        <li class="mb-2"><strong>Blood Pressure:</strong> ' . htmlspecialchars($appointment['blood_pressure'] ?? 'N/A') . '</li>
-                                        <li class="mb-2"><strong>Pulse:</strong> ' . htmlspecialchars($appointment['pulse'] ?? 'N/A') . ' bpm</li>
-                                        <li class="mb-2"><strong>SPO2:</strong> ' . htmlspecialchars($appointment['spo2'] ?? 'N/A') . '%</li>
-                                        <li class="mb-2"><strong>RBS/FBS:</strong> ' . htmlspecialchars($appointment['rbs_fbs'] ?? 'N/A') . '</li>
-                                    </ul>
-                                </div>
-                            </div>
-                            <hr>
-                            <div class="row">
-                                <div class="col-md-12">
-                                    <h5>Symptoms/Notes:</h5>
-                                    <p class="bg-light p-3 rounded">' . nl2br(htmlspecialchars($appointment['notes'] ?? 'No notes provided.')) . '</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>';
-            } else {
-                $other_party_name = $doctor['name'] ?? 'Doctor';
-                $other_party_image = !empty($doctor['profile_image']) ? $doctor['profile_image'] : 'assets/img/doctors/doctor-thumb-02.jpg';
-                $details_html = '
-                    <div class="card mt-4" id="details-section" style="display:none;">
-                        <div class="card-header">
-                            <h4 class="card-title">Doctor & Appointment Details</h4>
-                        </div>
-                        <div class="card-body">
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <ul class="list-unstyled">
-                                        <li class="mb-2"><strong>Name:</strong> Dr. ' . htmlspecialchars($doctor['name'] ?? 'N/A') . '</li>
-                                        <li class="mb-2"><strong>Email:</strong> ' . htmlspecialchars($doctor['email'] ?? 'N/A') . '</li>
-                                    </ul>
-                                </div>
-                                <div class="col-md-6">
-                                    <ul class="list-unstyled">
-                                        <li class="mb-2"><strong>Appointment Date:</strong> ' . htmlspecialchars($appointment['appointment_date'] ?? 'N/A') . '</li>
-                                        <li class="mb-2"><strong>Time Slot:</strong> ' . htmlspecialchars($appointment['slot_time'] ?? 'N/A') . '</li>
-                                        <li class="mb-2"><strong>Consultation Type:</strong> ' . htmlspecialchars($appointment['consultation_type'] ?? 'N/A') . '</li>
-                                    </ul>
-                                </div>
-                            </div>
-                        </div>
-                    </div>';
-            }
-        }
-        $conn->close();
-    } catch (Exception $e) {
-        error_log("Error fetching details: " . $e->getMessage());
-    }
-}
-
-// Include required scripts for Agora Token generation if needed on frontend via AJAX
-// or we can generate it here if we want but AJAX is cleaner for keeping credentials hidden.
-?>
 <!DOCTYPE html> 
 <html lang="en">
 	<head>
@@ -162,69 +38,6 @@ if ($appointment_id) {
 
 		<!-- Iconsax CSS-->
 		<link rel="stylesheet" href="assets/css/iconsax.css">
-
-		<style>
-			#local-video {
-				width: 100%;
-				height: 100%;
-				background: #000;
-				border-radius: 10px;
-			}
-			#remote-video {
-				width: 100%;
-				height: 100%;
-				background: #2e2e2e;
-				border-radius: 10px;
-			}
-			.call-content-wrap {
-				position: relative;
-			}
-			.call-window {
-				position: relative;
-			}
-			.user-video {
-				width: 100%;
-				height: 500px;
-				overflow: hidden;
-				display: flex;
-				align-items: center;
-				justify-content: center;
-				border-radius: 10px;
-			}
-			.my-video {
-				position: absolute;
-				bottom: 80px;
-				right: 20px;
-				width: 150px;
-				height: 120px;
-				z-index: 10;
-				border: 2px solid #fff;
-				border-radius: 10px;
-				overflow: hidden;
-			}
-			.call-footer {
-				position: absolute;
-				bottom: 10px;
-				width: 100%;
-				z-index: 100;
-				background: transparent !important;
-				border: none !important;
-			}
-			#video-toggle, #audio-toggle, #leave-btn, #view-details-btn {
-				display: none;
-			}
-			#join-btn-container {
-				position: absolute;
-				top: 50%;
-				left: 50%;
-				transform: translate(-50%, -50%);
-				z-index: 100;
-			}
-			#join-btn {
-				padding: 15px 40px;
-				font-size: 18px;
-			}
-		</style>
 
 		<!-- Feathericon CSS -->
     	<link rel="stylesheet" href="assets/css/feather.css">
@@ -430,7 +243,7 @@ if ($appointment_id) {
 										<a href="javascript:void(0);">Doctors <i class="fas fa-chevron-down"></i></a>
 										<ul class="submenu">
 											<li><a href="doctor-dashboard.html">Doctor Dashboard</a></li>
-											<li><a href="appointments.php">Appointments</a></li>
+											<li><a href="appointments.html">Appointments</a></li>
 											<li><a href="available-timings.html">Available Timing</a></li>
 											<li><a href="my-patients.html">Patients List</a></li>
 											<li><a href="patient-profile.html">Patients Profile</a></li>
@@ -464,14 +277,14 @@ if ($appointment_id) {
 											<li class="has-submenu">
 												<a href="javascript:void(0);">Search Doctor</a>
 												<ul class="submenu inner-submenu">
-													<li><a href="search.php">Search Doctor 1</a></li>
-													<li><a href="doctors.php">Search Doctor 2</a></li>
+													<li><a href="search.html">Search Doctor 1</a></li>
+													<li><a href="search-2.html">Search Doctor 2</a></li>
 												</ul>
 											</li>
 											<li class="has-submenu">
 												<a href="javascript:void(0);">Doctor Profile</a>
 												<ul class="submenu inner-submenu">
-													<li><a href="doctor-profile.php">Doctor Profile 1</a></li>
+													<li><a href="doctor-profile.html">Doctor Profile 1</a></li>
 													<li><a href="doctor-profile-2.html">Doctor Profile 2</a></li>
 												</ul>
 											</li>
@@ -497,7 +310,7 @@ if ($appointment_id) {
 										<ul class="submenu">
 											<li><a href="pharmacy-index.html">Pharmacy</a></li>
 											<li><a href="pharmacy-details.html">Pharmacy Details</a></li>
-											<li><a href="pharmacy-search.php">Pharmacy Search</a></li>
+											<li><a href="pharmacy-search.html">Pharmacy Search</a></li>
 											<li><a href="product-all.html">Product</a></li>
 											<li><a href="product-description.html">Product Description</a></li>
 											<li><a href="cart.html">Cart</a></li>
@@ -509,8 +322,8 @@ if ($appointment_id) {
 									<li class="has-submenu active">
 										<a href="javascript:void(0);">Pages <i class="fas fa-chevron-down"></i></a>
 										<ul class="submenu">
-											<li><a href="about-us.php">About Us</a></li>
-											<li><a href="contact-us.php">Contact Us</a></li>
+											<li><a href="about-us.html">About Us</a></li>
+											<li><a href="contact-us.html">Contact Us</a></li>
 											<li class="has-submenu">
 												<a href="javascript:void(0);">Other Pages</a>
 												<ul class="submenu inner-submenu">
@@ -567,7 +380,7 @@ if ($appointment_id) {
 										<a href="#">Blog <i class="fas fa-chevron-down"></i></a>
 										<ul class="submenu">
 											<li><a href="blog-list.html">Blog List</a></li>
-											<li><a href="blog.php">Blog Grid</a></li>
+											<li><a href="blog-grid.html">Blog Grid</a></li>
 											<li><a href="blog-details.html">Blog Details</a></li>
 										</ul>
 									</li>
@@ -584,7 +397,7 @@ if ($appointment_id) {
 								<li class="searchbar">
 									<a href="javascript:void(0);"><i class="feather-search"></i></a>
 									<div class="togglesearch">
-										<form action="search.php">
+										<form action="search.html">
 											<div class="input-group">
 												<input type="text" class="form-control">
 												<button type="submit" class="btn">Search</button>
@@ -758,7 +571,7 @@ if ($appointment_id) {
 										</div>
 										<a class="dropdown-item" href="patient-dashboard.html">Dashboard</a>
 										<a class="dropdown-item" href="profile-settings.html">Profile Settings</a>
-										<a class="dropdown-item" href="login.php">Logout</a>
+										<a class="dropdown-item" href="login.html">Logout</a>
 									</div>
 								</li>
 								<!-- /User Menu -->
@@ -810,19 +623,19 @@ if ($appointment_id) {
 													<div class="navbar">
 														<div class="user-details">
 															<div class="float-start user-img">
-																<a class="avatar avatar-sm me-2" href="javascript:void(0);" title="<?php echo htmlspecialchars($other_party_name); ?>">
-																	<img src="<?php echo htmlspecialchars($other_party_image); ?>" alt="User Image" class="rounded-circle">
+																<a class="avatar avatar-sm me-2" href="patient-profile.html" title="Charlene Reed">
+																	<img src="assets/img/patients/patient1.jpg" alt="User Image" class="rounded-circle">
 																	<span class="status online"></span>
 																</a>
 															</div>
 															<div class="user-info float-start">
-																<a href="javascript:void(0);"><span><?php echo htmlspecialchars($other_party_name); ?></span></a>
-																<span class="last-seen">UID: <?php echo $uid; ?></span>
+																<a href="patient-profile.html"><span>Charlene Reed</span></a>
+																<span class="last-seen">Online</span>
 															</div>
 														</div>
 														<ul class="nav float-end custom-menu">
-															<li class="nav-item">
-																<span class="badge bg-success">Channel: <?php echo htmlspecialchars($channel_name); ?></span>
+															<li class="nav-item dropdown dropdown-action">
+																<a href="#" class="user-icon"><i class="isax isax-user-add"></i></a>
 															</li>
 														</ul>
 													</div>
@@ -833,13 +646,14 @@ if ($appointment_id) {
 												<div class="call-contents">
 													<div class="call-content-wrap">
 														<div class="user-video">
-															<div id="join-btn-container">
-																<button id="join-btn" class="btn btn-success rounded-pill border-0 px-4 py-2">Start Consultation</button>
-															</div>
-															<div id="remote-video"></div>
+															<img src="assets/img/video-call.jpg" alt="User Image">
 														</div>
 														<div class="my-video">
-															<div id="local-video"></div>
+															<ul>
+																<li>
+																	<img src="assets/img/patients/patient1.jpg" class="img-fluid" alt="User Image">
+																</li>
+															</ul>
 														</div>
 													</div>
 												</div>
@@ -850,27 +664,20 @@ if ($appointment_id) {
 													<div class="call-icons">
 														<ul class="call-items">
 															<li class="call-item">
-																<a href="javascript:void(0)" class="mute-video" id="video-toggle" title="Disable Video" data-placement="top" data-bs-toggle="tooltip">
+																<a href="javascript:void(0)" class="mute-video" title="Enable Video" data-placement="top" data-bs-toggle="tooltip">
 																	<i class="isax isax-video"></i>
 																</a>
 															</li>
 															<li class="call-item">
-																<a href="javascript:void(0)" class="call-end" id="leave-btn">
+																<a href="javascript:void(0)" class="call-end">
 																	<i class="isax isax-call"></i>
 																</a>
 															</li>
 															<li class="call-item">
-																<a href="javascript:void(0)" class="mute-bt" id="audio-toggle" title="Mute" data-placement="top" data-bs-toggle="tooltip">
+																<a href="javascript:void(0)" class="mute-bt" title="Mute" data-placement="top" data-bs-toggle="tooltip">
 																	<i class="isax isax-microphone-2"></i>
 																</a>
 															</li>
-                                                            <?php if (!empty($details_html)): ?>
-															<li class="call-item">
-																<a href="javascript:void(0)" id="view-details-btn" title="View Details" data-placement="top" data-bs-toggle="tooltip">
-																	<i class="isax isax-eye"></i>
-																</a>
-															</li>
-                                                            <?php endif; ?>
 														</ul>
 													</div>
 												</div>
@@ -883,8 +690,6 @@ if ($appointment_id) {
 								</div>
 							</div>
 							<!-- /Call Wrapper -->
-                            
-                            <?php echo $details_html; ?>
 
 						</div>
 					</div>
@@ -905,8 +710,8 @@ if ($appointment_id) {
 										<div class="footer-widget footer-menu">
 											<h6 class="footer-title">Company</h6>
 											<ul>
-												<li><a href="about-us.php">About</a></li>
-												<li><a href="search.php">Features</a></li>
+												<li><a href="about-us.html">About</a></li>
+												<li><a href="search.html">Features</a></li>
 												<li><a href="javascript:void(0);">Works</a></li>
 												<li><a href="javascript:void(0);">Careers</a></li>
 												<li><a href="javascript:void(0);">Locations</a></li>
@@ -917,11 +722,11 @@ if ($appointment_id) {
 										<div class="footer-widget footer-menu">
 											<h6 class="footer-title">Treatments</h6>
 											<ul>
-												<li><a href="search.php">Dental</a></li>
-												<li><a href="search.php">Cardiac</a></li>
-												<li><a href="search.php">Spinal Cord</a></li>
-												<li><a href="search.php">Hair Growth</a></li>
-												<li><a href="search.php">Anemia & Disorder</a></li>
+												<li><a href="search.html">Dental</a></li>
+												<li><a href="search.html">Cardiac</a></li>
+												<li><a href="search.html">Spinal Cord</a></li>
+												<li><a href="search.html">Hair Growth</a></li>
+												<li><a href="search.html">Anemia & Disorder</a></li>
 											</ul>
 										</div>
 									</div>
@@ -929,11 +734,11 @@ if ($appointment_id) {
 										<div class="footer-widget footer-menu">
 											<h6 class="footer-title">Specialities</h6>
 											<ul>
-												<li><a href="search.php">Transplant</a></li>
-												<li><a href="search.php">Cardiologist</a></li>
-												<li><a href="search.php">Oncology</a></li>
-												<li><a href="search.php">Pediatrics</a></li>
-												<li><a href="search.php">Gynacology</a></li>
+												<li><a href="search.html">Transplant</a></li>
+												<li><a href="search.html">Cardiologist</a></li>
+												<li><a href="search.html">Oncology</a></li>
+												<li><a href="search.html">Pediatrics</a></li>
+												<li><a href="search.html">Gynacology</a></li>
 											</ul>
 										</div>
 									</div>
@@ -942,8 +747,8 @@ if ($appointment_id) {
 											<h6 class="footer-title">Utilites</h6>
 											<ul>
 												<li><a href="pricing.html">Pricing</a></li>
-												<li><a href="contact-us.php">Contact</a></li>
-												<li><a href="contact-us.php">Request A Quote</a></li>
+												<li><a href="contact-us.html">Contact</a></li>
+												<li><a href="contact-us.html">Request A Quote</a></li>
 												<li><a href="javascript:void(0);">Premium Membership</a></li>
 												<li><a href="javascript:void(0);">Integrations</a></li>
 											</ul>
@@ -1030,163 +835,10 @@ if ($appointment_id) {
 		<!-- jQuery -->
 		<script src="assets/js/jquery-3.7.1.min.js"></script>
 		
-		<!-- Agora Web SDK -->
-		<script src="https://download.agora.io/sdk/release/AgoraRTC_N.js"></script>
-		
 		<!-- Bootstrap Core JS -->
 		<script src="assets/js/bootstrap.bundle.min.js"></script>
 		
 		<!-- Custom JS -->
-		<script>
-		$(document).ready(function() {
-			const options = {
-				appId: "d4ab628137c74b519e71dec351b83c34",
-				channel: "<?php echo $channel_name; ?>",
-				uid: <?php echo $uid; ?>,
-				token: null // Will be generated via server-side logic if needed
-			};
-
-			const client = AgoraRTC.createClient({ mode: "rtc", codec: "vp8" });
-			let localTracks = {
-				videoTrack: null,
-				audioTrack: null
-			};
-			let remoteUsers = {};
-
-			const joinCall = async () => {
-				// We call the server to get a valid token
-				try {
-					const response = await $.ajax({
-						url: 'php/generate-agora-token.php',
-						type: 'POST',
-						data: { channel: options.channel, uid: options.uid },
-						dataType: 'json'
-					}).fail(function(jqXHR, textStatus, errorThrown) {
-						console.error("AJAX Error Details:", {
-							status: jqXHR.status,
-							responseText: jqXHR.responseText,
-							textStatus: textStatus,
-							errorThrown: errorThrown
-						});
-					});
-
-					if (response.success) {
-						options.token = response.token;
-						
-						console.log("Token received:", options.token);
-						
-						// Subscribe to events
-						client.on("user-published", async (user, mediaType) => {
-							await client.subscribe(user, mediaType);
-							if (mediaType === "video") {
-								remoteUsers[user.uid] = user;
-								$("#remote-video").html("");
-								user.videoTrack.play("remote-video");
-							}
-							if (mediaType === "audio") {
-								user.audioTrack.play();
-							}
-						});
-
-						client.on("user-unpublished", user => {
-							delete remoteUsers[user.uid];
-							$("#remote-video").html("");
-						});
-
-						// Join and Publish local media
-						await client.join(options.appId, options.channel, options.token, options.uid);
-						
-						localTracks.audioTrack = await AgoraRTC.createMicrophoneAudioTrack();
-						localTracks.videoTrack = await AgoraRTC.createCameraVideoTrack();
-						
-						localTracks.videoTrack.play("local-video");
-						await client.publish([localTracks.audioTrack, localTracks.videoTrack]);
-						
-						$("#join-btn-container").hide();
-						$("#video-toggle, #audio-toggle, #leave-btn, #view-details-btn").show();
-					} else {
-						alert("Could not start call: " + response.message);
-					}
-				} catch (err) {
-					console.error(err);
-				}
-			};
-
-			const leaveCall = async () => {
-				for (let trackName in localTracks) {
-					let track = localTracks[trackName];
-					if (track) {
-						track.stop();
-						track.close();
-						localTracks[trackName] = null;
-					}
-				}
-				await client.leave();
-				$("#local-video").html("");
-				$("#remote-video").html("");
-				$("#join-btn-container").show();
-				
-				// Mark as completed on backend
-				try {
-					await $.post('php/complete-appointment.php', { appointment_id: "<?php echo (int)$appointment_id; ?>" });
-				} catch (err) {
-					console.error("Failed to mark appointment as completed:", err);
-				}
-
-				// Handle redirect after ending the call
-				<?php 
-				$redirect_url = 'index.php';
-				if (isset($_SESSION['user_type'])) {
-					if ($_SESSION['user_type'] === 'doctor') {
-						$redirect_url = 'doctor-dashboard.php';
-					} else if ($_SESSION['user_type'] === 'patient') {
-						$redirect_url = 'patient-dashboard.php';
-					}
-				}
-				?>
-				window.location.href = "<?php echo $redirect_url; ?>";
-			};
-
-			$("#join-btn").click(function() {
-				joinCall();
-			});
-
-			$("#leave-btn").click(function() {
-				leaveCall();
-			});
-
-			let isVideoMuted = false;
-			$("#video-toggle").click(function() {
-				if (!isVideoMuted) {
-					localTracks.videoTrack.setEnabled(false);
-					isVideoMuted = true;
-					$(this).find('i').removeClass('isax-video').addClass('isax-video-slash');
-				} else {
-					localTracks.videoTrack.setEnabled(true);
-					isVideoMuted = false;
-					$(this).find('i').removeClass('isax-video-slash').addClass('isax-video');
-				}
-			});
-
-			let isAudioMuted = false;
-			$("#audio-toggle").click(function() {
-				if (!isAudioMuted) {
-					localTracks.audioTrack.setEnabled(false);
-					isAudioMuted = true;
-					$(this).find('i').removeClass('isax-microphone-2').addClass('isax-microphone-slash');
-				} else {
-					localTracks.audioTrack.setEnabled(true);
-					isAudioMuted = false;
-					$(this).find('i').removeClass('isax-microphone-slash').addClass('isax-microphone-2');
-				}
-			});
-
-			$("#view-details-btn").click(function() {
-				$("#details-section").slideToggle();
-			});
-
-		});
-		</script>
 		<script src="assets/js/script.js"></script>
 		
 	</body>
