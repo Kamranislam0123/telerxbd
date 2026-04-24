@@ -92,16 +92,25 @@ try {
     $clinics = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
     $stmt->close();
 
-    // Fetch doctor's appointments (all), ordered by date desc
-    $appointments = [];
+    // Fetch doctor's appointments (all), then split by status/date
+    $upcoming_appointments = [];
+    $cancelled_appointments = [];
+    $completed_appointments = [];
     $apt_stmt = $conn->prepare("SELECT id, appointment_number, patient_name, mobile, appointment_date, slot_time, status, notes, created_at, prescription_path FROM appointments WHERE doctor_id = ? ORDER BY appointment_date DESC, slot_time DESC");
     if ($apt_stmt) {
         $apt_stmt->bind_param("i", $doctor_id);
         $apt_stmt->execute();
         $apt_result = $apt_stmt->get_result();
+        $today = date('Y-m-d');
         while ($row = $apt_result->fetch_assoc()) {
             $row['appointment_number'] = $row['appointment_number'] ?? ('APT' . str_pad($row['id'], 5, '0', STR_PAD_LEFT));
-            $appointments[] = $row;
+            if (isset($row['status']) && strtolower($row['status']) === 'cancelled') {
+                $cancelled_appointments[] = $row;
+            } elseif ($row['appointment_date'] >= $today) {
+                $upcoming_appointments[] = $row;
+            } else {
+                $completed_appointments[] = $row;
+            }
         }
         $apt_stmt->close();
     }
@@ -129,13 +138,43 @@ include 'header.php';
 		<style>
 		.appointment-action ul li .btn-sm,
 		.appointment-wrap .btn-prescription {
-			padding: 4px 10px;
-			font-size: 12px;
-			line-height: 1.5;
-			border-radius: 4px;
-			min-width: unset;
-			height: auto;
+			padding: 6px;
+			font-size: 16px;
+			line-height: 1;
+			border-radius: 6px;
+			min-width: 32px;
+			height: 32px;
+			display: inline-flex;
+			align-items: center;
+			justify-content: center;
 			white-space: nowrap;
+		}
+		.appointment-wrap .start-link {
+			background-color: #15558d;
+			color: #fff;
+			border: 1px solid #15558d;
+			padding: 6px 15px;
+			font-size: 14px;
+			border-radius: 6px;
+			display: inline-block;
+			text-align: center;
+			white-space: nowrap;
+		}
+		.appointment-wrap .start-link:hover {
+			background-color: #fff;
+			color: #15558d;
+		}
+		.medicine-row .btn-remove-medicine {
+			padding: 5px 10px;
+			color: #ff0000;
+		}
+		.medicine-row {
+			border-bottom: 1px solid #eee;
+			padding-bottom: 10px;
+			margin-bottom: 10px;
+		}
+		.medicine-row:last-child {
+			border-bottom: none;
 		}
 		</style>
             <!-- Breadcrumb -->
@@ -201,10 +240,16 @@ include 'header.php';
 							</div>
 							<div class="appointment-tab-head">
 								<div class="appointment-tabs">
-									<ul class="nav nav-pills inner-tab ">
-										<li class="nav-item">
-											<button class="nav-link active">All Appointments<span><?php echo count($appointments); ?></span></button>
+									<ul class="nav nav-pills inner-tab " id="pills-tab" role="tablist">
+										<li class="nav-item" role="presentation">
+											<button class="nav-link active" id="pills-upcoming-tab" data-bs-toggle="pill" data-bs-target="#pills-upcoming" type="button" role="tab" aria-controls="pills-upcoming" aria-selected="false">Upcoming<span><?php echo count($upcoming_appointments); ?></span></button>
 										</li>	
+										<li class="nav-item" role="presentation">
+											<button class="nav-link" id="pills-cancel-tab" data-bs-toggle="pill" data-bs-target="#pills-cancel" type="button" role="tab" aria-controls="pills-cancel" aria-selected="true">Cancelled<span><?php echo count($cancelled_appointments); ?></span></button>
+										</li>
+										<li class="nav-item" role="presentation">
+											<button class="nav-link" id="pills-complete-tab" data-bs-toggle="pill" data-bs-target="#pills-complete" type="button" role="tab" aria-controls="pills-complete" aria-selected="true">Completed<span><?php echo count($completed_appointments); ?></span></button>
+										</li>
 									</ul>
 								</div>
 								<div class="filter-head">
@@ -360,28 +405,15 @@ include 'header.php';
 							</div>
 
 							<div class="tab-content appointment-tab-content">
-								<div class="tab-pane fade show active">
+								<div class="tab-pane fade show active" id="pills-upcoming" role="tabpanel" aria-labelledby="pills-upcoming-tab">
 									<?php
 									$profile_imgs = ['profile-01.jpg', 'profile-02.jpg', 'profile-03.jpg', 'profile-04.jpg', 'profile-05.jpg', 'profile-06.jpg', 'profile-07.jpg', 'profile-08.jpg'];
-									foreach ($appointments as $idx => $a):
+									foreach ($upcoming_appointments as $idx => $a):
 										$apt_date = $a['appointment_date'];
 										$slot = $a['slot_time'] ?? '';
-										$status = strtolower(trim($a['status'] ?? 'pending'));
 										$time_display = $slot ? date('g.i A', strtotime($slot)) : '';
 										$date_display = $apt_date ? date('d M Y', strtotime($apt_date)) . ($time_display ? ' ' . $time_display : '') : '';
 										$img = 'assets/img/doctors-dashboard/' . ($profile_imgs[$idx % count($profile_imgs)]);
-										
-										// Determine badge color and label
-										$badge_class = 'bg-primary-light';
-										$display_status = ucfirst($status);
-										if ($status === 'completed') {
-											$badge_class = 'bg-success-light';
-										} elseif ($status === 'cancelled') {
-											$badge_class = 'bg-danger-light';
-										} elseif (in_array($status, ['confirmed', 'booked', 'pending'])) {
-											$badge_class = 'bg-info-light';
-											$display_status = 'Upcoming';
-										}
 									?>
 									<div class="appointment-wrap">
 										<ul>
@@ -399,8 +431,8 @@ include 'header.php';
 											<li class="appointment-info">
 												<p><i class="isax isax-clock5"></i><?php echo htmlspecialchars($date_display); ?></p>
 												<ul class="d-flex apponitment-types">
+													<li>Consultation</li>
 													<li>Video Call</li>
-													<li><span class="badge <?php echo $badge_class; ?>"><?php echo $display_status; ?></span></li>
 												</ul>
 											</li>
 											<li class="mail-info-patient">
@@ -411,42 +443,128 @@ include 'header.php';
 											<li class="appointment-action">
 												<ul>
 													<li>
-														<a href="appointment-detail.php?id=<?php echo (int)$a['id']; ?>" class="text-primary-icon" title="View"><i class="isax isax-eye4"></i></a>
+														<a href="appointment-detail.php?id=<?php echo (int)$a['id']; ?>"><i class="isax isax-eye4"></i></a>
 													</li>
 													<li>
-														<a href="chat-doctor.php?appointment_id=<?php echo (int)$a['id']; ?>" class="text-info-icon" title="Chat"><i class="isax isax-messages-25"></i></a>
-													</li>
-													<?php if ($status !== 'cancelled' && $status !== 'completed'): ?>
-													<li><a href="#" class="text-danger-icon" title="Cancel"><i class="isax isax-close-circle5"></i></a></li>
-													<?php endif; ?>
-												</ul>
-												<div class="mt-2 text-center d-flex gap-1 flex-column">
-													<?php if ($status === 'completed'): ?>
 														<?php if (!empty($a['prescription_path'])): ?>
-															<a href="<?php echo htmlspecialchars($a['prescription_path']); ?>" target="_blank" class="btn btn-sm btn-outline-success btn-prescription w-100"><i class="isax isax-document-text me-1"></i>View Prescription</a>
+															<a href="<?php echo htmlspecialchars($a['prescription_path']); ?>" target="_blank" class="btn btn-sm btn-outline-success" title="View Prescription"><i class="isax isax-document-text"></i></a>
 														<?php else: ?>
-															<a href="javascript:void(0);" class="btn btn-sm btn-outline-primary upload-prescription btn-prescription w-100" data-id="<?php echo (int)$a['id']; ?>"><i class="isax isax-export me-1"></i>Upload Prescription</a>
+															<div class="d-flex gap-1">
+																<a href="javascript:void(0);" class="btn btn-sm btn-outline-primary btn-generate-prescription" data-id="<?php echo (int)$a['id']; ?>" data-patient="<?php echo htmlspecialchars($a['patient_name'] ?? 'Patient'); ?>" title="Generate Prescription"><i class="isax isax-edit-2"></i></a>
+																<a href="javascript:void(0);" class="btn btn-sm btn-outline-secondary upload-prescription" data-id="<?php echo (int)$a['id']; ?>" title="Upload Prescription"><i class="isax isax-import"></i></a>
+															</div>
 														<?php endif; ?>
-													<?php endif; ?>
-												</div>
+													</li>
+													<li><a href="#"><i class="isax isax-messages-25"></i></a></li>
+													<li><a href="#"><i class="isax isax-close-circle5"></i></a></li>
+												</ul>
 											</li>
 											<li class="appointment-start">
-												<?php if ($status !== 'cancelled' && $status !== 'completed'): ?>
 												<a href="video-call.php?appointment_id=<?php echo (int)$a['id']; ?>" class="start-link">Start Now</a>
-												<?php else: ?>
+											</li>
+										</ul>
+									</div>
+									<?php endforeach; ?>
+									<?php if (empty($upcoming_appointments)): ?>
+									<div class="appointment-wrap"><p class="text-muted mb-0 p-3">No upcoming appointments.</p></div>
+									<?php endif; ?>
+								</div>
+								<div class="tab-pane fade" id="pills-cancel" role="tabpanel" aria-labelledby="pills-cancel-tab">
+									<?php
+									foreach ($cancelled_appointments as $idx => $a):
+										$apt_date = $a['appointment_date'];
+										$slot = $a['slot_time'] ?? '';
+										$time_display = $slot ? date('g.i A', strtotime($slot)) : '';
+										$date_display = $apt_date ? date('d M Y', strtotime($apt_date)) . ($time_display ? ' ' . $time_display : '') : '';
+										$img = 'assets/img/doctors-dashboard/' . ($profile_imgs[$idx % count($profile_imgs)]);
+									?>
+									<div class="appointment-wrap">
+										<ul>
+											<li>
+												<div class="patinet-information">
+													<a href="appointment-detail.php?id=<?php echo (int)$a['id']; ?>">
+														<img src="<?php echo htmlspecialchars($img); ?>" alt="User Image">
+													</a>
+													<div class="patient-info">
+														<p>#<?php echo htmlspecialchars($a['appointment_number']); ?></p>
+														<h6><a href="appointment-detail.php?id=<?php echo (int)$a['id']; ?>"><?php echo htmlspecialchars($a['patient_name'] ?? 'Patient'); ?></a></h6>
+													</div>
+												</div>
+											</li>
+											<li class="appointment-info">
+												<p><i class="isax isax-clock5"></i><?php echo htmlspecialchars($date_display); ?></p>
+												<ul class="d-flex apponitment-types">
+													<li>Consultation</li>
+													<li>Video Call</li>
+												</ul>
+											</li>
+											<li class="appointment-detail-btn">
 												<a href="appointment-detail.php?id=<?php echo (int)$a['id']; ?>" class="start-link">View Details</a>
+												<?php if (!empty($a['prescription_path'])): ?>
+													<a href="<?php echo htmlspecialchars($a['prescription_path']); ?>" target="_blank" class="btn btn-sm btn-outline-success btn-prescription" title="View Prescription"><i class="isax isax-document-text"></i></a>
+												<?php else: ?>
+													<div class="d-inline-flex gap-1">
+														<a href="javascript:void(0);" class="btn btn-sm btn-outline-primary btn-generate-prescription" data-id="<?php echo (int)$a['id']; ?>" data-patient="<?php echo htmlspecialchars($a['patient_name'] ?? 'Patient'); ?>" title="Generate Prescription"><i class="isax isax-edit-2"></i></a>
+														<a href="javascript:void(0);" class="btn btn-sm btn-outline-secondary upload-prescription" data-id="<?php echo (int)$a['id']; ?>" title="Upload Prescription"><i class="isax isax-import"></i></a>
+													</div>
 												<?php endif; ?>
 											</li>
 										</ul>
 									</div>
 									<?php endforeach; ?>
-									<?php if (empty($appointments)): ?>
-									<div class="appointment-wrap"><p class="text-muted mb-0 p-3">No appointments found.</p></div>
+									<?php if (empty($cancelled_appointments)): ?>
+									<div class="appointment-wrap"><p class="text-muted mb-0 p-3">No cancelled appointments.</p></div>
 									<?php endif; ?>
 								</div>
+								<div class="tab-pane fade" id="pills-complete" role="tabpanel" aria-labelledby="pills-complete-tab">
+									<?php
+									foreach ($completed_appointments as $idx => $a):
+										$apt_date = $a['appointment_date'];
+										$slot = $a['slot_time'] ?? '';
+										$time_display = $slot ? date('g.i A', strtotime($slot)) : '';
+										$date_display = $apt_date ? date('d M Y', strtotime($apt_date)) . ($time_display ? ' ' . $time_display : '') : '';
+										$img = 'assets/img/doctors-dashboard/' . ($profile_imgs[$idx % count($profile_imgs)]);
+									?>
+									<div class="appointment-wrap">
+										<ul>
+											<li>
+												<div class="patinet-information">
+													<a href="appointment-detail.php?id=<?php echo (int)$a['id']; ?>">
+														<img src="<?php echo htmlspecialchars($img); ?>" alt="User Image">
+													</a>
+													<div class="patient-info">
+														<p>#<?php echo htmlspecialchars($a['appointment_number']); ?></p>
+														<h6><a href="appointment-detail.php?id=<?php echo (int)$a['id']; ?>"><?php echo htmlspecialchars($a['patient_name'] ?? 'Patient'); ?></a></h6>
+													</div>
+												</div>
+											</li>
+											<li class="appointment-info">
+												<p><i class="isax isax-clock5"></i><?php echo htmlspecialchars($date_display); ?></p>
+												<ul class="d-flex apponitment-types">
+													<li>Consultation</li>
+													<li>Video Call</li>
+												</ul>
+											</li>
+											<li class="appointment-detail-btn">
+												<a href="appointment-detail.php?id=<?php echo (int)$a['id']; ?>" class="start-link">View Details</a>
+												<?php if (!empty($a['prescription_path'])): ?>
+													<a href="<?php echo htmlspecialchars($a['prescription_path']); ?>" target="_blank" class="btn btn-sm btn-outline-success btn-prescription" title="View Prescription"><i class="isax isax-document-text"></i></a>
+												<?php else: ?>
+													<div class="d-inline-flex gap-1">
+														<a href="javascript:void(0);" class="btn btn-sm btn-outline-primary btn-generate-prescription" data-id="<?php echo (int)$a['id']; ?>" data-patient="<?php echo htmlspecialchars($a['patient_name'] ?? 'Patient'); ?>" title="Generate Prescription"><i class="isax isax-edit-2"></i></a>
+														<a href="javascript:void(0);" class="btn btn-sm btn-outline-secondary upload-prescription" data-id="<?php echo (int)$a['id']; ?>" title="Upload Prescription"><i class="isax isax-import"></i></a>
+													</div>
+												<?php endif; ?>
+											</li>
+										</ul>
+									</div>
+									<?php endforeach; ?>
+									<?php if (empty($completed_appointments)): ?>
+									<div class="appointment-wrap"><p class="text-muted mb-0 p-3">No completed appointments.</p></div>
+									<?php endif; ?>
+
+								</div>
 							</div>
-						</div>
-					</div>
 						</div>
 					</div>
 
@@ -502,6 +620,83 @@ include 'header.php';
 			</div>
 		</div>
 		<!-- /Appointment Details Modal -->
+
+		<!-- Prescription Modal -->
+		<div class="modal fade custom-modal" id="prescription_modal">
+			<div class="modal-dialog modal-dialog-centered modal-lg">
+				<div class="modal-content">
+					<div class="modal-header">
+						<h5 class="modal-title">Generate Prescription - <span id="modal_patient_name"></span></h5>
+						<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+					</div>
+					<form id="prescription_form">
+						<div class="modal-body">
+							<input type="hidden" name="appointment_id" id="modal_appointment_id">
+							
+							<div class="row">
+								<div class="col-md-6">
+									<div class="form-group mb-3">
+										<label class="form-label">Chief Complaints</label>
+										<textarea class="form-control" name="chief_complaints" rows="3" placeholder="Symptoms, duration..."></textarea>
+									</div>
+								</div>
+								<div class="col-md-6">
+									<div class="form-group mb-3">
+										<label class="form-label">On Examination</label>
+										<textarea class="form-control" name="on_examination" rows="3" placeholder="Vitals, physical findings..."></textarea>
+									</div>
+								</div>
+								<div class="col-md-12">
+									<div class="form-group mb-4">
+										<label class="form-label">Diagnosis</label>
+										<input type="text" class="form-control" name="diagnosis" placeholder="Primary diagnosis">
+									</div>
+								</div>
+							</div>
+
+							<hr>
+							<h6 class="mb-3">Medications (Rx)</h6>
+							<div id="medicine_list">
+								<!-- Medicine Row -->
+								<div class="medicine-row mt-2">
+									<div class="row g-2">
+										<div class="col-md-5">
+											<input type="text" class="form-control" name="medicine_name[]" placeholder="Medicine name" required>
+										</div>
+										<div class="col-md-3">
+											<input type="text" class="form-control" name="medicine_dose[]" placeholder="Dose (e.g. 1+0+1)">
+										</div>
+										<div class="col-md-3">
+											<input type="text" class="form-control" name="medicine_duration[]" placeholder="Duration (e.g. 7 days)">
+										</div>
+										<div class="col-md-1">
+											<button type="button" class="btn btn-link btn-remove-medicine" style="display:none;"><i class="fa-solid fa-trash"></i></button>
+										</div>
+									</div>
+								</div>
+							</div>
+							<button type="button" class="btn btn-sm btn-outline-info mt-2" id="btn_add_medicine"><i class="fa-solid fa-plus me-1"></i>Add Medicine</button>
+
+							<hr class="mt-4">
+							<div class="form-group mb-3">
+								<label class="form-label">Advice / Instructions</label>
+								<textarea class="form-control" name="advice" rows="3" placeholder="Diet, rest, follow-up..."></textarea>
+							</div>
+
+							<div class="form-group mb-0">
+								<label class="form-label">Prescription Footer (Optional)</label>
+								<textarea class="form-control" name="prescription_footer" rows="2" placeholder="e.g. Free Medical Camp address..."></textarea>
+							</div>
+						</div>
+						<div class="modal-footer">
+							<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+							<button type="submit" class="btn btn-primary" id="btn_submit_prescription">Generate & Save PDF</button>
+						</div>
+					</form>
+				</div>
+			</div>
+		</div>
+		<!-- /Prescription Modal -->
 	  
 		<!-- jQuery -->
 		<script src="assets/js/jquery-3.7.1.min.js"></script>
@@ -523,15 +718,15 @@ include 'header.php';
 		<!-- Custom JS -->
 		<script src="assets/js/script.js"></script>
 
-		<!-- Prescription Upload Handler -->
+		<!-- Prescription Handlers (Upload & Generate) -->
 		<script>
 		$(document).ready(function() {
-			// Create a hidden file input
+			// --- Upload Logic ---
 			var $fileInput = $('<input type="file" id="prescription_input" style="display:none;" accept=".pdf,.jpg,.jpeg,.png">');
 			$('body').append($fileInput);
 			var currentAppointmentId = null;
 
-			$('.upload-prescription').on('click', function() {
+			$(document).on('click', '.upload-prescription', function() {
 				currentAppointmentId = $(this).data('id');
 				$fileInput.trigger('click');
 			});
@@ -544,9 +739,9 @@ include 'header.php';
 				formData.append('prescription_file', file);
 				formData.append('appointment_id', currentAppointmentId);
 
-				// Show loading or disable button
 				var $btn = $('.upload-prescription[data-id="' + currentAppointmentId + '"]');
-				$btn.html('<i class="fa-solid fa-spinner fa-spin"></i>');
+				var originalText = $btn.text();
+				$btn.html('<i class="fa-solid fa-spinner fa-spin"></i> Uploading...');
 
 				$.ajax({
 					url: 'php/upload-prescription.php',
@@ -557,27 +752,111 @@ include 'header.php';
 					dataType: 'json',
 					success: function(response) {
 						if (response.success) {
-							// Check if it's in the action list (Upcoming) or standard list (Cancelled/Completed)
-							if ($btn.closest('.appointment-action').length) {
-								$btn.replaceWith('<a href="' + response.prescription_path + '" target="_blank" class="btn btn-sm btn-outline-success btn-prescription"><i class="isax isax-document-text me-1"></i>View Prescription</a>');
-							} else {
-								$btn.replaceWith('<a href="' + response.prescription_path + '" target="_blank" class="btn btn-sm btn-outline-success btn-prescription ms-2"><i class="isax isax-document-text me-1"></i>View Prescription</a>');
-							}
+							$btn.closest('.appointment-action, .appointment-detail-btn').html('<a href="' + response.prescription_path + '" target="_blank" class="btn btn-sm btn-outline-success" title="View Prescription"><i class="isax isax-document-text"></i></a>');
 							alert('Prescription uploaded successfully!');
 						} else {
 							alert('Upload failed: ' + response.message);
-							$btn.html('<i class="isax isax-export me-1"></i>Upload Prescription');
+							$btn.text(originalText);
 						}
 					},
 					error: function() {
 						alert('An error occurred during upload.');
-						$btn.html('<i class="isax isax-export me-1"></i>Upload Prescription');
-					},
-					complete: function() {
-						$fileInput.val('');
+						$btn.text(originalText);
 					}
 				});
 			});
+
+			// --- Generation Logic ---
+			$(document).on('click', '.btn-generate-prescription', function() {
+				const aptId = $(this).data('id');
+				const patientName = $(this).data('patient');
+				
+				$('#modal_appointment_id').val(aptId);
+				$('#modal_patient_name').text(patientName);
+				$('#prescription_form')[0].reset();
+				$('#medicine_list').html(`
+					<div class="medicine-row mt-2">
+						<div class="row g-2">
+							<div class="col-md-5">
+								<input type="text" class="form-control" name="medicine_name[]" placeholder="Medicine name" required>
+							</div>
+							<div class="col-md-3">
+								<input type="text" class="form-control" name="medicine_dose[]" placeholder="Dose (e.g. 1+0+1)">
+							</div>
+							<div class="col-md-3">
+								<input type="text" class="form-control" name="medicine_duration[]" placeholder="Duration (e.g. 7 days)">
+							</div>
+							<div class="col-md-1">
+								<button type="button" class="btn btn-link btn-remove-medicine" style="display:none;"><i class="fa-solid fa-trash"></i></button>
+							</div>
+						</div>
+					</div>
+				`);
+				
+				$('#prescription_modal').modal('show');
+			});
+
+			$('#btn_add_medicine').click(function() {
+				const newRow = `
+					<div class="medicine-row mt-2">
+						<div class="row g-2">
+							<div class="col-md-5">
+								<input type="text" class="form-control" name="medicine_name[]" placeholder="Medicine name" required>
+							</div>
+							<div class="col-md-3">
+								<input type="text" class="form-control" name="medicine_dose[]" placeholder="Dose (e.g. 1+0+1)">
+							</div>
+							<div class="col-md-3">
+								<input type="text" class="form-control" name="medicine_duration[]" placeholder="Duration (e.g. 7 days)">
+							</div>
+							<div class="col-md-1">
+								<button type="button" class="btn btn-link btn-remove-medicine"><i class="fa-solid fa-trash"></i></button>
+							</div>
+						</div>
+					</div>
+				`;
+				$('#medicine_list').append(newRow);
+			});
+
+			$(document).on('click', '.btn-remove-medicine', function() {
+				$(this).closest('.medicine-row').remove();
+			});
+
+			$('#prescription_form').submit(function(e) {
+				e.preventDefault();
+				
+				const $submitBtn = $('#btn_submit_prescription');
+				const originalText = $submitBtn.text();
+				$submitBtn.prop('disabled', true).html('<i class="fa-solid fa-spinner fa-spin me-1"></i> Generating...');
+
+				$.ajax({
+					url: 'php/save-prescription-data.php',
+					type: 'POST',
+					data: $(this).serialize(),
+					dataType: 'json',
+					success: function(response) {
+						if (response.success) {
+							// Trigger PDF generation
+							window.open('php/generate-prescription.php?appointment_id=' + response.appointment_id, '_blank');
+							$('#prescription_modal').modal('hide');
+							
+							// Update the UI
+							const aptId = response.appointment_id;
+							// We need to find the right container to update
+							// For simplicity, let's just reload or update all buttons for this ID
+							location.reload(); 
+						} else {
+							alert('Error: ' + response.message);
+							$submitBtn.prop('disabled', false).text(originalText);
+						}
+					},
+					error: function() {
+						alert('An error occurred while saving prescription data.');
+						$submitBtn.prop('disabled', false).text(originalText);
+					}
+				});
+			});
+
 		});
 		</script>
 		

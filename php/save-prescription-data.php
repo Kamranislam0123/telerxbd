@@ -1,0 +1,109 @@
+<?php
+/**
+ * Save Prescription Data
+ * Saves clinical record to appointments table for PDF generation.
+ */
+
+// Disable error display to prevent breaking JSON response
+ini_set('display_errors', 0);
+ob_start();
+header('Content-Type: application/json');
+
+require_once __DIR__ . '/config.php';
+
+// Check if doctor is logged in
+if (!isset($_SESSION['doctor_id']) || !isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true) {
+    ob_clean();
+    echo json_encode(['success' => false, 'message' => 'Authentication required']);
+    exit;
+}
+
+$doctor_id = $_SESSION['doctor_id'];
+
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    $appointment_id = (int)($_POST['appointment_id'] ?? 0);
+    $chief_complaints = $_POST['chief_complaints'] ?? '';
+    $on_examination = $_POST['on_examination'] ?? '';
+    $diagnosis = $_POST['diagnosis'] ?? '';
+    $advice = $_POST['advice'] ?? '';
+    $prescription_footer = $_POST['prescription_footer'] ?? '';
+    
+    // Process medications into JSON
+    $medications = [];
+    if (isset($_POST['medicine_name']) && is_array($_POST['medicine_name'])) {
+        foreach ($_POST['medicine_name'] as $index => $name) {
+            if (!empty($name)) {
+                $medications[] = [
+                    'name' => $name,
+                    'dose' => $_POST['medicine_dose'][$index] ?? '',
+                    'duration' => $_POST['medicine_duration'][$index] ?? ''
+                ];
+            }
+        }
+    }
+    $meds_json = json_encode($medications);
+
+    if ($appointment_id <= 0) {
+        ob_clean();
+        echo json_encode(['success' => false, 'message' => 'Invalid Appointment ID']);
+        exit;
+    }
+
+    try {
+        $conn = getDBConnection();
+        
+        // Verify ownership and status
+        $stmt = $conn->prepare("SELECT id FROM appointments WHERE id = ? AND doctor_id = ?");
+        $stmt->bind_param("ii", $appointment_id, $doctor_id);
+        $stmt->execute();
+        if ($stmt->get_result()->num_rows === 0) {
+            ob_clean();
+            echo json_encode(['success' => false, 'message' => 'Access denied or invalid appointment']);
+            $stmt->close();
+            $conn->close();
+            exit;
+        }
+        $stmt->close();
+
+        // Ensure prescription_footer column exists
+        $col_check = $conn->query("SHOW COLUMNS FROM appointments LIKE 'prescription_footer'");
+        if ($col_check->num_rows === 0) {
+            $conn->query("ALTER TABLE appointments ADD COLUMN prescription_footer TEXT NULL");
+        }
+
+        // Update appointment with prescription details
+        $update_sql = "UPDATE appointments SET 
+                        chief_complaints = ?, 
+                        on_examination = ?, 
+                        diagnosis = ?, 
+                        medications = ?, 
+                        advice = ?,
+                        prescription_footer = ?
+                       WHERE id = ?";
+        
+        $update_stmt = $conn->prepare($update_sql);
+        $update_stmt->bind_param("ssssssi", $chief_complaints, $on_examination, $diagnosis, $meds_json, $advice, $prescription_footer, $appointment_id);
+        
+        if ($update_stmt->execute()) {
+            ob_clean();
+            echo json_encode([
+                'success' => true,
+                'message' => 'Prescription data saved successfully',
+                'appointment_id' => $appointment_id
+            ]);
+        } else {
+            ob_clean();
+            echo json_encode(['success' => false, 'message' => 'Database update failed: ' . $conn->error]);
+        }
+        
+        $update_stmt->close();
+        $conn->close();
+    } catch (Exception $e) {
+        ob_clean();
+        echo json_encode(['success' => false, 'message' => 'Error: ' . $e->getMessage()]);
+    }
+} else {
+    ob_clean();
+    echo json_encode(['success' => false, 'message' => 'Invalid request method']);
+}
+?>
