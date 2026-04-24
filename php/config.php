@@ -10,32 +10,12 @@ define('DB_USER', 'telerxb2_telerx');
 define('DB_PASS', '&+;*LkaHNYztJ+{E');
 define('DB_NAME', 'telerxb2_telerx_db');
 
-
-
 // Database configuration local kamran
 
-
 // define('DB_HOST', 'localhost');
 // define('DB_USER', 'root');
 // define('DB_PASS', '123');
 // define('DB_NAME', 'telerx_db');
-
-
-// Database configuration local mehedi
-
-// define('DB_HOST', 'localhost');
-// define('DB_USER', 'root');
-// define('DB_PASS', '');
-// define('DB_NAME', 'telerx_db');
-
-
-
-
-// define('DB_HOST', 'localhost');
-// define('DB_USER', 'root');
-// define('DB_PASS', '123');
-// define('DB_NAME', 'telerx_db');
-
 
 
 // define('DB_HOST', 'localhost');
@@ -66,14 +46,24 @@ if (session_status() === PHP_SESSION_NONE) {
         || (!empty($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] === 'https')
         || (!empty($_SERVER['HTTP_X_FORWARDED_SSL']) && (strtolower($_SERVER['HTTP_X_FORWARDED_SSL']) === 'on' || $_SERVER['HTTP_X_FORWARDED_SSL'] === '1'))
         || (!empty($_SERVER['SERVER_PORT']) && (int) $_SERVER['SERVER_PORT'] === 443);
-    session_set_cookie_params([
-        'lifetime' => 0,
-        'path' => '/',
-        'domain' => '',
-        'secure' => $is_secure,
-        'httponly' => true,
-        'samesite' => 'Lax'
-    ]);
+    if (PHP_VERSION_ID >= 70300) {
+        session_set_cookie_params([
+            'lifetime' => 0,
+            'path' => '/',
+            'domain' => '',
+            'secure' => $is_secure,
+            'httponly' => true,
+            'samesite' => 'Lax'
+        ]);
+    } else {
+        session_set_cookie_params(
+            0,
+            '/',
+            '',
+            $is_secure,
+            true
+        );
+    }
     session_start();
 }
 
@@ -148,4 +138,3 @@ function checkRememberMe() {
 checkRememberMe();
 
 ?>
-
