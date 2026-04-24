@@ -4,6 +4,11 @@
  * Fetches appointment and doctor data to render a professional prescription.
  */
 
+// Enable error display for debugging in live
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
+
 echo "TEST: Script is executing...<br>\n";
 
 if (!file_exists(__DIR__ . '/../vendor/autoload.php')) {
@@ -14,11 +19,6 @@ require_once __DIR__ . '/config.php';
 
 use Dompdf\Dompdf;
 use Dompdf\Options;
-
-// Enable error display for debugging in live
-ini_set('display_errors', 1);
-ini_set('display_startup_errors', 1);
-error_reporting(E_ALL);
 
 function debug_log($message) {
     $dir = __DIR__ . '/../assets/prescriptions/';
