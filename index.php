@@ -71,7 +71,7 @@ try {
                     </div>
                     <h1 class="display-5">Discover Health: Find Your Trusted <span class="banner-icon"><img src="assets/img/icons/video.svg" alt="img"></span> <span class="text-gradient">Doctors</span> Today</h1>
                     <div class="search-box-one aos" data-aos="fade-up">
-                        <form action="doctors.php" method="GET">
+                        <form action="doctors" method="GET">
                             <div class="search-input search-line">
                                 <i class="isax isax-hospital5 bficon"></i>
                                 <div class=" mb-0">
@@ -153,7 +153,7 @@ try {
                     <div class="item">
                         <div class="doctor-profile-widget doc-item">
                             <div class="doc-pro-img">
-                                <a href="doctor-profile.php?id=<?php echo $doctor['id']; ?>">
+                                <a href="doctor-profile?id=<?php echo $doctor['id']; ?>">
                                     <div class="doctor-profile-img">
                                         <img src="<?php echo htmlspecialchars($doctor['profile_image'] ?? 'assets/img/doctors/default-doctor.png'); ?>" class="img-fluid" alt="<?php echo htmlspecialchars($doctor['name']); ?>">
                                     </div>
@@ -165,7 +165,7 @@ try {
                             <div class="doc-content">
                                 <div class="doc-pro-info">
                                     <div class="doc-pro-name">
-                                        <a href="doctor-profile.php?id=<?php echo $doctor['id']; ?>"><?php echo htmlspecialchars($doctor['name']); ?></a>
+                                        <a href="doctor-profile?id=<?php echo $doctor['id']; ?>"><?php echo htmlspecialchars($doctor['name']); ?></a>
                                         <p><?php echo htmlspecialchars($doctor['specialty'] ?? 'General Physician'); ?></p>
                                     </div>
                                     <div class="reviews-ratings">
