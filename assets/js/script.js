@@ -3933,7 +3933,9 @@ $(document).ready(function () {
 		$('#summary_pulse').text($('#booking_pulse').val() || '—');
 		$('#summary_spo2').text($('#booking_spo2').val() || '—');
 		$('#summary_rbs_fbs').text($('#booking_rbs_fbs').val() || '—');
-		$('#summary_attachment').text('—');
+		var attachFile = document.getElementById('booking_attachment');
+		var attachName = (attachFile && attachFile.files && attachFile.files.length > 0) ? attachFile.files[0].name : '—';
+		$('#summary_attachment').text(attachName);
 		var symptoms = $('#booking_symptoms').val() || '';
 		$('#summary_symptoms').text(symptoms.length > 80 ? symptoms.substring(0, 80) + '...' : symptoms || '—');
 		// Advance to Check Your Booking Info screen (payment step)
@@ -4019,46 +4021,64 @@ $(document).ready(function () {
 
 		showBookingToast('success', 'Confirming your booking...');
 		$btn.prop('disabled', true).html('<i class="fa fa-spinner fa-spin me-2"></i>Confirming...');
-		$.post('php/book-appointment.php', {
-			doctor_id: doctorId,
-			appointment_date: appointmentDate,
-			slot_time: slotTime,
-			patient_name: fullName,
-			mobile: mobile,
-			notes: $('#booking_symptoms').val() || '',
-			age: $('#booking_age').val() || '',
-			weight: $('#booking_weight').val() || '',
-			body_temperature: $('#booking_body_temperature').val() || '',
-			blood_pressure: $('#booking_blood_pressure').val() || '',
-			pulse: $('#booking_pulse').val() || '',
-			spo2: $('#booking_spo2').val() || '',
-			rbs_fbs: $('#booking_rbs_fbs').val() || '',
-			telerx_id: telerxId,
-			payment_method: paymentMethod
-		}, function(r) {
-			if (r && r.success) {
-				showBookingToast('success', r.message || 'Booking confirmed!');
-				$('.booking-id-badge').text(r.booking_number || ('APT' + (r.appointment_id || '')));
-				// Fill confirmation Booking Info with actual booked date & time
-				var dateStr = appointmentDate ? (moment(appointmentDate).format('D MMM YYYY') || appointmentDate) : '—';
-				var timeStr = formatSlotForSummary(slotTime);
-				$('#confirm_date_time').text(timeStr + ', ' + dateStr);
-				var $step = $btn.closest('fieldset');
-				$step.next().fadeIn('slow');
-				$step.css('display', 'none');
-				$('.progress-active').removeClass('progress-active').addClass('progress-activated').next().addClass('progress-active');
-			} else {
-				showBookingToast('danger', r && r.message ? r.message : 'Booking failed.');
+
+		// Use FormData to support file upload (attachment)
+		var formData = new FormData();
+		formData.append('doctor_id', doctorId);
+		formData.append('appointment_date', appointmentDate);
+		formData.append('slot_time', slotTime);
+		formData.append('patient_name', fullName);
+		formData.append('mobile', mobile);
+		formData.append('notes', $('#booking_symptoms').val() || '');
+		formData.append('age', $('#booking_age').val() || '');
+		formData.append('weight', $('#booking_weight').val() || '');
+		formData.append('body_temperature', $('#booking_body_temperature').val() || '');
+		formData.append('blood_pressure', $('#booking_blood_pressure').val() || '');
+		formData.append('pulse', $('#booking_pulse').val() || '');
+		formData.append('spo2', $('#booking_spo2').val() || '');
+		formData.append('rbs_fbs', $('#booking_rbs_fbs').val() || '');
+		formData.append('telerx_id', telerxId || '');
+		formData.append('payment_method', paymentMethod);
+
+		// Append attachment file if selected
+		var attachInput = document.getElementById('booking_attachment');
+		if (attachInput && attachInput.files && attachInput.files.length > 0) {
+			formData.append('booking_attachment', attachInput.files[0]);
+		}
+
+		$.ajax({
+			url: 'php/book-appointment.php',
+			type: 'POST',
+			data: formData,
+			processData: false,
+			contentType: false,
+			dataType: 'json',
+			success: function(r) {
+				if (r && r.success) {
+					showBookingToast('success', r.message || 'Booking confirmed!');
+					$('.booking-id-badge').text(r.booking_number || ('APT' + (r.appointment_id || '')));
+					// Fill confirmation Booking Info with actual booked date & time
+					var dateStr = appointmentDate ? (moment(appointmentDate).format('D MMM YYYY') || appointmentDate) : '—';
+					var timeStr = formatSlotForSummary(slotTime);
+					$('#confirm_date_time').text(timeStr + ', ' + dateStr);
+					var $step = $btn.closest('fieldset');
+					$step.next().fadeIn('slow');
+					$step.css('display', 'none');
+					$('.progress-active').removeClass('progress-active').addClass('progress-activated').next().addClass('progress-active');
+				} else {
+					showBookingToast('danger', r && r.message ? r.message : 'Booking failed.');
+				}
+				$btn.prop('disabled', false).html('Confirm & Pay <i class="isax isax-arrow-right-3 ms-1"></i>');
+			},
+			error: function(xhr) {
+				var msg = 'Booking failed. Please try again.';
+				try {
+					var r = JSON.parse(xhr.responseText);
+					if (r && r.message) msg = r.message;
+				} catch (z) {}
+				showBookingToast('danger', msg);
+				$btn.prop('disabled', false).html('Confirm & Pay <i class="isax isax-arrow-right-3 ms-1"></i>');
 			}
-			$btn.prop('disabled', false).html('Confirm & Pay <i class="isax isax-arrow-right-3 ms-1"></i>');
-		}, 'json').fail(function(xhr) {
-			var msg = 'Booking failed. Please try again.';
-			try {
-				var r = JSON.parse(xhr.responseText);
-				if (r && r.message) msg = r.message;
-			} catch (z) {}
-			showBookingToast('danger', msg);
-			$btn.prop('disabled', false).html('Confirm & Pay <i class="isax isax-arrow-right-3 ms-1"></i>');
 		});
 		return false;
 	});
