@@ -4,6 +4,8 @@
  * Fetches appointment and doctor data to render a professional prescription.
  */
 
+echo "TEST: Script is executing...<br>\n";
+
 if (!file_exists(__DIR__ . '/../vendor/autoload.php')) {
     die("Error: vendor/autoload.php not found at " . realpath(__DIR__ . '/../') . "/vendor/autoload.php. Please run 'composer install' on the server.");
 }
@@ -20,8 +22,9 @@ error_reporting(E_ALL);
 
 function debug_log($message) {
     $dir = __DIR__ . '/../assets/prescriptions/';
-    if (!is_dir($dir)) @mkdir($dir, 0777, true);
-    @file_put_contents($dir . 'debug.log', "[" . date('Y-m-d H:i:s') . "] " . $message . "\n", FILE_APPEND);
+    if (!is_dir($dir)) mkdir($dir, 0777, true);
+    file_put_contents($dir . 'debug.log', "[" . date('Y-m-d H:i:s') . "] " . $message . "\n", FILE_APPEND);
+    echo htmlspecialchars($message) . "<br>\n";
 }
 
 debug_log("=== STARTING PRESCRIPTION GENERATION ===");
