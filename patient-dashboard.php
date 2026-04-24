@@ -38,8 +38,28 @@ try {
     $patient = $result->fetch_assoc();
     $stmt->close();
 
+    // Fetch appointments for dashboard
     $appointments = [];
     $upcoming = [];
+    $prescriptions = [];
+    
+    $apt_stmt = $conn->prepare("SELECT a.*, d.name as doctor_name, dp.specialty FROM appointments a JOIN doctors d ON a.doctor_id = d.id LEFT JOIN doctor_profiles dp ON d.id = dp.doctor_id WHERE a.patient_id = ? ORDER BY a.appointment_date DESC");
+    if ($apt_stmt) {
+        $apt_stmt->bind_param("i", $patient_id);
+        $apt_stmt->execute();
+        $result = $apt_stmt->get_result();
+        while ($row = $result->fetch_assoc()) {
+            $appointments[] = $row;
+            if (in_array(strtolower($row['status']), ['booked', 'confirmed', 'pending'])) {
+                $upcoming[] = $row;
+            }
+            if (!empty($row['prescription_path'])) {
+                $prescriptions[] = $row;
+            }
+        }
+        $apt_stmt->close();
+    }
+    
     $conn->close();
 
     // Set default values if profile data is missing
@@ -340,11 +360,24 @@ include 'header.php';
 																		</tr>
 																	</thead>
 																	<tbody>
+																		<?php if (empty($prescriptions)): ?>
 																		<tr>
 																			<td colspan="5" class="text-center py-5">
 																				<p class="text-muted">No prescriptions found</p>
 																			</td>
 																		</tr>
+																		<?php else: foreach ($prescriptions as $prsc): ?>
+																		<tr>
+																			<td>#APT<?php echo str_pad($prsc['id'], 5, '0', STR_PAD_LEFT); ?></td>
+																			<td><?php echo htmlspecialchars($prsc['doctor_name'] ?? '—'); ?></td>
+																			<td><?php echo date('M j, Y', strtotime($prsc['appointment_date'])); ?></td>
+																			<td>Prescription File</td>
+																			<td>
+																				<a href="<?php echo htmlspecialchars((defined('APP_BASE') && APP_BASE ? APP_BASE . '/' : '') . $prsc['prescription_path']); ?>" target="_blank" class="btn btn-sm btn-outline-primary shadow-sm"><i class="fa-solid fa-eye me-1"></i> View</a>
+																				<a href="<?php echo htmlspecialchars((defined('APP_BASE') && APP_BASE ? APP_BASE . '/' : '') . $prsc['prescription_path']); ?>" download class="btn btn-sm btn-outline-success shadow-sm ms-2"><i class="fa-solid fa-download me-1"></i> Download</a>
+																			</td>
+																		</tr>
+																		<?php endforeach; endif; ?>
 																	</tbody>
 																</table>
 															</div>
