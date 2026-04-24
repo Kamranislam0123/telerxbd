@@ -18,15 +18,26 @@ ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 
+function debug_log($message) {
+    $dir = __DIR__ . '/../assets/prescriptions/';
+    if (!is_dir($dir)) @mkdir($dir, 0777, true);
+    @file_put_contents($dir . 'debug.log', "[" . date('Y-m-d H:i:s') . "] " . $message . "\n", FILE_APPEND);
+}
+
+debug_log("=== STARTING PRESCRIPTION GENERATION ===");
+
 if (!isset($_GET['appointment_id'])) {
+    debug_log("Error: Appointment ID missing in GET request.");
     die("Appointment ID is required.");
 }
 
 $appointment_id = (int)$_GET['appointment_id'];
 
 try {
+    debug_log("Connecting to database...");
     $conn = getDBConnection();
     
+    debug_log("Fetching appointment data for ID: $appointment_id...");
     // 1. Fetch Appointment Data
     $stmt = $conn->prepare("SELECT a.*, p.gender FROM appointments a LEFT JOIN patients p ON a.patient_id = p.id WHERE a.id = ?");
     $stmt->bind_param("i", $appointment_id);
@@ -81,8 +92,11 @@ try {
         $logo_path = realpath(__DIR__ . '/../assets/img/logo.png');
     }
 
+    debug_log("Logo path resolved to: " . ($logo_path ?: 'NOT FOUND'));
+
     // Convert to base64 for reliable PDF rendering
     if ($logo_path && file_exists($logo_path)) {
+        debug_log("Converting logo to base64...");
         $type = pathinfo($logo_path, PATHINFO_EXTENSION);
         $data = @file_get_contents($logo_path);
         if ($data !== false) {
@@ -273,6 +287,8 @@ try {
     </body>
     </html>';
 
+    debug_log("HTML content built. Initializing Dompdf...");
+
     // 7. Initialize Dompdf
     $options = new Options();
     $options->set('isHtml5ParserEnabled', true);
@@ -280,14 +296,17 @@ try {
     $options->set('defaultFont', 'DejaVu Sans');
     $options->set('isFontSubsettingEnabled', true);
     
+    debug_log("Loading HTML into Dompdf...");
     $dompdf = new Dompdf($options);
     $dompdf->loadHtml($html, 'UTF-8');
     
     // Set paper size
     $dompdf->setPaper('A4', 'portrait');
     
+    debug_log("Rendering PDF...");
     // Render the PDF
     $dompdf->render();
+    debug_log("PDF rendered successfully.");
     
     $filename = 'prescription_' . $appointment_id . '_' . time() . '.pdf';
     $output = $dompdf->output();
@@ -297,17 +316,21 @@ try {
     $save_dir = __DIR__ . '/../assets/prescriptions/';
     if (!is_dir($save_dir)) {
         if (!@mkdir($save_dir, 0777, true)) {
+            debug_log("Error: Failed to create directory $save_dir");
             die("Error: Failed to create directory $save_dir. Please create it manually and set permissions to 777.");
         }
     }
     if (!is_writable($save_dir)) {
+        debug_log("Error: Directory $save_dir is not writable");
         die("Error: Directory $save_dir is not writable. Please set permissions to 777.");
     }
     $save_path = $save_dir . $filename;
     
+    debug_log("Saving PDF to $save_path...");
     // Save to server
     file_put_contents($save_path, $output);
     
+    debug_log("Updating database with prescription path...");
     // Update DB with path
     $update_stmt = $conn->prepare("UPDATE appointments SET prescription_path = ? WHERE id = ?");
     $update_stmt->bind_param("si", $filepath, $appointment_id);
@@ -315,11 +338,14 @@ try {
     $update_stmt->close();
 
     // Stream to browser
+    debug_log("Streaming PDF to browser...");
     $dompdf->stream($filename, ["Attachment" => false]);
 
     $conn->close();
+    debug_log("=== PRESCRIPTION GENERATION COMPLETED ===");
 
 } catch (Exception $e) {
+    debug_log("EXCEPTION CAUGHT: " . $e->getMessage());
     die("Error generating prescription: " . $e->getMessage());
 }
 ?>
