@@ -53,6 +53,32 @@ $blood_pressure = isset($_POST['blood_pressure']) ? trim($_POST['blood_pressure'
 $pulse = isset($_POST['pulse']) ? trim($_POST['pulse']) : '';
 $spo2 = isset($_POST['spo2']) ? trim($_POST['spo2']) : '';
 $rbs_fbs = isset($_POST['rbs_fbs']) ? trim($_POST['rbs_fbs']) : '';
+
+// Handle Attachment Upload
+$attachment_path = '';
+if (isset($_FILES['booking_attachment']) && $_FILES['booking_attachment']['error'] === UPLOAD_ERR_OK) {
+    $fileTmpPath = $_FILES['booking_attachment']['tmp_name'];
+    $fileName = $_FILES['booking_attachment']['name'];
+    $fileSize = $_FILES['booking_attachment']['size'];
+    $fileType = $_FILES['booking_attachment']['type'];
+    $fileNameCmps = explode(".", $fileName);
+    $fileExtension = strtolower(end($fileNameCmps));
+
+    $allowedfileExtensions = array('jpg', 'gif', 'png', 'jpeg', 'pdf');
+    if (in_array($fileExtension, $allowedfileExtensions)) {
+        $uploadFileDir = __DIR__ . '/../assets/img/attachments/';
+        if (!is_dir($uploadFileDir)) {
+            mkdir($uploadFileDir, 0777, true);
+        }
+        $newFileName = md5(time() . $fileName) . '.' . $fileExtension;
+        $dest_path = $uploadFileDir . $newFileName;
+
+        if (move_uploaded_file($fileTmpPath, $dest_path)) {
+            $attachment_path = 'assets/img/attachments/' . $newFileName;
+        }
+    }
+}
+
 // Accept TID from either field name (booking form uses booking_telerx_id, JS sends telerx_id)
 $referrer_tid = isset($_POST['telerx_id']) ? trim($_POST['telerx_id']) : (isset($_POST['booking_telerx_id']) ? trim($_POST['booking_telerx_id']) : '');
 $payment_method = isset($_POST['payment_method']) ? trim($_POST['payment_method']) : 'bkash';
@@ -172,12 +198,54 @@ try {
     }
     $mobile_phone = $mobile;
 
+    // Ensure attachment_path column exists
+    $has_attachment_path = false;
+    $col_check_att = $conn->query("SHOW COLUMNS FROM appointments LIKE 'attachment_path'");
+    if ($col_check_att && $col_check_att->num_rows > 0) {
+        $has_attachment_path = true;
+    }
+    if (!$has_attachment_path) {
+        @$conn->query("ALTER TABLE appointments ADD COLUMN attachment_path VARCHAR(255) DEFAULT NULL COMMENT 'Path to uploaded attachment'");
+    }
+
     if ($has_referrer_tid && $has_payment_method) {
         $ins = $conn->prepare("
             INSERT INTO appointments (
                 patient_id, doctor_id, appointment_date, slot_time, appointment_time,
                 status, appointment_number, notes, patient_name, mobile, patient_phone,
-                age, weight, body_temperature, blood_pressure, pulse, spo2, rbs_fbs, referrer_tid, payment_method
+                age, weight, body_temperature, blood_pressure, pulse, spo2, rbs_fbs, referrer_tid, payment_method, attachment_path
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        ");
+        $ins->bind_param(
+            "iisssssssssssssssssss",
+            $patient_id,
+            $doctor_id,
+            $appointment_date,
+            $slot_time,
+            $slot_time,
+            $status,
+            $appointment_number,
+            $notes,
+            $patient_name,
+            $mobile,
+            $mobile_phone,
+            $age,
+            $weight,
+            $body_temperature,
+            $blood_pressure,
+            $pulse,
+            $spo2,
+            $rbs_fbs,
+            $referrer_tid,
+            $payment_method,
+            $attachment_path
+        );
+    } else if ($has_referrer_tid) {
+        $ins = $conn->prepare("
+            INSERT INTO appointments (
+                patient_id, doctor_id, appointment_date, slot_time, appointment_time,
+                status, appointment_number, notes, patient_name, mobile, patient_phone,
+                age, weight, body_temperature, blood_pressure, pulse, spo2, rbs_fbs, referrer_tid, attachment_path
             ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         ");
         $ins->bind_param(
@@ -201,14 +269,14 @@ try {
             $spo2,
             $rbs_fbs,
             $referrer_tid,
-            $payment_method
+            $attachment_path
         );
-    } else if ($has_referrer_tid) {
+    } else {
         $ins = $conn->prepare("
             INSERT INTO appointments (
                 patient_id, doctor_id, appointment_date, slot_time, appointment_time,
                 status, appointment_number, notes, patient_name, mobile, patient_phone,
-                age, weight, body_temperature, blood_pressure, pulse, spo2, rbs_fbs, referrer_tid
+                age, weight, body_temperature, blood_pressure, pulse, spo2, rbs_fbs, attachment_path
             ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         ");
         $ins->bind_param(
@@ -231,36 +299,7 @@ try {
             $pulse,
             $spo2,
             $rbs_fbs,
-            $referrer_tid
-        );
-    } else {
-        $ins = $conn->prepare("
-            INSERT INTO appointments (
-                patient_id, doctor_id, appointment_date, slot_time, appointment_time,
-                status, appointment_number, notes, patient_name, mobile, patient_phone,
-                age, weight, body_temperature, blood_pressure, pulse, spo2, rbs_fbs
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-        ");
-        $ins->bind_param(
-            "iissssssssssssssss",
-            $patient_id,
-            $doctor_id,
-            $appointment_date,
-            $slot_time,
-            $slot_time,
-            $status,
-            $appointment_number,
-            $notes,
-            $patient_name,
-            $mobile,
-            $mobile_phone,
-            $age,
-            $weight,
-            $body_temperature,
-            $blood_pressure,
-            $pulse,
-            $spo2,
-            $rbs_fbs
+            $attachment_path
         );
     }
     if (!$ins->execute()) {
@@ -301,7 +340,7 @@ try {
             'pulse' => $pulse ?: '—',
             'spo2' => $spo2 ?: '—',
             'rbs_fbs' => $rbs_fbs ?: '—',
-            'attachment' => '—',
+            'attachment' => $attachment_path ? basename($attachment_path) : '—',
             'symptoms' => $notes ? (strlen($notes) > 80 ? substr($notes, 0, 80) . '...' : $notes) : '—'
         ]
     ]);

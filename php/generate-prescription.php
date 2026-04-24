@@ -4,15 +4,19 @@
  * Fetches appointment and doctor data to render a professional prescription.
  */
 
+if (!file_exists(__DIR__ . '/../vendor/autoload.php')) {
+    die("Error: vendor/autoload.php not found at " . realpath(__DIR__ . '/../') . "/vendor/autoload.php. Please run 'composer install' on the server.");
+}
 require_once __DIR__ . '/../vendor/autoload.php';
 require_once __DIR__ . '/config.php';
 
 use Dompdf\Dompdf;
 use Dompdf\Options;
 
-// Disable error display for production-like behavior in PDF generation
-ini_set('display_errors', 0);
-error_reporting(0);
+// Enable error display for debugging in live
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
 
 if (!isset($_GET['appointment_id'])) {
     die("Appointment ID is required.");
@@ -292,7 +296,12 @@ try {
     // Ensure directory exists
     $save_dir = __DIR__ . '/../assets/prescriptions/';
     if (!is_dir($save_dir)) {
-        mkdir($save_dir, 0777, true);
+        if (!@mkdir($save_dir, 0777, true)) {
+            die("Error: Failed to create directory $save_dir. Please create it manually and set permissions to 777.");
+        }
+    }
+    if (!is_writable($save_dir)) {
+        die("Error: Directory $save_dir is not writable. Please set permissions to 777.");
     }
     $save_path = $save_dir . $filename;
     
