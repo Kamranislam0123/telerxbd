@@ -8,7 +8,7 @@
                     </div>
                     <div class="footer-buy-btn">
                         <h6>Get started with TeleRx Bangladesh?</h6>
-                        <a href="doctors.php" class="btn btn-primary">Book Now</a>
+                        <a href="doctors" class="btn btn-primary">Book Now</a>
                     </div>
                 </div>
                 <div class="footer-middle">
@@ -27,8 +27,8 @@
                             <div class="footer-links-middle">
                                 <h4>TeleRx</h4>
                                 <ul>
-                                    <li><a href="about-us.php">About Us</a></li>
-                                    <li><a href="blog.php">Blogs</a></li>
+                                    <li><a href="about-us">About Us</a></li>
+                                    <li><a href="blog">Blogs</a></li>
                                     <li><a href="javascript:void(0);">Careers</a></li>
                                     <li><a href="javascript:void(0);">Success Stories</a></li>
                                 </ul>

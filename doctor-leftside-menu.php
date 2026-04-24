@@ -6,11 +6,11 @@
         <div class="profile-sidebar doctor-sidebar profile-sidebar-new">
             <div class="widget-profile pro-widget-content">
                 <div class="profile-info-widget">
-                    <a href="doctor-profile.php?doctor_id=<?php echo $doctor_id; ?>" class="booking-doc-img">
+                    <a href="doctor-profile?doctor_id=<?php echo $doctor_id; ?>" class="booking-doc-img">
                         <img src="<?php echo htmlspecialchars($doctor['profile_image']); ?>" alt="User Image">
                     </a>
                 <div class="profile-det-info">
-                    <h3><a href="doctor-profile.php?doctor_id=<?php echo $doctor_id; ?>"><?php echo htmlspecialchars($doctor['name']); ?></a></h3>
+                    <h3><a href="doctor-profile?doctor_id=<?php echo $doctor_id; ?>"><?php echo htmlspecialchars($doctor['name']); ?></a></h3>
             <div class="patient-details">
                 <h5 class="mb-0"><?php echo htmlspecialchars($doctor['degrees'] ?: 'Doctor'); ?></h5>
     </div>
@@ -44,7 +44,7 @@ if (!empty($speciality_display)) {
     <nav class="dashboard-menu">
         <ul>
             <li>
-                <a href="doctor-dashboard.php">
+                <a href="doctor-dashboard">
                     <i class="isax isax-category-2"></i>
                     <span>Dashboard</span>
                 </a>
@@ -57,7 +57,7 @@ if (!empty($speciality_display)) {
                 </a>
             </li> -->
             <li>
-                <a href="appointments.php">
+                <a href="appointments">
                     <i class="isax isax-calendar-1"></i>
                     <span>Appointments</span>
                 </a>
@@ -112,7 +112,7 @@ if (!empty($speciality_display)) {
                 </a>
             </li> -->
             <li class="active">
-                <a href="doctor-profile-settings.php">
+                <a href="doctor-profile-settings">
                     <i class="isax isax-setting-2"></i>
                     <span>Profile Settings</span>
                 </a>

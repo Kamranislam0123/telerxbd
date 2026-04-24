@@ -3,11 +3,11 @@
         <div class="profile-sidebar patient-sidebar profile-sidebar-new">
             <div class="widget-profile pro-widget-content">
                 <div class="profile-info-widget">
-                    <a href="patient-profile-settings.php" class="booking-doc-img">
+                    <a href="patient-profile-settings" class="booking-doc-img">
                         <img src="<?php echo htmlspecialchars($patient['profile_image'] ?? 'assets/img/doctors-dashboard/profile-06.jpg'); ?>" alt="User Image">
                     </a>
                     <div class="profile-det-info">
-                        <h3><a href="<?php echo (defined('APP_BASE') && APP_BASE) ? APP_BASE . '/patient-profile-settings.php' : 'patient-profile-settings.php'; ?>"><?php echo htmlspecialchars($patient['name']); ?></a></h3>
+                        <h3><a href="<?php echo (defined('APP_BASE') && APP_BASE) ? APP_BASE . '/patient-profile-settings' : 'patient-profile-settings'; ?>"><?php echo htmlspecialchars($patient['name']); ?></a></h3>
                         <div class="patient-details">
                             <h5 class="mb-0">Patient ID : PT<?php echo str_pad($patient['id'], 6, '0', STR_PAD_LEFT); ?></h5>
                         </div>
@@ -36,19 +36,19 @@ if (!empty($patient['gender']) || !empty($patient['date_of_birth'])) {
                 <nav class="dashboard-menu">
                     <ul>
                         <li <?php echo (basename($_SERVER['PHP_SELF']) == 'patient-dashboard.php') ? 'class="active"' : ''; ?>>
-                            <a href="<?php echo (defined('APP_BASE') && APP_BASE) ? APP_BASE . '/patient-dashboard.php' : 'patient-dashboard.php'; ?>">
+                            <a href="<?php echo (defined('APP_BASE') && APP_BASE) ? APP_BASE . '/patient-dashboard' : 'patient-dashboard'; ?>">
                                 <i class="isax isax-category-2"></i>
                                 <span>Dashboard</span>
                             </a>
                         </li>
                         <li <?php echo (basename($_SERVER['PHP_SELF']) == 'patient-appointments.php') ? 'class="active"' : ''; ?>>
-                            <a href="<?php echo (defined('APP_BASE') && APP_BASE) ? APP_BASE . '/patient-appointments.php' : 'patient-appointments.php'; ?>">
+                            <a href="<?php echo (defined('APP_BASE') && APP_BASE) ? APP_BASE . '/patient-appointments' : 'patient-appointments'; ?>">
                                 <i class="isax isax-calendar-1"></i>
                                 <span>My Appointments</span>
                             </a>
                         </li>
                         <li <?php echo (basename($_SERVER['PHP_SELF']) == 'patient-profile-settings.php') ? 'class="active"' : ''; ?>>
-                            <a href="<?php echo (defined('APP_BASE') && APP_BASE) ? APP_BASE . '/patient-profile-settings.php' : 'patient-profile-settings.php'; ?>">
+                            <a href="<?php echo (defined('APP_BASE') && APP_BASE) ? APP_BASE . '/patient-profile-settings' : 'patient-profile-settings'; ?>">
                                 <i class="isax isax-setting-2"></i>
                                 <span>Settings</span>
                             </a>

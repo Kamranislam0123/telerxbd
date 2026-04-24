@@ -7,7 +7,7 @@ $healthcare = $healthcare ?? [];
     <div class="profile-sidebar doctor-sidebar profile-sidebar-new">
         <div class="widget-profile pro-widget-content">
             <div class="profile-info-widget">
-                <a href="health-worker-profile-settings.php" class="booking-doc-img">
+                <a href="health-worker-profile-settings" class="booking-doc-img">
                     <img src="<?php echo htmlspecialchars($healthcare['profile_image'] ?? 'assets/img/doctors-dashboard/doctor-profile-img.jpg'); ?>" alt="User Image">
                 </a>
                 <div class="profile-det-info">
@@ -25,19 +25,19 @@ $healthcare = $healthcare ?? [];
             <nav class="dashboard-menu">
                 <ul>
                     <li>
-                        <a href="health-worker-dashboard.php">
+                        <a href="health-worker-dashboard">
                             <i class="isax isax-element-35"></i>
                             <span>Dashboard</span>
                         </a>
                     </li>
                     <li class="<?php echo ($current_page === 'health-worker-dashboard.php') ? 'active' : ''; ?>">
-                        <a href="health-worker-dashboard.php">
+                        <a href="health-worker-dashboard">
                             <i class="fa-solid fa-user-injured"></i>
                             <span>Patient</span>
                         </a>
                     </li>
                     <li class="<?php echo ($current_page === 'health-worker-profile-settings.php') ? 'active' : ''; ?>">
-                        <a href="health-worker-profile-settings.php">
+                        <a href="health-worker-profile-settings">
                             <i class="isax isax-setting-2"></i>
                             <span>Profile Settings</span>
                         </a>

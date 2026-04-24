@@ -1,3 +1,4 @@
+
 <?php
 if (session_status() === PHP_SESSION_NONE) {
     $is_secure = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off')
@@ -128,7 +129,7 @@ $current_page = basename($_SERVER['PHP_SELF']);
                             <a href="/">Home</a>
                         </li>
                         <li class="<?php echo ($current_page == 'doctors') ? 'active' : ''; ?>">
-                            <a href="doctors.php">Our Doctors</a>
+                            <a href="doctors">Our Doctors</a>
                         </li>
                         <li class="<?php echo ($current_page == 'welfare') ? 'active' : ''; ?>">
                             <a href="welfare">Welfare</a>
@@ -154,7 +155,7 @@ $current_page = basename($_SERVER['PHP_SELF']);
                             <?php if(isset($_SESSION['logged_in']) && $_SESSION['logged_in'] === true): ?>
                                 <a href="php/logout.php">Logout</a>
                             <?php else: ?>
-                                <a href="login.php">Login / Signup</a>
+                                <a href="login">Login / Signup</a>
                             <?php endif; ?>
                         </li>
                     </ul>
@@ -221,14 +222,14 @@ $current_page = basename($_SERVER['PHP_SELF']);
                                 </div>
 
                                 <?php if($_SESSION['user_type'] == 'doctor'): ?>
-                                    <a class="dropdown-item" href="doctor-dashboard.php">Dashboard</a>
-                                    <a class="dropdown-item" href="doctor-profile-settings.php">Profile Settings</a>
+                                    <a class="dropdown-item" href="doctor-dashboard">Dashboard</a>
+                                    <a class="dropdown-item" href="doctor-profile-settings">Profile Settings</a>
                                 <?php elseif($_SESSION['user_type'] == 'healthcare'): ?>
-                                    <a class="dropdown-item" href="health-worker-dashboard.php">Dashboard</a>
-                                    <a class="dropdown-item" href="health-worker-profile-settings.php">Profile Settings</a>
+                                    <a class="dropdown-item" href="health-worker-dashboard">Dashboard</a>
+                                    <a class="dropdown-item" href="health-worker-profile-settings">Profile Settings</a>
                                 <?php elseif($_SESSION['user_type'] == 'patient'): ?>
-                                    <a class="dropdown-item" href="patient-dashboard.php">Dashboard</a>
-                                    <a class="dropdown-item" href="patient-profile-settings.php">Profile Settings</a>
+                                    <a class="dropdown-item" href="patient-dashboard">Dashboard</a>
+                                    <a class="dropdown-item" href="patient-profile-settings">Profile Settings</a>
                                 <?php endif; ?>
 
                                 <a class="dropdown-item" href="php/logout.php">Logout</a>
@@ -237,12 +238,12 @@ $current_page = basename($_SERVER['PHP_SELF']);
                     <?php else: ?>
                         <!-- Guest/Non-logged in menu -->
                         <li class="register-btn">
-                            <a href="registration.php" class="btn btn-dark reg-btn">
+                            <a href="registration" class="btn btn-dark reg-btn">
                                 <i class="isax isax-user"></i>Register
                             </a>
                         </li>
                         <li class="register-btn">
-                            <a href="login.php" class="btn btn-primary log-btn">
+                            <a href="login" class="btn btn-primary log-btn">
                                 <i class="isax isax-lock"></i>Login
                             </a>
                         </li>
@@ -252,4 +253,5 @@ $current_page = basename($_SERVER['PHP_SELF']);
         </div>
     </header>
     <div class="header-margin"></div>
+
     <!-- /Header -->
