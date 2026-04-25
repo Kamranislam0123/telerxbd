@@ -223,7 +223,7 @@ include 'header.php';
 																			</li>
 																			<?php endif; ?>
 																		</ul>
-																		<?php if ($status === 'completed' && !empty($appointment['prescription_path'])): ?>
+																		<?php if (!empty($appointment['prescription_path'])): ?>
 																		<div class="mt-2 text-center">
 																			<a href="<?php echo htmlspecialchars($appointment['prescription_path']); ?>" target="_blank" class="btn btn-sm btn-outline-success btn-prescription btn-block w-100"><i class="isax isax-document-text me-1"></i>View Prescription</a>
 																		</div>

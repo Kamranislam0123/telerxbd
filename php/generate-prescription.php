@@ -178,6 +178,17 @@ try {
             
             /* Bengali Support */
             .bn { font-family: "SolaimanLipi", "HindSiliguri", "DejaVu Sans", sans-serif; }
+            
+            .disclaimer { 
+                text-align: center; 
+                font-size: 8pt; 
+                color: #555; 
+                margin-top: 10px; 
+                padding-top: 5px; 
+                border-top: 1px solid #eee;
+                line-height: 1.5;
+                font-family: "HindSiliguri", "DejaVu Sans", sans-serif;
+            }
         </style>
     </head>
     <body>
@@ -280,6 +291,10 @@ try {
     }
 
     $html .= '
+            <div class="disclaimer">
+                This is a computer-generated prescription. No signature is required. | TeleRx Bangladesh<br>
+                www.telerxbd.com | Emergency Call: +880 17 0000 0000
+            </div>
         </div>
     </body>
     </html>';

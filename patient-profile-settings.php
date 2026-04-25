@@ -128,16 +128,16 @@ include 'header.php';
                                 <div class="setting-card">
                             <div class="change-avatar img-upload">
                                 <div class="profile-img">
-                                    <i class="fa-solid fa-file-image"></i>
+                                    <img src="<?php echo htmlspecialchars($patient['profile_image']); ?>" alt="Profile Image" id="profile_image_preview" style="width: 100%; height: 100%; object-fit: cover;">
                                 </div>
                                 <div class="upload-img">
                                     <h5>Profile Image</h5>
                                     <div class="imgs-load d-flex align-items-center">
                                         <div class="change-photo">
                                             Upload New
-                                            <input type="file" class="upload" name="profile_image" accept="image/*">
+                                            <input type="file" class="upload" name="profile_image" accept="image/*" id="profile_image_input">
                                         </div>
-                                        <a href="#" class="upload-remove">Remove</a>
+                                        <a href="#" class="upload-remove" id="remove_profile_image">Remove</a>
                                     </div>
                                     <p class="form-text">Photo size upto 4MB (jpg, jpeg or png format)</p>
                                 </div>
@@ -320,6 +320,24 @@ include 'header.php';
 <?php include 'footer.php'; ?>
 <script>
 $(document).ready(function() {
+    // Profile image preview
+    $('#profile_image_input').on('change', function() {
+        var file = this.files[0];
+        if (file) {
+            var reader = new FileReader();
+            reader.onload = function(e) {
+                $('#profile_image_preview').attr('src', e.target.result);
+            }
+            reader.readAsDataURL(file);
+        }
+    });
+
+    $('#remove_profile_image').on('click', function(e) {
+        e.preventDefault();
+        $('#profile_image_input').val('');
+        $('#profile_image_preview').attr('src', '<?php echo htmlspecialchars($patient['profile_image']); ?>');
+    });
+
     // Handle patient profile settings form submissions
     $('#profileForm').on('submit', function(e) {
         e.preventDefault();
@@ -351,6 +369,7 @@ $(document).ready(function() {
                     if (response.profile_image && response.profile_image.trim() !== '') {
                         // Update sidebar profile image
                         $('.booking-doc-img img').attr('src', response.profile_image);
+                        $('#profile_image_preview').attr('src', response.profile_image);
                         // Clear the file input
                         form.find('input[name="profile_image"]').val('');
                     }
