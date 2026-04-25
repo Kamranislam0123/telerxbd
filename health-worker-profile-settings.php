@@ -104,16 +104,16 @@ include 'header.php';
 								<div class="setting-card">
 									<div class="change-avatar img-upload">
 										<div class="profile-img">
-											<i class="fa-solid fa-file-image"></i>
+											<img src="<?php echo htmlspecialchars($healthcare['profile_image']); ?>" alt="Profile Image" id="profile_image_preview" style="width: 100%; height: 100%; object-fit: cover;">
 										</div>
 										<div class="upload-img">
 											<h5>Profile Image</h5>
 											<div class="imgs-load d-flex align-items-center">
 												<div class="change-photo">
 													Upload New
-													<input type="file" class="upload" name="profile_image" accept="image/*">
+													<input type="file" class="upload" name="profile_image" accept="image/*" id="profile_image_input">
 												</div>
-												<a href="#" class="upload-remove">Remove</a>
+												<a href="#" class="upload-remove" id="remove_profile_image">Remove</a>
 											</div>
 											<p class="form-text">Your Image should Below 4 MB, Accepted format jpg,png,svg</p>
 										</div>
@@ -371,6 +371,24 @@ include 'header.php';
 <?php include 'footer.php'; ?>
 		<script>
 		$(document).ready(function() {
+			// Profile image preview
+			$('#profile_image_input').on('change', function() {
+				var file = this.files[0];
+				if (file) {
+					var reader = new FileReader();
+					reader.onload = function(e) {
+						$('#profile_image_preview').attr('src', e.target.result);
+					}
+					reader.readAsDataURL(file);
+				}
+			});
+
+			$('#remove_profile_image').on('click', function(e) {
+				e.preventDefault();
+				$('#profile_image_input').val('');
+				$('#profile_image_preview').attr('src', '<?php echo htmlspecialchars($healthcare['profile_image']); ?>');
+			});
+
 			// Family members: add row
 			$(document).on('click', '.btn-add-family', function() {
 				var $first = $('.family-member-row').first();
@@ -447,6 +465,7 @@ include 'header.php';
 								$('.booking-doc-img img').attr('src', response.profile_image);
 								$('.user-img img').attr('src', response.profile_image);
 								$('.avatar-img').attr('src', response.profile_image);
+								$('#profile_image_preview').attr('src', response.profile_image);
 								form.find('input[name="profile_image"]').val('');
 							}
 

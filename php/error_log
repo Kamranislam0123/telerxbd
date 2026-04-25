@@ -181,3 +181,19 @@ Stack trace:
 [24-Apr-2026 11:10:04 UTC] PHP Parse error:  syntax error, unexpected '|', expecting '{' in /home/telerxb2/public_html/vendor/thecodingmachine/safe/lib/special_cases.php on line 396
 [24-Apr-2026 11:10:34 UTC] PHP Parse error:  syntax error, unexpected '|', expecting '{' in /home/telerxb2/public_html/vendor/thecodingmachine/safe/lib/special_cases.php on line 396
 [24-Apr-2026 11:11:54 UTC] PHP Parse error:  syntax error, unexpected '|', expecting '{' in /home/telerxb2/public_html/vendor/thecodingmachine/safe/lib/special_cases.php on line 396
+[24-Apr-2026 15:23:28 UTC] PHP Notice:  Array to string conversion in /home/telerxb2/public_html/php/config.php on line 75
+[24-Apr-2026 15:23:28 UTC] PHP Warning:  session_set_cookie_params(): Headers already sent. You cannot change the session module's ini settings at this time in /home/telerxb2/public_html/php/config.php on line 75
+[24-Apr-2026 15:23:28 UTC] PHP Warning:  session_start(): Cannot start session when headers already sent in /home/telerxb2/public_html/php/config.php on line 77
+[24-Apr-2026 21:30:11 Asia/Dhaka] PHP Warning:  mysqli::__construct(): (HY000/1045): Access denied for user 'root'@'localhost' (using password: YES) in /home/telerxb2/public_html/php/config.php on line 28
+[24-Apr-2026 21:30:11 Asia/Dhaka] Login error: Database connection failed: Access denied for user 'root'@'localhost' (using password: YES). Please check your database credentials in config.php | File: /home/telerxb2/public_html/php/config.php | Line: 32
+[24-Apr-2026 21:58:44 Asia/Dhaka] Agora Token Request - Channel: appointment_22, UID: 1009, Session User: doctor
+[24-Apr-2026 21:59:02 Asia/Dhaka] Agora Token Request - Channel: appointment_22, UID: 2004, Session User: patient
+[24-Apr-2026 21:59:19 Asia/Dhaka] Agora Token Request - Channel: appointment_22, UID: 1009, Session User: doctor
+[24-Apr-2026 21:59:23 Asia/Dhaka] Agora Token Request - Channel: appointment_22, UID: 2004, Session User: patient
+[24-Apr-2026 22:40:33 Asia/Dhaka] Agora Token Request - Channel: appointment_23, UID: 1010, Session User: doctor
+[24-Apr-2026 22:40:38 Asia/Dhaka] Agora Token Request - Channel: appointment_23, UID: 2004, Session User: patient
+[24-Apr-2026 22:50:11 Asia/Dhaka] Agora Token Request - Channel: appointment_23, UID: 1010, Session User: doctor
+[24-Apr-2026 22:50:13 Asia/Dhaka] Agora Token Request - Channel: appointment_23, UID: 1010, Session User: doctor
+[24-Apr-2026 22:50:14 Asia/Dhaka] Agora Token Request - Channel: appointment_23, UID: 1010, Session User: doctor
+[24-Apr-2026 22:50:16 Asia/Dhaka] Agora Token Request - Channel: appointment_23, UID: 1010, Session User: doctor
+[24-Apr-2026 23:18:48 Asia/Dhaka] Profile image upload errors for doctor 9: Upload error: 4
