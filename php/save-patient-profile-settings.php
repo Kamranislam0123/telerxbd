@@ -181,13 +181,20 @@ try {
 
             foreach ($columns_to_check as $column => $value) {
                 if (in_array($column, $existing_columns)) {
-                    if ($column === 'profile_image' && !empty($value)) {
+                    if ($column === 'profile_image') {
+                        if (!empty($value)) {
+                            $update_fields[] = "$column = ?";
+                            $update_values[] = $value;
+                            $update_types .= 's';
+                        }
+                    } else {
                         $update_fields[] = "$column = ?";
-                        $update_values[] = $value;
-                        $update_types .= 's';
-                    } elseif ($column !== 'profile_image') {
-                        $update_fields[] = "$column = ?";
-                        $update_values[] = $value;
+                        // Handle empty values for fields that should be NULL if empty
+                        if ($value === '') {
+                            $update_values[] = null;
+                        } else {
+                            $update_values[] = $value;
+                        }
                         $update_types .= 's';
                     }
                 }

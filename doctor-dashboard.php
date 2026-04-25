@@ -48,7 +48,7 @@ try {
     $conn->close();
 
     // Set default values if profile data is missing
-    $doctor['profile_image'] = $doctor['profile_image'] ?? 'assets/img/doctors-dashboard/doctor-profile-img.jpg';
+    $doctor['profile_image'] = !empty($doctor['profile_image']) ? $doctor['profile_image'] : 'assets/img/doctors-dashboard/doctor-profile-img.jpg';
     $doctor['specialty'] = $doctor['specialty'] ?? 'General Medicine';
 
     // Extract variables for template use
@@ -257,9 +257,4 @@ include 'header.php';
 </body>
 </html>
 
-<?php include 'footer.php'; ?>
-<?php include 'footer.php'; ?>
-<?php include 'footer.php'; ?>
-<?php include 'footer.php'; ?>
-<?php include 'footer.php'; ?>
 <?php include 'footer.php'; ?>

@@ -1,4 +1,5 @@
 assets/img/doctors/
+assets/img/patients/
 .htaccess
 php/config.php
 error_log

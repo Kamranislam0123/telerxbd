@@ -47,7 +47,7 @@ try {
     $doctor['languages_spoken'] = $doctor['languages_spoken'] ?? '';
     $doctor['consultation_fee'] = $doctor['consultation_fee'] ?? '';
     $doctor['experience_years'] = $doctor['experience_years'] ?? '';
-    $doctor['profile_image'] = $doctor['profile_image'] ?? 'assets/img/doctors-dashboard/doctor-profile-img.jpg';
+    $doctor['profile_image'] = !empty($doctor['profile_image']) ? $doctor['profile_image'] : 'assets/img/doctors-dashboard/doctor-profile-img.jpg';
 
     // Set default values for new doctor table fields
     $doctor['gender'] = $doctor['gender'] ?? '';
