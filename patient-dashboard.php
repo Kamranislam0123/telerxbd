@@ -63,7 +63,7 @@ try {
     $conn->close();
 
     // Set default values if profile data is missing
-    $patient['profile_image'] = $patient['profile_image'] ?? 'assets/img/doctors-dashboard/profile-06.jpg';
+    $patient['profile_image'] = !empty($patient['profile_image']) ? $patient['profile_image'] : 'assets/img/patients/patient.jpg';
 
     // Extract variables for template use
     $patient_name = $patient['name'];
@@ -428,35 +428,7 @@ include 'header.php';
 			</div>		
 			<!-- /Page Content -->
    
-			<!-- Footer Section -->
-			<?php include 'footer.php'; ?>
-			<!-- /Footer Section -->
-		   
 		</div>
 		<!-- /Main Wrapper -->
-	  
-		<!-- jQuery -->
-		<script src="assets/js/jquery-3.7.1.min.js"></script>
-		
-		<!-- Bootstrap Core JS -->
-		<script src="assets/js/bootstrap.bundle.min.js"></script>
-		
-		<!-- Sticky Sidebar JS -->
-        <script src="assets/plugins/theia-sticky-sidebar/ResizeSensor.js"></script>
-        <script src="assets/plugins/theia-sticky-sidebar/theia-sticky-sidebar.js"></script>
 
-		<!-- select JS -->
-		<script src="assets/plugins/select2/js/select2.min.js"></script>
-
-		<!-- Apexchart JS -->
-		<script src="assets/plugins/apex/apexcharts.min.js"></script>
-		<script src="assets/plugins/apex/chart-data.js"></script>
-		
-		<!-- Circle Progress JS -->
-		<script src="assets/js/circle-progress.min.js"></script>
-		
-		<!-- Custom JS -->
-		<script src="assets/js/script.js"></script>
-		
-	</body>
-</html>
+<?php include 'footer.php'; ?>

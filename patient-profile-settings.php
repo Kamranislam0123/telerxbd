@@ -37,7 +37,7 @@ try {
     $patient = $result->fetch_assoc();
 
     // Set default values if profile data is missing
-    $patient['profile_image'] = $patient['profile_image'] ?? 'assets/img/doctors-dashboard/profile-06.jpg';
+    $patient['profile_image'] = !empty($patient['profile_image']) ? $patient['profile_image'] : 'assets/img/patients/patient.jpg';
     $patient['phone'] = $patient['phone'] ?? '';
     $patient['gender'] = $patient['gender'] ?? '';
     $patient['date_of_birth'] = $patient['date_of_birth'] ?? '';

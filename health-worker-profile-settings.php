@@ -60,7 +60,7 @@ try {
     }
 
     // Set default values if profile data is missing
-    $healthcare['profile_image'] = $healthcare['profile_image'] ?? 'assets/img/doctors-dashboard/doctor-profile-img.jpg';
+    $healthcare['profile_image'] = !empty($healthcare['profile_image']) ? $healthcare['profile_image'] : 'assets/img/doctors-dashboard/doctor-profile-img.jpg';
     $healthcare['gender'] = $healthcare['gender'] ?? '';
     $healthcare['degrees'] = $healthcare['degrees'] ?? '';
     $healthcare['currently_working'] = $healthcare['currently_working'] ?? '';
