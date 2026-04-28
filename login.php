@@ -147,6 +147,9 @@ include 'header.php';?>
 									case 'healthcare':
 										redirectUrl = 'health-worker-profile-settings.php';
 										break;
+									case 'special_tid':
+										redirectUrl = 'health-worker-dashboard.php';
+										break;
 									case 'patient':
 										redirectUrl = 'patient-dashboard.php';
 										break;

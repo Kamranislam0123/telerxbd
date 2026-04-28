@@ -120,6 +120,41 @@ try {
         }
         $stmt->close();
     }
+
+    // If not found, check special_tid_users (email or mobile)
+    if (!$user_found) {
+        try {
+            $tid_stmt = null;
+            if ($is_email) {
+                $tid_stmt = $conn->prepare("SELECT id, name, email, mobile, tid, password FROM special_tid_users WHERE email = ? LIMIT 1");
+                if ($tid_stmt) {
+                    $tid_stmt->bind_param("s", $email_or_mobile);
+                }
+            } elseif ($is_mobile) {
+                $mobile_clean = preg_replace('/[^0-9]/', '', $email_or_mobile);
+                $tid_stmt = $conn->prepare("SELECT id, name, email, mobile, tid, password FROM special_tid_users WHERE mobile = ? OR mobile LIKE ? LIMIT 1");
+                if ($tid_stmt) {
+                    $mobile_pattern = '%' . $mobile_clean . '%';
+                    $tid_stmt->bind_param("ss", $mobile_clean, $mobile_pattern);
+                }
+            }
+
+            if ($tid_stmt) {
+                $tid_stmt->execute();
+                $tid_res = $tid_stmt->get_result();
+                if ($tid_res && $tid_res->num_rows > 0) {
+                    $user_data = $tid_res->fetch_assoc();
+                    if (password_verify($password, $user_data['password'])) {
+                        $user_type = 'special_tid';
+                        $user_found = true;
+                    }
+                }
+                $tid_stmt->close();
+            }
+        } catch (Exception $e) {
+            error_log("Special TID login error: " . $e->getMessage());
+        }
+    }
     
     // Check patients table - support both email and mobile
     if (!$user_found) {
@@ -216,7 +251,16 @@ try {
             $_SESSION['healthcare_phone'] = $user_data['phone'] ?? '';
             $_SESSION['healthcare_nid'] = $user_data['nid_number'] ?? '';
             $_SESSION['healthcare_tid'] = $user_data['tid'] ?? '';
-            $redirect_url = 'health-worker-profile-settings.php';
+            $redirect_url = 'health-worker-dashboard.php';
+            break;
+
+        case 'special_tid':
+            $_SESSION['special_tid_id'] = $user_data['id'];
+            $_SESSION['special_tid_name'] = $user_data['name'];
+            $_SESSION['special_tid_email'] = $user_data['email'];
+            $_SESSION['special_tid_mobile'] = $user_data['mobile'] ?? '';
+            $_SESSION['special_tid_code'] = $user_data['tid'] ?? '';
+            $redirect_url = 'health-worker-dashboard.php';
             break;
             
         case 'patient':

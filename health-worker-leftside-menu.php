@@ -11,9 +11,9 @@ $healthcare = $healthcare ?? [];
                     <img src="<?php echo htmlspecialchars($healthcare['profile_image'] ?? 'assets/img/doctors-dashboard/doctor-profile-img.jpg'); ?>" alt="User Image">
                 </a>
                 <div class="profile-det-info">
-                    <h3><?php echo htmlspecialchars($healthcare['name'] ?? 'Health Worker'); ?></h3>
+                    <h3><?php echo htmlspecialchars($healthcare['name'] ?? 'Special TID User'); ?></h3>
                     <div class="patient-details">
-                        <h5 class="mb-0"><?php echo htmlspecialchars($healthcare['degrees'] ?? 'Health-Worker'); ?></h5>
+                        <h5 class="mb-0"><?php echo htmlspecialchars($healthcare['degrees'] ?? 'Special TID'); ?></h5>
                     </div>
                     <?php if (!empty($healthcare['tid'])): ?>
                     <span class="badge doctor-role-badge mt-1"><i class="fa-solid fa-circle"></i> TID: <?php echo htmlspecialchars($healthcare['tid']); ?></span>
