@@ -44,7 +44,22 @@ if ($patient_name === '' || $mobile === '') {
     exit;
 }
 
+if (!preg_match('/^[\p{L}\s\.\-]{2,100}$/u', $patient_name)) {
+    echo json_encode(['success' => false, 'message' => 'Patient name must be 2-100 characters and contain only letters, spaces, dot, or hyphen.']);
+    exit;
+}
+
+$mobile_clean = preg_replace('/[^0-9]/', '', $mobile);
+if (strlen($mobile_clean) < 10 || strlen($mobile_clean) > 15) {
+    echo json_encode(['success' => false, 'message' => 'Mobile number must contain 10-15 digits.']);
+    exit;
+}
+$mobile = $mobile_clean;
+
 $patient_id = isset($_SESSION['patient_id']) ? (int) $_SESSION['patient_id'] : 0;
+$booked_by_special_tid_id = (isset($_SESSION['user_type']) && $_SESSION['user_type'] === 'special_tid' && isset($_SESSION['special_tid_id']))
+    ? (int) $_SESSION['special_tid_id']
+    : 0;
 $notes = isset($_POST['notes']) ? trim($_POST['notes']) : '';
 $age = isset($_POST['age']) ? trim($_POST['age']) : '';
 $weight = isset($_POST['weight']) ? trim($_POST['weight']) : '';
@@ -104,6 +119,70 @@ try {
         } else {
             $referrer_tid = '';
         }
+    }
+
+    // Special TID booking flow:
+    // - if health worker is booking, resolve patient by mobile
+    // - create patient automatically when mobile does not exist
+    if ($booked_by_special_tid_id > 0) {
+        $phone_col_check = $conn->query("SHOW COLUMNS FROM patients LIKE 'phone'");
+        $has_patient_phone = $phone_col_check && $phone_col_check->num_rows > 0;
+
+        if (!$has_patient_phone) {
+            $conn->rollback();
+            $conn->close();
+            echo json_encode(['success' => false, 'message' => 'Patient phone support is not available in database.']);
+            exit;
+        }
+
+        $patient_lookup = $conn->prepare("SELECT id, name FROM patients WHERE phone = ? LIMIT 1");
+        if (!$patient_lookup) {
+            $conn->rollback();
+            $conn->close();
+            echo json_encode(['success' => false, 'message' => 'Unable to verify patient by mobile number.']);
+            exit;
+        }
+        $patient_lookup->bind_param("s", $mobile);
+        $patient_lookup->execute();
+        $patient_res = $patient_lookup->get_result();
+
+        if ($patient_res && $patient_res->num_rows > 0) {
+            $existing_patient = $patient_res->fetch_assoc();
+            $patient_id = (int) $existing_patient['id'];
+            // Keep appointment name aligned with existing patient profile name.
+            $patient_name = trim($existing_patient['name'] ?? '') !== '' ? $existing_patient['name'] : $patient_name;
+        } else {
+            // patients.email is required+unique in this project, generate deterministic synthetic email from mobile.
+            $base_email = 'patient' . $mobile . '@auto.telerx.local';
+            $auto_email = $base_email;
+            $counter = 1;
+            while (true) {
+                $email_check = $conn->prepare("SELECT id FROM patients WHERE email = ? LIMIT 1");
+                $email_check->bind_param("s", $auto_email);
+                $email_check->execute();
+                $email_exists = $email_check->get_result()->num_rows > 0;
+                $email_check->close();
+                if (!$email_exists) {
+                    break;
+                }
+                $counter++;
+                $auto_email = 'patient' . $mobile . '+' . $counter . '@auto.telerx.local';
+            }
+
+            $default_password_hash = password_hash('12345', PASSWORD_DEFAULT);
+            $patient_create = $conn->prepare("INSERT INTO patients (name, email, phone, password) VALUES (?, ?, ?, ?)");
+            $patient_create->bind_param("ssss", $patient_name, $auto_email, $mobile, $default_password_hash);
+            if (!$patient_create->execute()) {
+                $conn->rollback();
+                $patient_create->close();
+                $conn->close();
+                echo json_encode(['success' => false, 'message' => 'Failed to auto-register patient.']);
+                exit;
+            }
+            $patient_id = (int) $conn->insert_id;
+            $patient_create->close();
+        }
+        $patient_lookup->close();
     }
 
     // 1) Check slot is in doctor's availability (doctor_availability_ranges for this weekday)
@@ -198,6 +277,20 @@ try {
     }
     $mobile_phone = $mobile;
 
+    // Ensure created_by_special_tid_id column exists for "bookings created under this Special TID account"
+    $has_created_by_special_tid = false;
+    $created_by_check = $conn->query("SHOW COLUMNS FROM appointments LIKE 'created_by_special_tid_id'");
+    if ($created_by_check && $created_by_check->num_rows > 0) {
+        $has_created_by_special_tid = true;
+    }
+    if (!$has_created_by_special_tid) {
+        @$conn->query("ALTER TABLE appointments ADD COLUMN created_by_special_tid_id INT NULL DEFAULT NULL COMMENT 'Special TID account that created this booking'");
+        $created_by_check2 = $conn->query("SHOW COLUMNS FROM appointments LIKE 'created_by_special_tid_id'");
+        if ($created_by_check2 && $created_by_check2->num_rows > 0) {
+            $has_created_by_special_tid = true;
+        }
+    }
+
     // Ensure attachment_path column exists
     $has_attachment_path = false;
     $col_check_att = $conn->query("SHOW COLUMNS FROM appointments LIKE 'attachment_path'");
@@ -208,7 +301,40 @@ try {
         @$conn->query("ALTER TABLE appointments ADD COLUMN attachment_path VARCHAR(255) DEFAULT NULL COMMENT 'Path to uploaded attachment'");
     }
 
-    if ($has_referrer_tid && $has_payment_method) {
+    if ($has_referrer_tid && $has_payment_method && $has_created_by_special_tid) {
+        $ins = $conn->prepare("
+            INSERT INTO appointments (
+                patient_id, doctor_id, appointment_date, slot_time, appointment_time,
+                status, appointment_number, notes, patient_name, mobile, patient_phone,
+                age, weight, body_temperature, blood_pressure, pulse, spo2, rbs_fbs, referrer_tid, payment_method, attachment_path, created_by_special_tid_id
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        ");
+        $ins->bind_param(
+            "iisssssssssssssssssssi",
+            $patient_id,
+            $doctor_id,
+            $appointment_date,
+            $slot_time,
+            $slot_time,
+            $status,
+            $appointment_number,
+            $notes,
+            $patient_name,
+            $mobile,
+            $mobile_phone,
+            $age,
+            $weight,
+            $body_temperature,
+            $blood_pressure,
+            $pulse,
+            $spo2,
+            $rbs_fbs,
+            $referrer_tid,
+            $payment_method,
+            $attachment_path,
+            $booked_by_special_tid_id
+        );
+    } else if ($has_referrer_tid && $has_payment_method) {
         $ins = $conn->prepare("
             INSERT INTO appointments (
                 patient_id, doctor_id, appointment_date, slot_time, appointment_time,
@@ -240,6 +366,38 @@ try {
             $payment_method,
             $attachment_path
         );
+    } else if ($has_referrer_tid && $has_created_by_special_tid) {
+        $ins = $conn->prepare("
+            INSERT INTO appointments (
+                patient_id, doctor_id, appointment_date, slot_time, appointment_time,
+                status, appointment_number, notes, patient_name, mobile, patient_phone,
+                age, weight, body_temperature, blood_pressure, pulse, spo2, rbs_fbs, referrer_tid, attachment_path, created_by_special_tid_id
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        ");
+        $ins->bind_param(
+            "iissssssssssssssssssi",
+            $patient_id,
+            $doctor_id,
+            $appointment_date,
+            $slot_time,
+            $slot_time,
+            $status,
+            $appointment_number,
+            $notes,
+            $patient_name,
+            $mobile,
+            $mobile_phone,
+            $age,
+            $weight,
+            $body_temperature,
+            $blood_pressure,
+            $pulse,
+            $spo2,
+            $rbs_fbs,
+            $referrer_tid,
+            $attachment_path,
+            $booked_by_special_tid_id
+        );
     } else if ($has_referrer_tid) {
         $ins = $conn->prepare("
             INSERT INTO appointments (
@@ -270,6 +428,37 @@ try {
             $rbs_fbs,
             $referrer_tid,
             $attachment_path
+        );
+    } else if ($has_created_by_special_tid) {
+        $ins = $conn->prepare("
+            INSERT INTO appointments (
+                patient_id, doctor_id, appointment_date, slot_time, appointment_time,
+                status, appointment_number, notes, patient_name, mobile, patient_phone,
+                age, weight, body_temperature, blood_pressure, pulse, spo2, rbs_fbs, attachment_path, created_by_special_tid_id
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        ");
+        $ins->bind_param(
+            "iisssssssssssssssssi",
+            $patient_id,
+            $doctor_id,
+            $appointment_date,
+            $slot_time,
+            $slot_time,
+            $status,
+            $appointment_number,
+            $notes,
+            $patient_name,
+            $mobile,
+            $mobile_phone,
+            $age,
+            $weight,
+            $body_temperature,
+            $blood_pressure,
+            $pulse,
+            $spo2,
+            $rbs_fbs,
+            $attachment_path,
+            $booked_by_special_tid_id
         );
     } else {
         $ins = $conn->prepare("

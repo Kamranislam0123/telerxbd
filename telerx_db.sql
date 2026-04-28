@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost:3306
--- Generation Time: Apr 06, 2026 at 07:39 AM
+-- Generation Time: Apr 27, 2026 at 05:44 PM
 -- Server version: 8.0.30
 -- PHP Version: 8.3.16
 
@@ -48,21 +48,58 @@ CREATE TABLE `appointments` (
   `spo2` varchar(20) DEFAULT NULL,
   `rbs_fbs` varchar(20) DEFAULT NULL,
   `attachment_path` varchar(255) DEFAULT NULL,
+  `prescription_path` varchar(255) DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  `referrer_tid` varchar(20) DEFAULT NULL COMMENT 'Health worker TID (e.g. T1001)'
+  `referrer_tid` varchar(20) DEFAULT NULL COMMENT 'Health worker TID (e.g. T1001)',
+  `chief_complaints` text,
+  `on_examination` text,
+  `diagnosis` text,
+  `medications` text,
+  `advice` text,
+  `payment_method` varchar(50) DEFAULT 'bkash' COMMENT 'bkash or welfare',
+  `prescription_footer` text
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 --
 -- Dumping data for table `appointments`
 --
 
-INSERT INTO `appointments` (`id`, `patient_id`, `doctor_id`, `appointment_date`, `slot_time`, `appointment_time`, `status`, `appointment_number`, `notes`, `patient_name`, `mobile`, `patient_phone`, `age`, `weight`, `body_temperature`, `blood_pressure`, `pulse`, `spo2`, `rbs_fbs`, `attachment_path`, `created_at`, `updated_at`, `referrer_tid`) VALUES
-(1, 1, 1, '2026-03-05', '06:00', '06:00', 'confirmed', 'APT00001', 'ok', 'kamran', '01771971072', '01771971072', '50', '80', '100', '100', '100', '100', '100', NULL, '2026-03-05 02:42:39', '2026-03-05 02:42:39', NULL),
-(2, 1, 1, '2026-03-05', '06:15', '06:15', 'confirmed', 'APT00002', 'kkmdmdm', 'kkkkk', '01771971079', '01771971079', '50', '80', '100', '100', '100', '100', '100', NULL, '2026-03-05 02:47:52', '2026-03-05 02:47:52', NULL),
-(3, 1, 1, '2026-03-12', '06:00', '06:00', 'confirmed', 'APT00003', 'mmmmm', 'jjjjjj', '01771971079', '01771971079', '50', '100', '100', '100', '100', '100', '100', NULL, '2026-03-07 16:41:44', '2026-03-07 16:41:44', ''),
-(4, 1, 1, '2026-03-12', '11:45', '11:45', 'confirmed', 'APT00004', 'hekkko', 'ookk', '01771971075', '01771971075', '100', '80', '100', '', '100', '100', '120', NULL, '2026-03-08 04:37:56', '2026-03-08 04:37:56', 'T1001'),
-(5, 1, 1, '2026-04-09', '06:00', '06:00', 'confirmed', 'APT00005', 'heeello', 'Md Kamran', '01771971072', '01771971072', '100', '50', '60', '100', '100', '120', '56', NULL, '2026-04-06 06:49:00', '2026-04-06 06:49:00', '');
+INSERT INTO `appointments` (`id`, `patient_id`, `doctor_id`, `appointment_date`, `slot_time`, `appointment_time`, `status`, `appointment_number`, `notes`, `patient_name`, `mobile`, `patient_phone`, `age`, `weight`, `body_temperature`, `blood_pressure`, `pulse`, `spo2`, `rbs_fbs`, `attachment_path`, `prescription_path`, `created_at`, `updated_at`, `referrer_tid`, `chief_complaints`, `on_examination`, `diagnosis`, `medications`, `advice`, `payment_method`, `prescription_footer`) VALUES
+(1, 1, 1, '2026-03-05', '06:00', '06:00', 'completed', 'APT00001', 'ok', 'kamran', '01771971072', '01771971072', '50', '80', '100', '100', '100', '100', '100', NULL, NULL, '2026-03-05 02:42:39', '2026-04-22 16:04:11', NULL, NULL, NULL, NULL, NULL, NULL, 'bkash', NULL),
+(2, 1, 1, '2026-03-05', '06:15', '06:15', 'completed', 'APT00002', 'kkmdmdm', 'kkkkk', '01771971079', '01771971079', '50', '80', '100', '100', '100', '100', '100', NULL, NULL, '2026-03-05 02:47:52', '2026-04-15 19:25:05', NULL, NULL, NULL, NULL, NULL, NULL, 'bkash', NULL),
+(3, 1, 1, '2026-03-12', '06:00', '06:00', 'completed', 'APT00003', 'mmmmm', 'jjjjjj', '01771971079', '01771971079', '50', '100', '100', '100', '100', '100', '100', NULL, NULL, '2026-03-07 16:41:44', '2026-04-15 19:06:18', '', NULL, NULL, NULL, NULL, NULL, 'bkash', NULL),
+(4, 1, 1, '2026-03-12', '11:45', '11:45', 'completed', 'APT00004', 'hekkko', 'ookk', '01771971075', '01771971075', '100', '80', '100', '', '100', '100', '120', NULL, NULL, '2026-03-08 04:37:56', '2026-04-15 17:53:01', 'T1001', NULL, NULL, NULL, NULL, NULL, 'bkash', NULL),
+(5, 1, 1, '2026-04-09', '06:00', '06:00', 'completed', 'APT00005', 'heeello', 'Md Kamran', '01771971072', '01771971072', '100', '50', '60', '100', '100', '120', '56', NULL, 'assets/prescriptions/prescription_5_1775465235.pdf', '2026-04-06 06:49:00', '2026-04-15 17:51:15', '', NULL, NULL, NULL, NULL, NULL, 'bkash', NULL),
+(6, 1, 1, '2026-04-16', '06:15', '06:15', 'completed', 'APT00006', 'kkkkkkkkkkkk', 'Md kala jahangir', '01771971090', '01771971090', '100', '100', '100', '100', '100', '100', '100', NULL, 'assets/prescriptions/Prescription_APT00006.pdf', '2026-04-12 15:33:15', '2026-04-20 10:01:36', '', 'abcd', 'no issue', 'nooot', '[{\"name\":\"napa\",\"dose\":\"1+1+1\",\"duration\":\"7\"},{\"name\":\"deslor\",\"dose\":\"1+1+1\",\"duration\":\"10\"}]', 'sleep', 'bkash', NULL),
+(7, 1, 1, '2026-04-30', '06:00', '06:00', 'completed', 'APT00007', 'hello', 'Jahangir', '01771971009', '01771971009', '100', '100', '100', '100', '100', '100', '100', NULL, 'assets/prescriptions/Prescription_APT00007.pdf', '2026-04-23 14:34:05', '2026-04-23 14:38:36', '', 'hello', 'iokkk', 'kjhh', '[{\"name\":\"napa\",\"dose\":\"1+1+1\",\"duration\":\"7\"}]', 'kkkkk', 'bkash', NULL),
+(8, 1, 1, '2026-04-30', '06:15', '06:15', 'confirmed', 'APT00008', 'heello', 'Alam', '01771971008', '01771971008', '100', '100', '100', '100', '100', '100', '100', NULL, 'assets/prescriptions/prescription_8_1777049886.pdf', '2026-04-23 15:12:13', '2026-04-24 16:58:06', '', 'vgbfgb', 'xgbgbsfg', 'gbfgbfg', '[{\"name\":\"gxfgxg\",\"dose\":\"gxfgxg\",\"duration\":\"\"}]', 'bzgbzgbz', 'bkash', 'gbzgbzgb');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `chat_messages`
+--
+
+CREATE TABLE `chat_messages` (
+  `id` int UNSIGNED NOT NULL,
+  `sender_account` varchar(50) NOT NULL COMMENT 'Format: userType_id, e.g., doctor_1 or patient_5',
+  `receiver_account` varchar(50) NOT NULL COMMENT 'Format: userType_id, e.g., doctor_1 or patient_5',
+  `message` text NOT NULL,
+  `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+--
+-- Dumping data for table `chat_messages`
+--
+
+INSERT INTO `chat_messages` (`id`, `sender_account`, `receiver_account`, `message`, `created_at`) VALUES
+(1, 'doctor_1', 'patient_1', 'hello', '2026-04-09 09:46:29'),
+(2, 'doctor_1', 'patient_1', 'hello', '2026-04-09 11:39:37'),
+(3, 'patient_1', 'doctor_1', 'hello', '2026-04-09 11:40:40'),
+(4, 'doctor_1', 'patient_1', 'This is  doctor', '2026-04-09 11:45:07'),
+(5, 'patient_1', 'doctor_1', 'This is patient', '2026-04-09 11:47:18'),
+(6, 'patient_1', 'doctor_1', 'How are you', '2026-04-09 12:21:07');
 
 -- --------------------------------------------------------
 
@@ -336,7 +373,7 @@ CREATE TABLE `doctor_profiles` (
 --
 
 INSERT INTO `doctor_profiles` (`id`, `doctor_id`, `profile_image`, `bio`, `specialty`, `languages_spoken`, `consultation_fee`, `experience_years`, `total_appointments`, `total_reviews`, `average_rating`, `is_available`, `address`, `city`, `district`, `state`, `zip_code`, `created_at`, `updated_at`, `gender`, `account_number`, `degrees`, `currently_working`, `department`, `present_address`, `bmdc_certificate`, `nid_card`, `degrees_certificate`) VALUES
-(1, 1, 'assets/img/doctors/doctor_1_1768309872.jpg', 'Test biography', 'General Physician, Pediatrician', 'English, Bengali, Hindi', '150.00', 10, 200, 50, '4.80', 1, '123 Medical Center, Dhanmondi', 'Dhaka', 'Bogra', 'Dhaka', '1209', '2026-01-09 16:41:44', '2026-02-15 07:22:44', 'Male', '1712345678', 'MBBS, MD', 'Test Hospital', '', '123 Medical Center, Dhanmondi', NULL, NULL, NULL),
+(1, 1, 'assets/img/doctors/doctor_1_1777105116.jpg', 'Test biography', 'General Physician, Pediatrician', 'English, Bengali, Hindi', '150.00', 10, 200, 50, '4.80', 1, '123 Medical Center, Dhanmondi', 'Dhaka', 'Bogra', 'Dhaka', '1209', '2026-01-09 16:41:44', '2026-04-25 08:18:36', 'Male', '1712345678', 'MBBS, MD', 'Test Hospital', '', '123 Medical Center, Dhanmondi', NULL, NULL, NULL),
 (2, 2, NULL, 'Pediatrician dedicated to providing comprehensive healthcare for children from infancy through adolescence.', 'Pediatrics', 'English, Bengali', '120.00', 12, 150, 35, '4.90', 1, '456 Children Hospital, Gulshan', 'Dhaka', NULL, 'Dhaka', '1212', '2026-01-09 16:41:44', '2026-01-09 16:41:44', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
 (3, 3, NULL, 'Orthopedic surgeon specializing in joint replacement and sports medicine.', 'Orthopedic Surgery', 'English, Bengali, Urdu', '180.00', 18, 300, 75, '4.70', 1, '789 Orthopedic Center, Uttara', 'Dhaka', NULL, 'Dhaka', '1230', '2026-01-09 16:41:44', '2026-01-09 16:41:44', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
 
@@ -490,7 +527,8 @@ INSERT INTO `doctor_sessions` (`id`, `doctor_id`, `session_token`, `ip_address`,
 (44, 1, '9dfe5b8a4c513331f4d34397a57fe72289a4e0f891f0d2dac98f62c5c89a2a70', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36', '2026-03-25 23:13:59', '2026-02-23 17:13:59'),
 (48, 1, '0458ce00de0f17ea4f8ad2fb44e7b2b2f58434c6a8d27020105c95f5e87a3a13', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36', '2026-03-28 00:01:59', '2026-02-25 18:01:59'),
 (49, 1, 'ea1405166e7e061ff20fb364a2641f73238ba8509cf30d99748f957fca22bc7f', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36', '2026-03-28 00:36:12', '2026-02-25 18:36:12'),
-(50, 1, 'c3c6ecb1093211d2ebacf7b4b6a91e728595fca18b4d3dc7245598422e79cb92', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36', '2026-03-28 00:36:19', '2026-02-25 18:36:19');
+(50, 1, 'c3c6ecb1093211d2ebacf7b4b6a91e728595fca18b4d3dc7245598422e79cb92', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36', '2026-03-28 00:36:19', '2026-02-25 18:36:19'),
+(73, 1, '242d5008358285170d936dcac1534b7f238dfa4f97cfadf0d2e0ebc5e950b4bf', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', '2026-05-06 15:27:18', '2026-04-06 09:27:18');
 
 -- --------------------------------------------------------
 
@@ -579,7 +617,7 @@ CREATE TABLE `patients` (
 --
 
 INSERT INTO `patients` (`id`, `name`, `email`, `phone`, `password`, `gender`, `date_of_birth`, `blood_group`, `profile_image`, `address`, `city`, `state`, `country`, `pincode`, `created_at`, `updated_at`) VALUES
-(1, 'Test Patient', 'testpatient@example.com', '01712345678', '$2y$10$HCGKz6O0YTtO.qYRCiMQN.jNgFvnRByvHlRJTg/3PIlCeRk9l7lUe', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'Bangladesh', NULL, '2026-02-17 13:04:20', '2026-02-17 13:04:20');
+(1, 'Test Patient', 'testpatient@example.com', '01712345678', '$2y$10$HCGKz6O0YTtO.qYRCiMQN.jNgFvnRByvHlRJTg/3PIlCeRk9l7lUe', NULL, NULL, NULL, 'assets/img/patients/patient_1_1777107714.jpg', NULL, NULL, NULL, 'Bangladesh', NULL, '2026-02-17 13:04:20', '2026-04-25 09:01:54');
 
 --
 -- Indexes for dumped tables
@@ -593,6 +631,14 @@ ALTER TABLE `appointments`
   ADD UNIQUE KEY `uk_doctor_date_time` (`doctor_id`,`appointment_date`,`slot_time`),
   ADD KEY `idx_doctor_date` (`doctor_id`,`appointment_date`),
   ADD KEY `idx_patient_date` (`patient_id`,`appointment_date`);
+
+--
+-- Indexes for table `chat_messages`
+--
+ALTER TABLE `chat_messages`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `sender_account` (`sender_account`),
+  ADD KEY `receiver_account` (`receiver_account`);
 
 --
 -- Indexes for table `doctors`
@@ -717,7 +763,13 @@ ALTER TABLE `patients`
 -- AUTO_INCREMENT for table `appointments`
 --
 ALTER TABLE `appointments`
-  MODIFY `id` int UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `id` int UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
+
+--
+-- AUTO_INCREMENT for table `chat_messages`
+--
+ALTER TABLE `chat_messages`
+  MODIFY `id` int UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 
 --
 -- AUTO_INCREMENT for table `doctors`
@@ -771,7 +823,7 @@ ALTER TABLE `doctor_insurances`
 -- AUTO_INCREMENT for table `doctor_profiles`
 --
 ALTER TABLE `doctor_profiles`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=30;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=32;
 
 --
 -- AUTO_INCREMENT for table `doctor_schedule`
@@ -783,7 +835,7 @@ ALTER TABLE `doctor_schedule`
 -- AUTO_INCREMENT for table `doctor_sessions`
 --
 ALTER TABLE `doctor_sessions`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=69;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=99;
 
 --
 -- AUTO_INCREMENT for table `healthcare_providers`

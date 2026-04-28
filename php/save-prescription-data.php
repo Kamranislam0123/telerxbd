@@ -26,6 +26,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $on_examination = $_POST['on_examination'] ?? '';
     $diagnosis = $_POST['diagnosis'] ?? '';
     $advice = $_POST['advice'] ?? '';
+    $note_reference = $_POST['note_reference'] ?? '';
     $prescription_footer = $_POST['prescription_footer'] ?? '';
     
     // Process medications into JSON
@@ -71,6 +72,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $conn->query("ALTER TABLE appointments ADD COLUMN prescription_footer TEXT NULL");
         }
 
+        // Ensure note_reference column exists
+        $note_col_check = $conn->query("SHOW COLUMNS FROM appointments LIKE 'note_reference'");
+        if ($note_col_check->num_rows === 0) {
+            $conn->query("ALTER TABLE appointments ADD COLUMN note_reference TEXT NULL");
+        }
+
         // Update appointment with prescription details
         $update_sql = "UPDATE appointments SET 
                         chief_complaints = ?, 
@@ -78,11 +85,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                         diagnosis = ?, 
                         medications = ?, 
                         advice = ?,
+                        note_reference = ?,
                         prescription_footer = ?
                        WHERE id = ?";
         
         $update_stmt = $conn->prepare($update_sql);
-        $update_stmt->bind_param("ssssssi", $chief_complaints, $on_examination, $diagnosis, $meds_json, $advice, $prescription_footer, $appointment_id);
+        $update_stmt->bind_param("sssssssi", $chief_complaints, $on_examination, $diagnosis, $meds_json, $advice, $note_reference, $prescription_footer, $appointment_id);
         
         if ($update_stmt->execute()) {
             ob_clean();

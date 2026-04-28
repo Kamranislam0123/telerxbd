@@ -2,13 +2,15 @@
 session_start();
 require_once 'php/config.php';
 
-// Check if doctor is logged in
-if (!isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true || $_SESSION['user_type'] !== 'doctor') {
+// Check if user is logged in and is doctor or patient
+if (!isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true || !in_array(($_SESSION['user_type'] ?? ''), ['doctor', 'patient'])) {
     header('Location: login.php');
     exit;
 }
 
-$doctor_id = $_SESSION['doctor_id'];
+$user_type = $_SESSION['user_type'];
+$doctor_id = isset($_SESSION['doctor_id']) ? (int) $_SESSION['doctor_id'] : 0;
+$patient_id = isset($_SESSION['patient_id']) ? (int) $_SESSION['patient_id'] : 0;
 $appointment_id = isset($_GET['id']) ? (int)$_GET['id'] : 0;
 
 if ($appointment_id <= 0) {
@@ -18,19 +20,34 @@ if ($appointment_id <= 0) {
 try {
     $conn = getDBConnection();
     
-    // Fetch appointment details ensuring it belongs to the logged-in doctor
-    $stmt = $conn->prepare("
-        SELECT 
-            a.*,
-            d.name as doctor_name,
-            dp.specialty as doctor_specialty,
-            dp.profile_image as doctor_image
-        FROM appointments a
-        JOIN doctors d ON a.doctor_id = d.id
-        LEFT JOIN doctor_profiles dp ON d.id = dp.doctor_id
-        WHERE a.id = ? AND a.doctor_id = ?
-    ");
-    $stmt->bind_param("ii", $appointment_id, $doctor_id);
+    // Fetch appointment details with role-based ownership checks
+    if ($user_type === 'doctor') {
+        $stmt = $conn->prepare("
+            SELECT
+                a.*,
+                d.name as doctor_name,
+                dp.specialty as doctor_specialty,
+                dp.profile_image as doctor_image
+            FROM appointments a
+            JOIN doctors d ON a.doctor_id = d.id
+            LEFT JOIN doctor_profiles dp ON d.id = dp.doctor_id
+            WHERE a.id = ? AND a.doctor_id = ?
+        ");
+        $stmt->bind_param("ii", $appointment_id, $doctor_id);
+    } else {
+        $stmt = $conn->prepare("
+            SELECT
+                a.*,
+                d.name as doctor_name,
+                dp.specialty as doctor_specialty,
+                dp.profile_image as doctor_image
+            FROM appointments a
+            JOIN doctors d ON a.doctor_id = d.id
+            LEFT JOIN doctor_profiles dp ON d.id = dp.doctor_id
+            WHERE a.id = ? AND a.patient_id = ?
+        ");
+        $stmt->bind_param("ii", $appointment_id, $patient_id);
+    }
     $stmt->execute();
     $result = $stmt->get_result();
     $appointment = $result->fetch_assoc();
@@ -55,7 +72,7 @@ include 'header.php';
                 <h2 class="breadcrumb-title">Appointment Details</h2>
                 <nav aria-label="breadcrumb" class="page-breadcrumb">
                     <ol class="breadcrumb">
-                        <li class="breadcrumb-item"><a href="doctor-dashboard.php">Dashboard</a></li>
+                        <li class="breadcrumb-item"><a href="<?php echo $user_type === 'doctor' ? 'doctor-dashboard.php' : 'patient-dashboard.php'; ?>">Dashboard</a></li>
                         <li class="breadcrumb-item active" aria-current="page">Details</li>
                     </ol>
                 </nav>
@@ -114,8 +131,8 @@ include 'header.php';
                     </div>
                 </div>
                 <div class="text-center mt-4">
-                    <a href="appointments.php" class="btn btn-secondary">Back to List</a>
-                    <?php if ($appointment['status'] !== 'completed' && $appointment['status'] !== 'cancelled'): ?>
+                    <a href="<?php echo $user_type === 'doctor' ? 'appointments.php' : 'patient-appointments.php'; ?>" class="btn btn-secondary">Back to List</a>
+                    <?php if ($appointment['status'] !== 'completed' && $appointment['status'] !== 'cancelled' && $user_type === 'doctor'): ?>
                         <a href="video-call.php?appointment_id=<?php echo $appointment['id']; ?>" class="btn btn-primary">Start Consultation</a>
                     <?php endif; ?>
                 </div>

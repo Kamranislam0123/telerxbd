@@ -21,6 +21,9 @@ if ($_SESSION['user_type'] === 'doctor' && isset($_SESSION['doctor_id'])) {
 } else if ($_SESSION['user_type'] === 'healthcare' && isset($_SESSION['healthcare_id'])) {
 	$uid = 3000 + (int) $_SESSION['healthcare_id'];
 	$user_name = $_SESSION['healthcare_name'] ?? 'Health Worker';
+} else if ($_SESSION['user_type'] === 'special_tid' && isset($_SESSION['special_tid_id'])) {
+	$uid = 3500 + (int) $_SESSION['special_tid_id'];
+	$user_name = $_SESSION['special_tid_name'] ?? 'Special TID User';
 } else {
 	$uid = rand(4000, 5000);
 	$user_name = 'User';
@@ -45,7 +48,7 @@ if ($appointment_id) {
 			$stmt_d->execute();
 			$doctor = $stmt_d->get_result()->fetch_assoc();
 
-			if ($_SESSION['user_type'] === 'doctor' || $_SESSION['user_type'] === 'healthcare') {
+			if ($_SESSION['user_type'] === 'doctor' || $_SESSION['user_type'] === 'healthcare' || $_SESSION['user_type'] === 'special_tid') {
 				$other_party_name = $appointment['patient_name'] ?? 'Patient';
 				$other_party_image = 'assets/img/patients/patient.jpg';
 
@@ -432,7 +435,7 @@ if ($appointment_id) {
 					<!-- /Call Wrapper -->
 
 					<!-- Patient Details Section -->
-					<?php if (($_SESSION['user_type'] === 'doctor' || $_SESSION['user_type'] === 'healthcare') && isset($patient_info)): ?>
+					<?php if (($_SESSION['user_type'] === 'doctor' || $_SESSION['user_type'] === 'healthcare' || $_SESSION['user_type'] === 'special_tid') && isset($patient_info)): ?>
 					<div class="patient-details-card">
 						<h4><i class="isax isax-user me-2"></i>Patient Details</h4>
 						
@@ -596,6 +599,10 @@ if ($appointment_id) {
 							<button type="button" class="btn btn-sm btn-outline-info mt-2" id="btn_add_medicine"><i class="fa-solid fa-plus me-1"></i>Add Medicine</button>
 
 							<hr class="mt-4">
+							<div class="form-group mb-3">
+								<label class="form-label">Note / Reference</label>
+								<textarea class="form-control" name="note_reference" rows="2" placeholder="Additional note or reference..."></textarea>
+							</div>
 							<div class="form-group mb-3">
 								<label class="form-label">Advice / Instructions</label>
 								<textarea class="form-control" name="advice" rows="3" placeholder="Diet, rest, follow-up..."></textarea>

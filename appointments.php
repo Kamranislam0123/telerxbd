@@ -679,6 +679,10 @@ include 'header.php';
 
 							<hr class="mt-4">
 							<div class="form-group mb-3">
+								<label class="form-label">Note / Reference</label>
+								<textarea class="form-control" name="note_reference" rows="2" placeholder="Additional note or reference..."></textarea>
+							</div>
+							<div class="form-group mb-3">
 								<label class="form-label">Advice / Instructions</label>
 								<textarea class="form-control" name="advice" rows="3" placeholder="Diet, rest, follow-up..."></textarea>
 							</div>

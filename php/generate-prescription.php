@@ -175,6 +175,26 @@ try {
                 font-size: 11pt;
             }
             .address-title { font-weight: bold; font-size: 14pt; margin-bottom: 5px; }
+            .note-reference-box {
+                width: 100%;
+                margin: 10px 0 14px 0;
+                padding: 8px 10px;
+                border: 1px dashed #999;
+                border-radius: 6px;
+                text-align: center;
+                background: #fafafa;
+                page-break-inside: avoid;
+            }
+            .note-reference-title {
+                font-weight: bold;
+                text-decoration: underline;
+                margin-bottom: 4px;
+                font-size: 10pt;
+            }
+            .note-reference-content {
+                font-size: 10pt;
+                line-height: 1.45;
+            }
             
             /* Bengali Support */
             .bn { font-family: "SolaimanLipi", "HindSiliguri", "DejaVu Sans", sans-serif; }
@@ -237,6 +257,9 @@ try {
                     ' . ($appointment['spo2'] ? "SpO2: {$appointment['spo2']} %<br>" : "") . '
                     ' . nl2br(htmlspecialchars($appointment['on_examination'] ?: "")) . '
                 </div>
+
+                <div class="section-header">Diagnosis:</div>
+                <div class="section-content">' . nl2br(htmlspecialchars($appointment['diagnosis'] ?: "—")) . '</div>
                 
                 <div class="section-header">Advice:</div>
                 <div class="section-content">' . nl2br(htmlspecialchars($appointment['advice'] ?: "—")) . '</div>
@@ -260,11 +283,6 @@ try {
 
     $html .= '
                 </div>
-                ' . ($appointment['diagnosis'] ? '
-                <div style="margin-top: 50px; border-top: 1px dotted #ccc; padding-top: 15px;">
-                    <div class="section-header">Diagnosis:</div>
-                    <div class="section-content" style="font-size: 12pt;"><strong>' . htmlspecialchars($appointment['diagnosis']) . '</strong></div>
-                </div>' : '') . '
             </div>
         </div>
 
@@ -291,6 +309,11 @@ try {
     }
 
     $html .= '
+            ' . (!empty($appointment['note_reference']) ? '
+            <div class="note-reference-box">
+                <div class="note-reference-title">Note / Reference</div>
+                <div class="note-reference-content">' . nl2br(htmlspecialchars($appointment['note_reference'])) . '</div>
+            </div>' : '') . '
             <div class="disclaimer">
                 This is a computer-generated prescription. No signature is required. | TeleRx Bangladesh<br>
                 www.telerxbd.com | Emergency Call: +880 17 0000 0000

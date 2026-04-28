@@ -1,8 +1,10 @@
 <?php
 session_start();
 
-// Require patient login before allowing booking
-if (!isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true || ($_SESSION['user_type'] ?? '') !== 'patient') {
+// Allow booking by patient or Special TID user
+$is_patient = isset($_SESSION['logged_in']) && $_SESSION['logged_in'] === true && (($_SESSION['user_type'] ?? '') === 'patient');
+$is_special_tid = isset($_SESSION['logged_in']) && $_SESSION['logged_in'] === true && (($_SESSION['user_type'] ?? '') === 'special_tid');
+if (!$is_patient && !$is_special_tid) {
 	$booking_doctor_id = isset($_GET['doctor_id']) ? (int) $_GET['doctor_id'] : (isset($_GET['id']) ? (int) $_GET['id'] : 0);
 	$redirectUrl = 'registration.php';
 	if ($booking_doctor_id > 0) {

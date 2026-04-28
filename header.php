@@ -196,6 +196,9 @@ $current_page = basename($_SERVER['PHP_SELF']);
                                     } elseif($_SESSION['user_type'] == 'healthcare') {
                                         $profile_image = $_SESSION['profile_image'] ?? $profile_image;
                                         $user_name = $_SESSION['healthcare_name'] ?? 'Healthcare';
+                                    } elseif($_SESSION['user_type'] == 'special_tid') {
+                                        $profile_image = $_SESSION['profile_image'] ?? $profile_image;
+                                        $user_name = $_SESSION['special_tid_name'] ?? 'Special TID User';
                                     } elseif($_SESSION['user_type'] == 'patient') {
                                         $profile_image = $_SESSION['profile_image'] ?? $profile_image;
                                         $user_name = $_SESSION['patient_name'] ?? 'Patient';
@@ -214,7 +217,8 @@ $current_page = basename($_SERVER['PHP_SELF']);
                                         <p class="text-muted mb-0">
                                             <?php
                                             echo $_SESSION['user_type'] == 'doctor' ? 'Doctor' :
-                                                    ($_SESSION['user_type'] == 'healthcare' ? 'Healthcare Provider' : 'Patient');
+                                                    ($_SESSION['user_type'] == 'healthcare' ? 'Healthcare Provider' :
+                                                    (($_SESSION['user_type'] == 'special_tid') ? 'Special TID User' : 'Patient'));
                                             ?>
                                         </p>
                                     </div>
@@ -226,6 +230,8 @@ $current_page = basename($_SERVER['PHP_SELF']);
                                 <?php elseif($_SESSION['user_type'] == 'healthcare'): ?>
                                     <a class="dropdown-item" href="health-worker-dashboard">Dashboard</a>
                                     <a class="dropdown-item" href="health-worker-profile-settings">Profile Settings</a>
+                                <?php elseif($_SESSION['user_type'] == 'special_tid'): ?>
+                                    <a class="dropdown-item" href="health-worker-dashboard">Dashboard</a>
                                 <?php elseif($_SESSION['user_type'] == 'patient'): ?>
                                     <a class="dropdown-item" href="patient-dashboard">Dashboard</a>
                                     <a class="dropdown-item" href="patient-profile-settings">Profile Settings</a>
