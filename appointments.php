@@ -130,11 +130,6 @@ $last_name = $name_parts[1] ?? '';
 
 include 'header.php';
 ?>
-
-<!DOCTYPE html>
-<html lang="en">
-
-<body>
 		<style>
 		.appointment-action ul li .btn-sm,
 		.appointment-wrap .btn-prescription {
@@ -701,26 +696,6 @@ include 'header.php';
 			</div>
 		</div>
 		<!-- /Prescription Modal -->
-	  
-		<!-- jQuery -->
-		<script src="assets/js/jquery-3.7.1.min.js"></script>
-		
-		<!-- Bootstrap Core JS -->
-		<script src="assets/js/bootstrap.bundle.min.js"></script>
-
-		<!-- select JS -->
-		<script src="assets/plugins/select2/js/select2.min.js"></script>
-
-		<!-- Daterangepikcer JS -->
-		<script src="assets/js/moment.min.js"></script>
-		<script src="assets/plugins/daterangepicker/daterangepicker.js"></script>
-		
-		<!-- Sticky Sidebar JS -->
-        <script src="assets/plugins/theia-sticky-sidebar/ResizeSensor.js"></script>
-        <script src="assets/plugins/theia-sticky-sidebar/theia-sticky-sidebar.js"></script>
-		
-		<!-- Custom JS -->
-		<script src="assets/js/script.js"></script>
 
 		<!-- Prescription Handlers (Upload & Generate) -->
 		<script>
@@ -863,8 +838,5 @@ include 'header.php';
 
 		});
 		</script>
-		
-	</body>
-</html>
 
 <?php include 'footer.php'; ?>
