@@ -101,6 +101,20 @@ $current_page = basename($_SERVER['PHP_SELF']);
 
     <!-- Header -->
     <header class="header header-custom header-fixed header-one home-head-one">
+        <div class="telerx-header-top d-none d-lg-block">
+            <div class="container telerx-header-top-inner">
+                <div class="telerx-top-left">
+                    <span class="telerx-top-label">Follow us :</span>
+                    <a href="#" aria-label="Facebook"><i class="fa-brands fa-facebook-f" aria-hidden="true"></i></a>
+                    <a href="#" aria-label="Twitter X"><i class="fa-brands fa-x-twitter" aria-hidden="true"></i></a>
+                    <a href="#" aria-label="Instagram"><i class="fa-brands fa-instagram" aria-hidden="true"></i></a>
+                </div>
+                <div class="telerx-top-right">
+                    <span><i class="fa-solid fa-phone" aria-hidden="true"></i> +880 1836 838888</span>
+                    <span><i class="fa-solid fa-location-dot" aria-hidden="true"></i> Badda,Dhaka,Bangladesh</span>
+                </div>
+            </div>
+        </div>
         <div class="container">
             <nav class="navbar navbar-expand-lg header-nav">
                 <div class="navbar-header">
@@ -243,14 +257,19 @@ $current_page = basename($_SERVER['PHP_SELF']);
                         </li>
                     <?php else: ?>
                         <!-- Guest/Non-logged in menu -->
-                        <li class="register-btn">
-                            <a href="registration" class="btn btn-dark reg-btn">
-                                <i class="isax isax-user"></i>Register
+                        <li class="nav-item dropdown guest-auth-dropdown">
+                            <a href="#" class="nav-link guest-auth-toggle" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Account">
+                                <i class="fa-regular fa-user" aria-hidden="true"></i>
                             </a>
+                            <ul class="dropdown-menu dropdown-menu-end guest-auth-menu">
+                                <li><a class="dropdown-item guest-auth-link guest-login-link" href="login">Login</a></li>
+                                <li><a class="dropdown-item guest-auth-link guest-register-link" href="registration">Registration</a></li>
+                            </ul>
                         </li>
-                        <li class="register-btn">
-                            <a href="login" class="btn btn-primary log-btn">
-                                <i class="isax isax-lock"></i>Login
+                        <li class="nav-item header-appointment-item">
+                            <a href="doctors" class="header-appointment-btn" aria-label="Book Appointment">
+                                <span class="header-appointment-text">APPOINTMENT</span>
+                                <span class="header-appointment-plus" aria-hidden="true">+</span>
                             </a>
                         </li>
                     <?php endif; ?>
