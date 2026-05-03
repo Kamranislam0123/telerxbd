@@ -289,13 +289,17 @@ try {
         <div class="footer">
             <div class="footer-line"></div>';
 
-    if (!empty($appointment['prescription_footer'])) {
-        $html .= '
+    $html .= '
+            ' . (!empty($appointment['note_reference']) ? '
+            <div class="note-reference-box">
+                <div class="note-reference-title">Note / Reference</div>
+                <div class="note-reference-content">' . nl2br(htmlspecialchars($appointment['note_reference'])) . '</div>
+            </div>' : '') . '
+
+            ' . (!empty($appointment['prescription_footer']) ? '
             <div class="address-box">
                 <div class="bn">' . nl2br(htmlspecialchars($appointment['prescription_footer'])) . '</div>
-            </div>';
-    } else {
-        $html .= '
+            </div>' : '
             <div class="badges">
                 <span class="badge bn">ফ্রি মেডিকেল ক্যাম্প</span>
                 <span class="badge bn">ফ্রি মেডিকেল ক্যাম্প</span>
@@ -305,19 +309,13 @@ try {
             <div class="address-box">
                 <div class="address-title bn">তা\'লীমূল কোরআন নূরানী হাফিজিয়া মাদ্রাসা</div>
                 <div class="bn">ঠিকানা: প-১৫২/৬, দক্ষিণ বাড্ডা, ঢাকা-১২১২</div>
-            </div>';
-    }
+            </div>') . '
 
-    $html .= '
-            ' . (!empty($appointment['note_reference']) ? '
-            <div class="note-reference-box">
-                <div class="note-reference-title">Note / Reference</div>
-                <div class="note-reference-content">' . nl2br(htmlspecialchars($appointment['note_reference'])) . '</div>
-            </div>' : '') . '
             <div class="disclaimer">
                 This is a computer-generated prescription. No signature is required. | TeleRx Bangladesh<br>
                 www.telerxbd.com | Emergency Call: +880 17 0000 0000
-            </div>
+            </div>' . '
+
         </div>
     </body>
     </html>';

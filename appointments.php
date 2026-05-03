@@ -248,12 +248,6 @@ include 'header.php';
 									</ul>
 								</div>
 								<div class="filter-head">
-									<div class="position-relative daterange-wraper me-2">
-										<div class="input-groupicon calender-input">
-											<input type="text" class="form-control  date-range bookingrange" placeholder="From Date - To Date ">
-										</div>
-										<i class="isax isax-calendar-1"></i>
-									</div>
 									<div class="form-sorts dropdown">
 										<a href="javascript:void(0);" class="dropdown-toggle" id="table-filter"><i class="isax isax-filter me-2"></i>Filter By</a>
 										<div class="filter-dropdown-menu">
