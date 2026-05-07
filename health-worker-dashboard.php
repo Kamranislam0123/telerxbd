@@ -138,7 +138,7 @@ include 'header.php';
                     <p class="text-muted mb-0">Appointments created from your Special TID account (TID: <?php echo htmlspecialchars($healthcare['tid'] ?? '—'); ?>).</p>
                 </div>
                 <div class="mb-3">
-                    <a href="search.php" class="btn btn-primary">
+                    <a href="doctors.php" class="btn btn-primary">
                         <i class="fa-solid fa-plus me-1"></i> Book New Appointment
                     </a>
                 </div>
