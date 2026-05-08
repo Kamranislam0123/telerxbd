@@ -108,9 +108,11 @@ $current_page = basename($_SERVER['PHP_SELF']);
                     <a href="#" aria-label="Twitter X"><i class="fa-brands fa-x-twitter" aria-hidden="true"></i></a>
                     <a href="#" aria-label="Instagram"><i class="fa-brands fa-instagram" aria-hidden="true"></i></a>
                 </div>
+                <div>
+                    <marquee width="100%" behavior="scroll" direction="left">TeleRx website in under maintenance.</marquee>
+                </div>
                 <div class="telerx-top-right">
-                    <span><i class="fa-solid fa-phone" aria-hidden="true"></i> +880 1836 838888</span>
-                    <span><i class="fa-solid fa-location-dot" aria-hidden="true"></i> Badda,Dhaka,Bangladesh</span>
+                    <span> Emergency Call: <i class="fa-solid fa-phone" aria-hidden="true"></i> +880 1836 838888</span>
                 </div>
             </div>
         </div>
@@ -256,19 +258,14 @@ $current_page = basename($_SERVER['PHP_SELF']);
                         </li>
                     <?php else: ?>
                         <!-- Guest/Non-logged in menu -->
-                        <li class="nav-item dropdown guest-auth-dropdown">
-                            <a href="#" class="nav-link guest-auth-toggle" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Account">
-                                <i class="fa-regular fa-user" aria-hidden="true"></i>
+                        <li class="register-btn">
+                            <a href="registration" class="btn btn-dark reg-btn">
+                                <i class="isax isax-user"></i>Register
                             </a>
-                            <ul class="dropdown-menu dropdown-menu-end guest-auth-menu">
-                                <li><a class="dropdown-item guest-auth-link guest-login-link" href="login">Login</a></li>
-                                <li><a class="dropdown-item guest-auth-link guest-register-link" href="registration">Registration</a></li>
-                            </ul>
                         </li>
-                        <li class="nav-item header-appointment-item">
-                            <a href="doctors" class="header-appointment-btn" aria-label="Book Appointment">
-                                <span class="header-appointment-text">APPOINTMENT</span>
-                                <span class="header-appointment-plus" aria-hidden="true">+</span>
+                        <li class="register-btn">
+                            <a href="login.php" class="btn btn-primary log-btn">
+                                <i class="isax isax-lock"></i>Login
                             </a>
                         </li>
                     <?php endif; ?>
