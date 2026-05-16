@@ -496,7 +496,7 @@ try {
         $ins->close();
         $conn->close();
         error_log('book-appointment insert: ' . $conn->error);
-        echo json_encode(['success' => false, 'message' => 'Failed to save booking.']);
+        echo json_encode(['success' => false, 'message' => 'Failed to save booking: ' . $conn->error]);
         exit;
     }
     $appointment_id = $conn->insert_id;
