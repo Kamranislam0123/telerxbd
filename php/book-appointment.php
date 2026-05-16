@@ -59,7 +59,7 @@ $mobile = $mobile_clean;
 $patient_id = isset($_SESSION['patient_id']) ? (int) $_SESSION['patient_id'] : 0;
 $booked_by_special_tid_id = (isset($_SESSION['user_type']) && $_SESSION['user_type'] === 'special_tid' && isset($_SESSION['special_tid_id']))
     ? (int) $_SESSION['special_tid_id']
-    : 0;
+    : null;
 $notes = isset($_POST['notes']) ? trim($_POST['notes']) : '';
 $age = isset($_POST['age']) ? trim($_POST['age']) : '';
 $weight = isset($_POST['weight']) ? trim($_POST['weight']) : '';
