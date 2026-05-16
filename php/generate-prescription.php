@@ -273,10 +273,14 @@ try {
                     $html .= '<p style="color: #999; font-style: italic;">No medications prescribed.</p>';
                 } else {
                     foreach ($medications as $med) {
+                        $duration = trim($med['duration'] ?? '');
+                        if (is_numeric($duration)) {
+                            $duration .= ' Days';
+                        }
                         $html .= '
                         <div class="medication-item">
                             <div class="med-name">' . htmlspecialchars($med['name']) . '</div>
-                            <div class="med-instruction">' . htmlspecialchars($med['dose']) . ' — ' . htmlspecialchars($med['duration']) . '</div>
+                            <div class="med-instruction">' . htmlspecialchars($med['dose']) . ' — ' . htmlspecialchars($duration) . '</div>
                         </div>';
                     }
                 }
@@ -313,7 +317,7 @@ try {
 
             <div class="disclaimer">
                 This is a computer-generated prescription. No signature is required. | TeleRx Bangladesh<br>
-                www.telerxbd.com | Emergency Call: +880 17 0000 0000
+                www.telerxbd.com | Emergency Call: 01335053237
             </div>' . '
 
         </div>
