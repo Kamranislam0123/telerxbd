@@ -317,7 +317,7 @@ try {
 
             <div class="disclaimer">
                 This is a computer-generated prescription. No signature is required. | TeleRx Bangladesh<br>
-                www.telerxbd.com | Emergency Call: +880 17 0000 0000
+                www.telerxbd.com | Emergency Call: 01335053237
             </div>' . '
 
         </div>
