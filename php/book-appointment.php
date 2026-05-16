@@ -499,20 +499,15 @@ try {
         exit;
     }
 
-    if (!$ins->execute()) {
-        $msg = "Execute failed: " . $ins->error . " (Conn Error: " . $conn->error . ")";
-        $conn->rollback();
-        $ins->close();
-        $conn->close();
-<<<<<<< HEAD
-        error_log('book-appointment insert: ' . $conn->error);
-        echo json_encode(['success' => false, 'message' => 'Failed to save booking: ' . $conn->error]);
-=======
-        error_log('book-appointment insert error: ' . $msg);
-        echo json_encode(['success' => false, 'message' => 'Failed to save booking: ' . $msg]);
->>>>>>> d0ab1fa7d5828cea867f8d4b277d2ef8b92a54a6
-        exit;
-    }
+if (!$ins->execute()) {
+    $msg = "Execute failed: " . $ins->error . " (Conn Error: " . $conn->error . ")";
+    $conn->rollback();
+    $ins->close();
+    $conn->close();
+    error_log('book-appointment insert error: ' . $msg);
+    echo json_encode(['success' => false, 'message' => 'Failed to save booking: ' . $msg]);
+    exit;
+}
     $appointment_id = $conn->insert_id;
     $ins->close();
 
