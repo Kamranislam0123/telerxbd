@@ -273,10 +273,14 @@ try {
                     $html .= '<p style="color: #999; font-style: italic;">No medications prescribed.</p>';
                 } else {
                     foreach ($medications as $med) {
+                        $duration = trim($med['duration'] ?? '');
+                        if (is_numeric($duration)) {
+                            $duration .= ' Days';
+                        }
                         $html .= '
                         <div class="medication-item">
                             <div class="med-name">' . htmlspecialchars($med['name']) . '</div>
-                            <div class="med-instruction">' . htmlspecialchars($med['dose']) . ' — ' . htmlspecialchars($med['duration']) . '</div>
+                            <div class="med-instruction">' . htmlspecialchars($med['dose']) . ' — ' . htmlspecialchars($duration) . '</div>
                         </div>';
                     }
                 }
