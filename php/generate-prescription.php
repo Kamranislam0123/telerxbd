@@ -141,7 +141,7 @@ try {
             .info-value { border-bottom: 1px solid #000; display: inline-block; padding: 0 5px; margin-right: 15px; }
             
             /* Prescription Body */
-            .prescription-body { width: 100%; min-height: 700px; display: table; border-top: 1px solid #000; }
+            .prescription-body { width: 100%; height: 750px; display: table; border-top: 1px solid #000; }
             .sidebar { display: table-cell; width: 25%; border-right: 1px solid #000; vertical-align: top; padding-right: 15px; padding-top: 15px; }
             .main-rx { display: table-cell; width: 75%; vertical-align: top; padding-left: 25px; padding-top: 15px; }
             
@@ -245,24 +245,54 @@ try {
         </div>
 
         <div class="prescription-body">
-            <div class="sidebar">
+            <div class="sidebar">';
+
+                $chief = isset($appointment['chief_complaints']) ? trim((string)$appointment['chief_complaints']) : '';
+                if ($chief !== '' && $chief !== '-') {
+                    $html .= '
                 <div class="section-header">Chief Complaints:</div>
-                <div class="section-content">' . nl2br(htmlspecialchars($appointment['chief_complaints'] ?: "—")) . '</div>
+                <div class="section-content">' . nl2br(htmlspecialchars($chief)) . '</div>';
+                }
                 
+                $on_exam_content = '';
+                $bp = isset($appointment['blood_pressure']) ? trim((string)$appointment['blood_pressure']) : '';
+                if ($bp !== '' && $bp !== '-' && $bp !== '0') $on_exam_content .= "BP: {$bp} mmHg<br>";
+                
+                $temp = isset($appointment['body_temperature']) ? trim((string)$appointment['body_temperature']) : '';
+                if ($temp !== '' && $temp !== '-' && $temp !== '0') $on_exam_content .= "Temp: {$temp} F<br>";
+                
+                $pulse = isset($appointment['pulse']) ? trim((string)$appointment['pulse']) : '';
+                if ($pulse !== '' && $pulse !== '-' && $pulse !== '0') $on_exam_content .= "Pulse: {$pulse} /min<br>";
+                
+                $spo2 = isset($appointment['spo2']) ? trim((string)$appointment['spo2']) : '';
+                if ($spo2 !== '' && $spo2 !== '-' && $spo2 !== '0') $on_exam_content .= "SpO2: {$spo2} %<br>";
+                
+                $on_exam = isset($appointment['on_examination']) ? trim((string)$appointment['on_examination']) : '';
+                if ($on_exam !== '' && $on_exam !== '-') $on_exam_content .= nl2br(htmlspecialchars($on_exam)) . '<br>';
+                
+                if ($on_exam_content !== '') {
+                    $html .= '
                 <div class="section-header">On Examination:</div>
                 <div class="section-content">
-                    ' . ($appointment['blood_pressure'] ? "BP: {$appointment['blood_pressure']} mmHg<br>" : "") . '
-                    ' . ($appointment['body_temperature'] ? "Temp: {$appointment['body_temperature']} F<br>" : "") . '
-                    ' . ($appointment['pulse'] ? "Pulse: {$appointment['pulse']} /min<br>" : "") . '
-                    ' . ($appointment['spo2'] ? "SpO2: {$appointment['spo2']} %<br>" : "") . '
-                    ' . nl2br(htmlspecialchars($appointment['on_examination'] ?: "")) . '
-                </div>
+                    ' . $on_exam_content . '
+                </div>';
+                }
 
+                $diagnosis = isset($appointment['diagnosis']) ? trim((string)$appointment['diagnosis']) : '';
+                if ($diagnosis !== '' && $diagnosis !== '-') {
+                    $html .= '
                 <div class="section-header">Diagnosis:</div>
-                <div class="section-content">' . nl2br(htmlspecialchars($appointment['diagnosis'] ?: "—")) . '</div>
+                <div class="section-content">' . nl2br(htmlspecialchars($diagnosis)) . '</div>';
+                }
                 
+                $advice = isset($appointment['advice']) ? trim((string)$appointment['advice']) : '';
+                if ($advice !== '' && $advice !== '-') {
+                    $html .= '
                 <div class="section-header">Advice:</div>
-                <div class="section-content">' . nl2br(htmlspecialchars($appointment['advice'] ?: "—")) . '</div>
+                <div class="section-content">' . nl2br(htmlspecialchars($advice)) . '</div>';
+                }
+
+            $html .= '
             </div>
             
             <div class="main-rx">
@@ -303,17 +333,7 @@ try {
             ' . (!empty($appointment['prescription_footer']) ? '
             <div class="address-box">
                 <div class="bn">' . nl2br(htmlspecialchars($appointment['prescription_footer'])) . '</div>
-            </div>' : '
-            <div class="badges">
-                <span class="badge bn">ফ্রি মেডিকেল ক্যাম্প</span>
-                <span class="badge bn">ফ্রি মেডিকেল ক্যাম্প</span>
-                <span class="badge bn">ফ্রি মেডিকেল ক্যাম্প</span>
-                <span class="badge bn">ফ্রি মেডিকেল ক্যাম্প</span>
-            </div>
-            <div class="address-box">
-                <div class="address-title bn">তা\'লীমূল কোরআন নূরানী হাফিজিয়া মাদ্রাসা</div>
-                <div class="bn">ঠিকানা: প-১৫২/৬, দক্ষিণ বাড্ডা, ঢাকা-১২১২</div>
-            </div>') . '
+            </div>' : '') . '
 
             <div class="disclaimer">
                 This is a computer-generated prescription. No signature is required. | TeleRx Bangladesh<br>
