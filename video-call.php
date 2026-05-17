@@ -621,7 +621,7 @@ if ($appointment_id) {
 								<div class="col-md-6">
 									<div class="form-group mb-3">
 										<label class="form-label">Chief Complaints</label>
-										<textarea class="form-control" name="chief_complaints" rows="3" placeholder="Symptoms, duration..."><?php echo htmlspecialchars($appointment['notes'] ?? ''); ?></textarea>
+										<textarea class="form-control" name="chief_complaints" rows="3" placeholder="Symptoms, duration..."><?php echo htmlspecialchars($appointment['chief_complaints'] ?? $appointment['notes'] ?? ''); ?></textarea>
 									</div>
 									<div id="prescription_message_area" class="mt-2"></div>
 								</div>
@@ -629,13 +629,13 @@ if ($appointment_id) {
 								<div class="col-md-6">
 									<div class="form-group mb-3">
 										<label class="form-label">On Examination</label>
-										<textarea class="form-control" name="on_examination" rows="3" placeholder="Vitals, physical findings..."></textarea>
+										<textarea class="form-control" name="on_examination" rows="3" placeholder="Vitals, physical findings..."><?php echo htmlspecialchars($appointment['on_examination'] ?? ''); ?></textarea>
 									</div>
 								</div>
 								<div class="col-md-12">
 									<div class="form-group mb-4">
 										<label class="form-label">Diagnosis</label>
-										<input type="text" class="form-control" name="diagnosis" placeholder="Primary diagnosis">
+										<input type="text" class="form-control" name="diagnosis" placeholder="Primary diagnosis" value="<?php echo htmlspecialchars($appointment['diagnosis'] ?? ''); ?>">
 									</div>
 								</div>
 							</div>
@@ -643,40 +643,50 @@ if ($appointment_id) {
 							<hr>
 							<h6 class="mb-3">Medications (Rx)</h6>
 							<div id="medicine_list">
-								<!-- Medicine Row -->
+								<?php 
+								$medications = [];
+								if (!empty($appointment['medications'])) {
+									$medications = json_decode($appointment['medications'], true) ?: [];
+								}
+								if (empty($medications)) {
+									$medications = [['name' => '', 'dose' => '', 'duration' => '']];
+								}
+								foreach ($medications as $index => $med): 
+								?>
 								<div class="medicine-row mt-2">
 									<div class="row g-2">
 										<div class="col-md-5">
-											<input type="text" class="form-control" name="medicine_name[]" placeholder="Medicine name" required>
+											<input type="text" class="form-control" name="medicine_name[]" placeholder="Medicine name" value="<?php echo htmlspecialchars($med['name'] ?? ''); ?>" required>
 										</div>
 										<div class="col-md-3">
-											<input type="text" class="form-control" name="medicine_dose[]" placeholder="Dose (e.g. 1+0+1)">
+											<input type="text" class="form-control" name="medicine_dose[]" placeholder="Dose (e.g. 1+0+1)" value="<?php echo htmlspecialchars($med['dose'] ?? ''); ?>">
 										</div>
 										<div class="col-md-3">
-											<input type="text" class="form-control" name="medicine_duration[]" placeholder="Duration (e.g. 7 days)">
+											<input type="text" class="form-control" name="medicine_duration[]" placeholder="Duration (e.g. 7 days)" value="<?php echo htmlspecialchars($med['duration'] ?? ''); ?>">
 										</div>
 										<div class="col-md-1">
-											<button type="button" class="btn btn-link btn-remove-medicine" style="display:none;"><i class="fa-solid fa-trash"></i></button>
+											<button type="button" class="btn btn-link btn-remove-medicine" style="<?php echo count($medications) === 1 ? 'display:none;' : ''; ?>"><i class="fa-solid fa-trash"></i></button>
 										</div>
 									</div>
 								</div>
+								<?php endforeach; ?>
 							</div>
 							<button type="button" class="btn btn-sm btn-outline-info mt-2" id="btn_add_medicine"><i class="fa-solid fa-plus me-1"></i>Add Medicine</button>
 
 							<hr class="mt-4">
 							<div class="form-group mb-3">
 								<label class="form-label">Advice / Instructions</label>
-								<textarea class="form-control" name="advice" rows="3" placeholder="Diet, rest, follow-up..."></textarea>
+								<textarea class="form-control" name="advice" rows="3" placeholder="Diet, rest, follow-up..."><?php echo htmlspecialchars($appointment['advice'] ?? ''); ?></textarea>
 							</div>
 
 							<div class="form-group mb-3">
 								<label class="form-label">Note / Reference</label>
-								<textarea class="form-control" name="note_reference" rows="2" placeholder="Additional note or reference..."></textarea>
+								<textarea class="form-control" name="note_reference" rows="2" placeholder="Additional note or reference..."><?php echo htmlspecialchars($appointment['note_reference'] ?? ''); ?></textarea>
 							</div>
 
 							<div class="form-group mb-4">
 								<label class="form-label">Prescription Footer (Optional)</label>
-								<textarea class="form-control" name="prescription_footer" rows="2" placeholder="e.g. Free Medical Camp address..."></textarea>
+								<textarea class="form-control" name="prescription_footer" rows="2" placeholder="e.g. Free Medical Camp address..."><?php echo htmlspecialchars($appointment['prescription_footer'] ?? ''); ?></textarea>
 							</div>
 
 

@@ -141,7 +141,7 @@ try {
             .info-value { border-bottom: 1px solid #000; display: inline-block; padding: 0 5px; margin-right: 15px; }
             
             /* Prescription Body */
-            .prescription-body { width: 100%; min-height: 700px; display: table; border-top: 1px solid #000; }
+            .prescription-body { width: 100%; height: 750px; display: table; border-top: 1px solid #000; }
             .sidebar { display: table-cell; width: 25%; border-right: 1px solid #000; vertical-align: top; padding-right: 15px; padding-top: 15px; }
             .main-rx { display: table-cell; width: 75%; vertical-align: top; padding-left: 25px; padding-top: 15px; }
             
