@@ -902,6 +902,18 @@ if ($appointment_id) {
 
 					$("#join-btn-container").hide();
 					$("#video-toggle, #audio-toggle, #leave-btn, #view-details-btn").show();
+
+					// If the user is a doctor or health provider, notify the database that the call has started
+					<?php if (in_array($_SESSION['user_type'], ['doctor', 'healthcare', 'special_tid'])): ?>
+					try {
+						await $.post('php/handle-call-status.php', {
+							appointment_id: "<?php echo (int) $appointment_id; ?>",
+							action: 'start_call'
+						});
+					} catch (err) {
+						console.error("Failed to notify call start to server:", err);
+					}
+					<?php endif; ?>
 				} catch (err) {
 					console.error("Join call failed:", err);
 					alert("Failed to join call. Please check your camera/microphone permissions.");
@@ -909,6 +921,18 @@ if ($appointment_id) {
 			};
 
 			const leaveCall = async () => {
+				// Clear the calling status on the backend
+				<?php if (in_array($_SESSION['user_type'], ['doctor', 'healthcare', 'special_tid'])): ?>
+				try {
+					await $.post('php/handle-call-status.php', {
+						appointment_id: "<?php echo (int) $appointment_id; ?>",
+						action: 'end_call'
+					});
+				} catch (err) {
+					console.error("Failed to notify call end to server:", err);
+				}
+				<?php endif; ?>
+
 				for (let trackName in localTracks) {
 					let track = localTracks[trackName];
 					if (track) {
@@ -1074,6 +1098,16 @@ if ($appointment_id) {
 			$(document).on('click', '.btn-remove-medicine', function () {
 				$(this).closest('.medicine-row').remove();
 			});
+
+			// If the provider closes the window/tab or navigates away, clear the call status
+			<?php if (in_array($_SESSION['user_type'], ['doctor', 'healthcare', 'special_tid'])): ?>
+			$(window).on('beforeunload', function() {
+				const formData = new FormData();
+				formData.append('appointment_id', '<?php echo (int)$appointment_id; ?>');
+				formData.append('action', 'end_call');
+				navigator.sendBeacon('php/handle-call-status.php', formData);
+			});
+			<?php endif; ?>
 		});
 	</script>
 	<script src="assets/js/script.js"></script>

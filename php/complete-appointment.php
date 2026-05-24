@@ -34,7 +34,7 @@ try {
 
     // Verify ownership and update status only if it's currently confirmed or pending
     // Doctors and patients can both end calls, but usually the status update is automatic
-    $stmt = $conn->prepare("UPDATE appointments SET status = 'completed' WHERE id = ? AND status NOT IN ('cancelled', 'completed')");
+    $stmt = $conn->prepare("UPDATE appointments SET status = 'completed', call_status = NULL, call_started_at = NULL WHERE id = ? AND status NOT IN ('cancelled', 'completed')");
     $stmt->bind_param("i", $appointment_id);
     
     if ($stmt->execute()) {
