@@ -38,7 +38,7 @@ try {
             JOIN doctors d ON a.doctor_id = d.id 
             LEFT JOIN doctor_profiles dp ON d.id = dp.doctor_id 
             WHERE a.patient_id = ? 
-              AND a.call_status = 'calling' 
+              AND a.call_status = 'in_progress' 
               AND a.call_started_at >= NOW() - INTERVAL 5 MINUTE 
             ORDER BY a.call_started_at DESC 
             LIMIT 1
@@ -57,7 +57,7 @@ try {
             JOIN doctors d ON a.doctor_id = d.id 
             LEFT JOIN doctor_profiles dp ON d.id = dp.doctor_id 
             WHERE a.referrer_tid = ? 
-              AND a.call_status = 'calling' 
+              AND a.call_status = 'in_progress' 
               AND a.call_started_at >= NOW() - INTERVAL 5 MINUTE 
             ORDER BY a.call_started_at DESC 
             LIMIT 1

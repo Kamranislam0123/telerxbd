@@ -41,8 +41,8 @@ try {
             exit;
         }
 
-        // Update appointment call status to 'calling' and record starting time
-        $stmt = $conn->prepare("UPDATE appointments SET call_status = 'calling', call_started_at = NOW() WHERE id = ?");
+        // Update appointment call status to 'in_progress' and record starting time
+        $stmt = $conn->prepare("UPDATE appointments SET call_status = 'in_progress', call_started_at = NOW() WHERE id = ?");
         $stmt->bind_param("i", $appointment_id);
         
         if ($stmt->execute()) {
@@ -54,7 +54,7 @@ try {
 
     } elseif ($action === 'end_call' || $action === 'decline_call') {
         // Both provider and patient can end/decline
-        $stmt = $conn->prepare("UPDATE appointments SET call_status = NULL, call_started_at = NULL WHERE id = ?");
+        $stmt = $conn->prepare("UPDATE appointments SET call_status = 'ended', call_started_at = NULL WHERE id = ?");
         $stmt->bind_param("i", $appointment_id);
         
         if ($stmt->execute()) {
