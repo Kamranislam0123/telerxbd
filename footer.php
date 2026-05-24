@@ -428,7 +428,7 @@
 
         function checkCalls() {
             $.ajax({
-                url: 'php/check-incoming-calls.php',
+                url: '<?php echo (defined('APP_BASE') ? APP_BASE : ''); ?>/php/check-incoming-calls.php',
                 type: 'GET',
                 dataType: 'json',
                 success: function(res) {
@@ -442,11 +442,7 @@
                         // Handle absolute paths for doctor avatar if required
                         let avatarSrc = call.doctor_image;
                         if (avatarSrc.indexOf('http') !== 0 && avatarSrc.indexOf('/') !== 0) {
-                            // Check if need relative paths
-                            const currentDir = window.location.pathname;
-                            if (currentDir.indexOf('/php/') !== -1) {
-                                avatarSrc = '../' + avatarSrc;
-                            }
+                            avatarSrc = '<?php echo (defined('APP_BASE') ? APP_BASE : ''); ?>/' + avatarSrc;
                         }
                         $('#caller-avatar').attr('src', avatarSrc);
                         
@@ -482,13 +478,8 @@
             if (!activeAppointmentId) return;
             stopRingtone();
             
-            // Build proper redirection URL considering if currently in php/ subdirectory
-            const currentDir = window.location.pathname;
-            let targetUrl = 'video-call.php?appointment_id=' + activeAppointmentId;
-            if (currentDir.indexOf('/php/') !== -1) {
-                targetUrl = '../' + targetUrl;
-            }
-            window.location.href = targetUrl;
+            // Build absolute URL for video room
+            window.location.href = '<?php echo (defined('APP_BASE') ? APP_BASE : ''); ?>/video-call.php?appointment_id=' + activeAppointmentId;
         });
 
         // Decline Call - Clear DB state and close overlay
@@ -498,14 +489,8 @@
             const btn = $(this);
             btn.prop('disabled', true);
             
-            let handleUrl = 'php/handle-call-status.php';
-            const currentDir = window.location.pathname;
-            if (currentDir.indexOf('/php/') !== -1) {
-                handleUrl = 'handle-call-status.php';
-            }
-            
             $.ajax({
-                url: handleUrl,
+                url: '<?php echo (defined('APP_BASE') ? APP_BASE : ''); ?>/php/handle-call-status.php',
                 type: 'POST',
                 data: {
                     appointment_id: activeAppointmentId,
