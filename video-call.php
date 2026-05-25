@@ -979,8 +979,8 @@ if ($appointment_id) {
 			$("#join-btn").click(joinCall);
 			$("#leave-btn").click(leaveCall);
 
-            <?php if ($_SESSION['user_type'] === 'patient' && !empty($appointment['call_status']) && $appointment['call_status'] === 'in_progress'): ?>
-            // Automatically join the video when patient answers an incoming call.
+            <?php if (in_array($_SESSION['user_type'], ['patient', 'healthcare', 'special_tid']) && !empty($appointment['call_status']) && $appointment['call_status'] === 'in_progress'): ?>
+            // Automatically join the video when a receiver answers an incoming call.
             setTimeout(function() {
                 if ($('#join-btn').is(':visible')) {
                     joinCall();
