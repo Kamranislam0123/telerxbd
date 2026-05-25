@@ -979,22 +979,31 @@ if ($appointment_id) {
 			$("#join-btn").click(joinCall);
 			$("#leave-btn").click(leaveCall);
 
-			let isVideoMuted = false;
-			$("#video-toggle").click(function () {
-				if (!isVideoMuted) {
-					localTracks.videoTrack.setEnabled(false);
-					isVideoMuted = true;
-					$(this).find('i').removeClass('isax-video').addClass('isax-video-slash');
-					$(this).attr('title', 'Enable Video');
-				} else {
-					localTracks.videoTrack.setEnabled(true);
-					isVideoMuted = false;
-					$(this).find('i').removeClass('isax-video-slash').addClass('isax-video');
-					$(this).attr('title', 'Disable Video');
-				}
-			});
+            <?php if ($_SESSION['user_type'] === 'patient' && !empty($appointment['call_status']) && $appointment['call_status'] === 'in_progress'): ?>
+            // Automatically join the video when patient answers an incoming call.
+            setTimeout(function() {
+                if ($('#join-btn').is(':visible')) {
+                    joinCall();
+                }
+            }, 500);
+            <?php endif; ?>
 
-			let isAudioMuted = false;
+            let isVideoMuted = false;
+            $("#video-toggle").click(function () {
+                if (!isVideoMuted) {
+                    localTracks.videoTrack.setEnabled(false);
+                    isVideoMuted = true;
+                    $(this).find('i').removeClass('isax-video').addClass('isax-video-slash');
+                    $(this).attr('title', 'Enable Video');
+                } else {
+                    localTracks.videoTrack.setEnabled(true);
+                    isVideoMuted = false;
+                    $(this).find('i').removeClass('isax-video-slash').addClass('isax-video');
+                    $(this).attr('title', 'Disable Video');
+                }
+            });
+
+            let isAudioMuted = false;
 			$("#audio-toggle").click(function () {
 				if (!isAudioMuted) {
 					localTracks.audioTrack.setEnabled(false);

@@ -20,6 +20,7 @@ if (!isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true) {
 $user_type = $_SESSION['user_type'] ?? '';
 $patient_id = $_SESSION['patient_id'] ?? null;
 $healthcare_tid = $_SESSION['healthcare_tid'] ?? $_SESSION['special_tid_code'] ?? null;
+$special_tid_id = $_SESSION['special_tid_id'] ?? null;
 
 // Only patients and healthcare providers can receive calls
 if ($user_type !== 'patient' && $user_type !== 'healthcare' && $user_type !== 'special_tid') {
@@ -50,13 +51,13 @@ try {
             $active_call = $res->fetch_assoc();
         }
         $stmt->close();
-    } elseif (($user_type === 'healthcare' || $user_type === 'special_tid') && $healthcare_tid) {
+    } elseif ($user_type === 'healthcare' && $healthcare_tid) {
         $stmt = $conn->prepare("
             SELECT a.id as appointment_id, d.name as doctor_name, dp.profile_image as doctor_image, a.patient_name 
             FROM appointments a 
             JOIN doctors d ON a.doctor_id = d.id 
             LEFT JOIN doctor_profiles dp ON d.id = dp.doctor_id 
-            WHERE a.referrer_tid = ? 
+            WHERE UPPER(TRIM(a.referrer_tid)) = UPPER(TRIM(?)) 
               AND a.call_status = 'in_progress' 
               AND a.call_started_at >= NOW() - INTERVAL 5 MINUTE 
             ORDER BY a.call_started_at DESC 
@@ -69,6 +70,47 @@ try {
             $active_call = $res->fetch_assoc();
         }
         $stmt->close();
+    } elseif ($user_type === 'special_tid') {
+        // Special TID users: check by referrer_tid OR by created_by_special_tid_id
+        // This covers both cases: appointments referred with their TID code,
+        // and appointments they created directly (stored via created_by_special_tid_id)
+        $conditions = [];
+        $bind_types = '';
+        $bind_values = [];
+
+        if (!empty($healthcare_tid)) {
+            $conditions[] = "UPPER(TRIM(a.referrer_tid)) = UPPER(TRIM(?))";
+            $bind_types .= 's';
+            $bind_values[] = $healthcare_tid;
+        }
+        if (!empty($special_tid_id)) {
+            $conditions[] = "a.created_by_special_tid_id = ?";
+            $bind_types .= 'i';
+            $bind_values[] = $special_tid_id;
+        }
+
+        if (!empty($conditions)) {
+            $query = "
+            SELECT a.id as appointment_id, d.name as doctor_name, dp.profile_image as doctor_image, a.patient_name 
+            FROM appointments a 
+            JOIN doctors d ON a.doctor_id = d.id 
+            LEFT JOIN doctor_profiles dp ON d.id = dp.doctor_id 
+            WHERE (" . implode(' OR ', $conditions) . ") 
+              AND a.call_status = 'in_progress' 
+              AND a.call_started_at >= NOW() - INTERVAL 5 MINUTE 
+            ORDER BY a.call_started_at DESC 
+            LIMIT 1
+        ";
+
+            $stmt = $conn->prepare($query);
+            $stmt->bind_param($bind_types, ...$bind_values);
+            $stmt->execute();
+            $res = $stmt->get_result();
+            if ($res->num_rows > 0) {
+                $active_call = $res->fetch_assoc();
+            }
+            $stmt->close();
+        }
     }
 
     if ($active_call) {
