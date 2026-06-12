@@ -42,6 +42,12 @@ $healthcare = $healthcare ?? [];
                             <span>Profile Settings</span>
                         </a>
                     </li>
+                    <li class="<?php echo ($current_page === 'change-password.php') ? 'active' : ''; ?>">
+                        <a href="change-password">
+                            <i class="isax isax-key"></i>
+                            <span>Change Password</span>
+                        </a>
+                    </li>
                     <li>
                         <a href="php/logout.php">
                             <i class="isax isax-logout"></i>

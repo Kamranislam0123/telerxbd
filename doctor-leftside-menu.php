@@ -129,6 +129,12 @@ if (!empty($speciality_display)) {
                     <span>Change Password</span>
                 </a>
             </li> -->
+            <li class="<?php echo (basename($_SERVER['PHP_SELF']) == 'change-password.php') ? 'active' : ''; ?>">
+                <a href="change-password">
+                    <i class="isax isax-key"></i>
+                    <span>Change Password</span>
+                </a>
+            </li>
             <li>
                 <a href="php/logout.php">  <!-- এই লাইনটি সঠিক? -->
                     <i class="isax isax-logout"></i>

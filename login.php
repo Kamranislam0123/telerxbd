@@ -59,7 +59,7 @@ include 'header.php';?>
 											<div class="mb-3">
 												<div class="form-group-flex">
 													<label class="form-label">Password</label>
-													<a href="forgot-password.html" class="forgot-link">Forgot password?</a>
+
 												</div>
 												<div class="pass-group">
 													<input type="password" class="form-control pass-input" name="password" id="login-password" required>

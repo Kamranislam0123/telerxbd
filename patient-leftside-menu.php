@@ -53,6 +53,12 @@ if (!empty($patient['gender']) || !empty($patient['date_of_birth'])) {
                                 <span>Settings</span>
                             </a>
                         </li>
+                        <li <?php echo (basename($_SERVER['PHP_SELF']) == 'change-password.php') ? 'class="active"' : ''; ?>>
+                            <a href="<?php echo (defined('APP_BASE') && APP_BASE) ? APP_BASE . '/change-password' : 'change-password'; ?>">
+                                <i class="isax isax-key"></i>
+                                <span>Change Password</span>
+                            </a>
+                        </li>
                         <li>
                             <a href="php/logout.php">
                                 <i class="isax isax-logout"></i>
