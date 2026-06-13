@@ -12,8 +12,7 @@ error_reporting(E_ALL);
 require_once __DIR__ . '/../vendor/autoload.php';
 require_once __DIR__ . '/config.php';
 
-use Dompdf\Dompdf;
-use Dompdf\Options;
+// Using mPDF for PDF generation
 
 function debug_log($message) {
     $dir = __DIR__ . '/../assets/prescriptions/';
@@ -109,11 +108,11 @@ try {
         <style>
             @font-face {
                 font-family: "HindSiliguri";
-                src: url("https://fonts.gstatic.com/s/hindsiliguri/v12/ijwb88v_idY79uO6f7902E396U2Z8V2n.ttf") format("truetype");
+                src: url("../assets/fonts/HindSiliguri-Regular.ttf") format("truetype");
             }
             @font-face {
                 font-family: "HindSiliguri-Bold";
-                src: url("https://fonts.gstatic.com/s/hindsiliguri/v12/ijwe88v_idY79uO6f7902E396V2W_W7i_H6i.ttf") format("truetype");
+                src: url("../assets/fonts/HindSiliguri-Bold.ttf") format("truetype");
                 font-weight: bold;
             }
             @font-face {
@@ -121,20 +120,20 @@ try {
                 src: url("https://raw.githubusercontent.com/at-shuvro/SolaimanLipi/master/SolaimanLipi.ttf") format("truetype");
             }
             @page { margin: 10mm; }
-            body { font-family: "SolaimanLipi", "HindSiliguri", "DejaVu Sans", sans-serif; color: #000; line-height: 1.3; font-size: 11pt; }
+            body { font-family: "SolaimanLipi", "HindSiliguri", "DejaVu Sans", sans-serif; color: #000; line-height: 1.3; font-size: 10pt; }
             
             /* Header Section */
-            .header { width: 100%; border-bottom: 1px solid #000; padding-bottom: 8px; margin-bottom: 15px; position: relative; }
+            .header { width: 100%; border-bottom: 1px solid #000; padding-bottom: 8px;  position: relative; }
             .doctor-info { float: left; width: 65%; }
-            .doctor-name { font-size: 18pt; font-weight: bold; margin: 0; text-transform: uppercase; font-family: "Times New Roman", "HindSiliguri", serif; }
-            .doctor-details { font-size: 10pt; margin: 1px 0; text-transform: uppercase; font-weight: bold; }
+            .doctor-name { font-size: 14pt; font-weight: bold; margin: 0; text-transform: uppercase; font-family: "HindSiliguri", "Times New Roman", serif; }
+            .doctor-details { font-size: 9pt; margin: 1px 0; text-transform: uppercase; font-weight: bold; }
             .logo-info { float: right; width: 30%; text-align: right; }
             .logo-info img { width: 140px; height: auto; }
-            .slogan { font-size: 9pt; color: #15558d; margin-top: 3px; font-weight: bold; }
+            .slogan { font-size: 8pt; color: #15558d; margin-top: 3px; font-weight: bold; }
             .clear { clear: both; }
 
             /* Patient Info Section */
-            .patient-info { width: 100%; border-bottom: 1px solid #000; padding: 12px 0; margin-bottom: 0px; font-size: 11pt; }
+            .patient-info { width: 100%; solid #000; padding: 12px 0; margin-bottom: 0px; font-size: 10pt; }
             .info-row { width: 100%; margin-bottom: 10px; }
             .info-item { display: inline-block; }
             .info-label { font-weight: bold; }
@@ -145,17 +144,17 @@ try {
             .sidebar { display: table-cell; width: 25%; border-right: 1px solid #000; vertical-align: top; padding-right: 15px; padding-top: 15px; }
             .main-rx { display: table-cell; width: 75%; vertical-align: top; padding-left: 25px; padding-top: 15px; }
             
-            .section-header { font-weight: bold; text-decoration: underline; margin-bottom: 10px; margin-top: 15px; font-size: 11pt; }
-            .section-content { font-size: 10pt; margin-bottom: 20px; min-height: 40px; }
+            .section-header { font-weight: bold; text-decoration: underline; padding-bottom: 5px; padding-top: 15px; font-size: 10pt; }
+            .section-content { font-size: 9pt; padding-bottom: 20px; }
             
-            .rx-symbol { font-size: 32pt; font-family: "Times New Roman", "HindSiliguri", serif; font-weight: bold; margin-bottom: 20px; }
-            .medication-item { margin-bottom: 15px; font-size: 12pt; }
+            .rx-symbol { font-size: 18pt; font-family: "Times New Roman", "HindSiliguri", serif; font-weight: bold; margin-bottom: 20px; }
+            .medication-item { margin-bottom: 15px; font-size: 11pt; }
             .med-name { font-weight: bold; }
-            .med-instruction { font-size: 10pt; font-style: italic; margin-left: 20px; margin-top: 3px; }
+            .med-instruction { font-size: 9pt; font-style: italic; margin-left: 20px; margin-top: 3px; }
 
             /* Footer Section */
-            .footer { position: fixed; bottom: 0; width: 100%; padding-bottom: 5mm; }
-            .footer-line { border-top: 1px solid #000; margin-bottom: 15px; }
+            .footer { position: fixed; bottom: 0; width: 100%; }
+            .footer-line {  margin-bottom: 15px; }
             .badges { width: 100%; text-align: center; margin-bottom: 15px; }
             .badge { 
                 display: inline-block; 
@@ -163,7 +162,7 @@ try {
                 color: #fff; 
                 padding: 5px 12px; 
                 border-radius: 4px; 
-                font-size: 10pt; 
+                font-size: 9pt; 
                 margin: 0 8px; 
                 font-weight: bold;
             }
@@ -172,9 +171,10 @@ try {
                 background: #f4f4f4; 
                 padding: 12px; 
                 text-align: center; 
-                font-size: 11pt;
+                font-size: 10pt;
+                margin-top: 18px;
             }
-            .address-title { font-weight: bold; font-size: 14pt; margin-bottom: 5px; }
+            .address-title { font-weight: bold; font-size: 12pt; margin-bottom: 5px; }
             .note-reference-box {
                 width: 100%;
                 margin: 10px 0 14px 0;
@@ -189,10 +189,10 @@ try {
                 font-weight: bold;
                 text-decoration: underline;
                 margin-bottom: 4px;
-                font-size: 10pt;
+                font-size: 9pt;
             }
             .note-reference-content {
-                font-size: 10pt;
+                font-size: 9pt;
                 line-height: 1.45;
             }
             
@@ -227,31 +227,36 @@ try {
             <div class="clear"></div>
         </div>
 
-        <div class="patient-info">
-            <div class="info-row">
-                <span class="info-label">Patient Name:</span>
-                <span class="info-value" style="width: 400px;">' . htmlspecialchars($appointment['patient_name']) . '</span>
-                <span class="info-label">Age:</span>
-                <span class="info-value" style="width: 60px;">' . htmlspecialchars($appointment['age'] ?: "—") . '</span>
-                <span class="info-label">Sex:</span>
-                <span class="info-value" style="width: 60px;">' . htmlspecialchars($appointment['gender'] ?: "M / F") . '</span>
-            </div>
-            <div class="info-row" style="margin-top: 15px;">
-                <span class="info-label">Date:</span>
-                <span class="info-value" style="width: 180px;">' . $prescription_date . '</span>
-                <span class="info-label" style="margin-left: 40px;">Weight:</span>
-                <span class="info-value" style="width: 100px;">' . htmlspecialchars($appointment['weight'] ?: "—") . '</span> <span class="info-label">kg</span>
-            </div>
+        <div class="patient-info" style="padding: 5px 0; margin-bottom: 0px; font-size: 10pt;">
+            <table width="100%" cellpadding="0" cellspacing="0" style="font-size: 10pt;">
+                <tr>
+                    <td width="40px"><b>Name:</b></td>
+                    <td style="padding:3px 0 3px 5px;">&nbsp;' . htmlspecialchars($appointment['patient_name']) . '</td>
+                    <td width="20px"></td>
+                    <td width="30px"><b>Age:</b></td>
+                    <td width="45px" style="text-align: center;">' . htmlspecialchars($appointment['age'] ?: "—") . '</td>
+                    <td width="20px"></td>
+                    <td width="30px"><b>Sex:</b></td>
+                    <td width="45px" style=" text-align: center;">' . htmlspecialchars($appointment['gender'] ?: "M / F") . '</td>
+                    <td width="20px"></td>
+                    <td width="25px"><b>Wt:</b></td>
+                    <td width="60px" style=" text-align: center;">' . htmlspecialchars($appointment['weight'] ?: "—") . ' kg</td>
+                    <td width="20px"></td>
+                    <td width="35px"><b>Date:</b></td>
+                    <td width="100px" style="text-align: center;">' . $prescription_date . '</td>
+                </tr>
+            </table>
         </div>
 
-        <div class="prescription-body">
-            <div class="sidebar">';
+        <table class="prescription-body" width="100%" cellpadding="0" cellspacing="0" style="border-top: 1px solid #000; margin-top: 0px; height: 750px;">
+            <tr>
+            <td class="sidebar" width="30%" valign="top" style="border-right: 1px solid #000; padding-right: 15px; padding-top: 15px;">';
 
                 $chief = isset($appointment['chief_complaints']) ? trim((string)$appointment['chief_complaints']) : '';
                 if ($chief !== '' && $chief !== '-') {
                     $html .= '
                 <div class="section-header">Chief Complaints:</div>
-                <div class="section-content">' . nl2br(htmlspecialchars($chief)) . '</div>';
+                <div class="section-content">' . nl2br(htmlspecialchars($chief)) . '<br><br></div>';
                 }
                 
                 $on_exam_content = '';
@@ -274,7 +279,7 @@ try {
                     $html .= '
                 <div class="section-header">On Examination:</div>
                 <div class="section-content">
-                    ' . $on_exam_content . '
+                    ' . $on_exam_content . '<br>
                 </div>';
                 }
 
@@ -282,20 +287,19 @@ try {
                 if ($diagnosis !== '' && $diagnosis !== '-') {
                     $html .= '
                 <div class="section-header">Diagnosis:</div>
-                <div class="section-content">' . nl2br(htmlspecialchars($diagnosis)) . '</div>';
+                <div class="section-content">' . nl2br(htmlspecialchars($diagnosis)) . '<br><br></div>';
                 }
                 
                 $advice = isset($appointment['advice']) ? trim((string)$appointment['advice']) : '';
                 if ($advice !== '' && $advice !== '-') {
                     $html .= '
                 <div class="section-header">Advice:</div>
-                <div class="section-content">' . nl2br(htmlspecialchars($advice)) . '</div>';
+                <div class="section-content">' . nl2br(htmlspecialchars($advice)) . '<br><br></div>';
                 }
-
             $html .= '
-            </div>
+            </td>
             
-            <div class="main-rx">
+            <td class="main-rx" width="70%" valign="top" style="padding-left: 25px; padding-top: 15px;">
                 <div class="rx-symbol">Rx,</div>
                 <div class="medications-list">';
                 
@@ -317,8 +321,9 @@ try {
 
     $html .= '
                 </div>
-            </div>
-        </div>
+            </td>
+            </tr>
+        </table>
 
         <div class="footer">
             <div class="footer-line"></div>';
@@ -338,35 +343,57 @@ try {
             <div class="disclaimer">
                 This is a computer-generated prescription. No signature is required. | TeleRx Bangladesh<br>
                 www.telerxbd.com | Emergency Call: 01335053237
-            </div>' . '
+            </div>
 
         </div>
     </body>
     </html>';
 
-    debug_log("HTML content built. Initializing Dompdf...");
+    if (isset($_GET['preview']) && $_GET['preview'] == 'html') {
+        echo $html;
+        exit;
+    }
 
-    // 7. Initialize Dompdf
-    $options = new Options();
-    $options->set('isHtml5ParserEnabled', true);
-    $options->set('isRemoteEnabled', true);
-    $options->set('defaultFont', 'DejaVu Sans');
-    $options->set('isFontSubsettingEnabled', true);
+    debug_log("HTML content built. Initializing mPDF...");
+
+    // 7. Initialize mPDF with Custom Font Configuration
+    $defaultConfig = (new \Mpdf\Config\ConfigVariables())->getDefaults();
+    $fontDirs = $defaultConfig['fontDir'];
+
+    $defaultFontConfig = (new \Mpdf\Config\FontVariables())->getDefaults();
+    $fontData = $defaultFontConfig['fontdata'];
+
+    $mpdf = new \Mpdf\Mpdf([
+        'mode' => 'utf-8',
+        'format' => 'A4',
+        'fontDir' => array_merge($fontDirs, [
+            __DIR__ . '/../assets/fonts',
+        ]),
+        'fontdata' => $fontData + [
+            'hindsiliguri' => [
+                'R' => 'HindSiliguri-Regular.ttf',
+                'B' => 'HindSiliguri-Bold.ttf',
+                'I' => 'HindSiliguri-Medium.ttf',
+                'useOTL' => 0xFF,
+                'useKashida' => 75,
+            ]
+        ],
+        'default_font' => 'hindsiliguri',
+        'autoScriptToLang' => true,
+        'autoLangToFont' => true,
+        'tempDir' => __DIR__ . '/../assets/prescriptions'
+    ]);
     
-    debug_log("Loading HTML into Dompdf...");
-    $dompdf = new Dompdf($options);
-    $dompdf->loadHtml($html, 'UTF-8');
+    $mpdf->autoScriptToLang = true;
+    $mpdf->autoLangToFont = true;
+
+    debug_log("Loading HTML into mPDF...");
+    $mpdf->WriteHTML($html);
     
-    // Set paper size
-    $dompdf->setPaper('A4', 'portrait');
-    
-    debug_log("Rendering PDF...");
-    // Render the PDF
-    $dompdf->render();
     debug_log("PDF rendered successfully.");
     
     $filename = 'prescription_' . $appointment_id . '_' . time() . '.pdf';
-    $output = $dompdf->output();
+    $output = $mpdf->Output('', 'S'); // Return PDF as string
     $filepath = 'assets/prescriptions/' . $filename;
     
     // Ensure directory exists
@@ -396,7 +423,7 @@ try {
 
     // Stream to browser
     debug_log("Streaming PDF to browser...");
-    $dompdf->stream($filename, ["Attachment" => false]);
+    $mpdf->Output($filename, 'I'); // 'I' for inline display
 
     $conn->close();
     debug_log("=== PRESCRIPTION GENERATION COMPLETED ===");
