@@ -8,6 +8,7 @@
 // Start output buffering to catch any accidental output (e.g. from config or whitespace)
 ob_start();
 
+
 // Turn off error display to prevent warnings from breaking JSON
 ini_set('display_errors', 0);
 error_reporting(E_ALL & ~E_WARNING & ~E_NOTICE);

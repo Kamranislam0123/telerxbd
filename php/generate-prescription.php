@@ -12,7 +12,7 @@ error_reporting(E_ALL);
 require_once __DIR__ . '/../vendor/autoload.php';
 require_once __DIR__ . '/config.php';
 
-// Using mPDF for PDF generation
+// Using Dompdf for PDF generation
 
 function debug_log($message) {
     $dir = __DIR__ . '/../assets/prescriptions/';
@@ -354,48 +354,34 @@ try {
         exit;
     }
 
-    debug_log("HTML content built. Initializing mPDF...");
+    debug_log("HTML content built. Initializing Dompdf...");
 
-    // 7. Initialize mPDF with Custom Font Configuration
-    $defaultConfig = (new \Mpdf\Config\ConfigVariables())->getDefaults();
-    $fontDirs = $defaultConfig['fontDir'];
+    if (!class_exists(\Dompdf\Dompdf::class)) {
+        debug_log("Error: Dompdf class not found.");
+        die("Dompdf is not installed. Please install dompdf/dompdf via composer.");
+    }
 
-    $defaultFontConfig = (new \Mpdf\Config\FontVariables())->getDefaults();
-    $fontData = $defaultFontConfig['fontdata'];
+    $options = new \Dompdf\Options();
+    $options->set('isRemoteEnabled', true);
+    $options->set('isHtml5ParserEnabled', true);
+    $options->set('isFontSubsettingEnabled', true);
+    $options->set('fontDir', __DIR__ . '/../assets/fonts');
+    $options->set('fontCache', __DIR__ . '/../assets/prescriptions');
+    $options->set('tempDir', __DIR__ . '/../assets/prescriptions');
 
-    $mpdf = new \Mpdf\Mpdf([
-        'mode' => 'utf-8',
-        'format' => 'A4',
-        'fontDir' => array_merge($fontDirs, [
-            __DIR__ . '/../assets/fonts',
-        ]),
-        'fontdata' => $fontData + [
-            'hindsiliguri' => [
-                'R' => 'HindSiliguri-Regular.ttf',
-                'B' => 'HindSiliguri-Bold.ttf',
-                'I' => 'HindSiliguri-Medium.ttf',
-                'useOTL' => 0xFF,
-                'useKashida' => 75,
-            ]
-        ],
-        'default_font' => 'hindsiliguri',
-        'autoScriptToLang' => true,
-        'autoLangToFont' => true,
-        'tempDir' => __DIR__ . '/../assets/prescriptions'
-    ]);
-    
-    $mpdf->autoScriptToLang = true;
-    $mpdf->autoLangToFont = true;
+    $dompdf = new \Dompdf\Dompdf($options);
+    $dompdf->setBasePath(__DIR__ . '/');
+    $dompdf->loadHtml($html, 'UTF-8');
+    $dompdf->setPaper('A4', 'portrait');
 
-    debug_log("Loading HTML into mPDF...");
-    $mpdf->WriteHTML($html);
-    
+    debug_log("Rendering PDF with Dompdf...");
+    $dompdf->render();
     debug_log("PDF rendered successfully.");
-    
+
     $filename = 'prescription_' . $appointment_id . '_' . time() . '.pdf';
-    $output = $mpdf->Output('', 'S'); // Return PDF as string
+    $output = $dompdf->output();
     $filepath = 'assets/prescriptions/' . $filename;
-    
+
     // Ensure directory exists
     $save_dir = __DIR__ . '/../assets/prescriptions/';
     if (!is_dir($save_dir)) {
@@ -409,11 +395,11 @@ try {
         die("Error: Directory $save_dir is not writable. Please set permissions to 777.");
     }
     $save_path = $save_dir . $filename;
-    
+
     debug_log("Saving PDF to $save_path...");
     // Save to server
     file_put_contents($save_path, $output);
-    
+
     debug_log("Updating database with prescription path...");
     // Update DB with path
     $update_stmt = $conn->prepare("UPDATE appointments SET prescription_path = ? WHERE id = ?");
@@ -423,7 +409,9 @@ try {
 
     // Stream to browser
     debug_log("Streaming PDF to browser...");
-    $mpdf->Output($filename, 'I'); // 'I' for inline display
+    header('Content-Type: application/pdf');
+    header('Content-Disposition: inline; filename="' . $filename . '"');
+    echo $output;
 
     $conn->close();
     debug_log("=== PRESCRIPTION GENERATION COMPLETED ===");
