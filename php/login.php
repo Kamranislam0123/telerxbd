@@ -163,14 +163,14 @@ try {
             $stmt = null;
             if ($is_email) {
                 // Login with email
-                $stmt = $conn->prepare("SELECT id, name, email, password FROM patients WHERE email = ?");
+                $stmt = $conn->prepare("SELECT id, name, email, password, requires_password_change FROM patients WHERE email = ?");
                 $stmt->bind_param("s", $email_or_mobile);
             } elseif ($is_mobile) {
                 // Login with mobile - check if phone column exists
                 $mobile_clean = preg_replace('/[^0-9]/', '', $email_or_mobile);
                 // Try with phone column first, fallback to email if phone doesn't exist
                 try {
-                    $stmt = $conn->prepare("SELECT id, name, email, password FROM patients WHERE phone = ? OR phone LIKE ?");
+                    $stmt = $conn->prepare("SELECT id, name, email, password, requires_password_change FROM patients WHERE phone = ? OR phone LIKE ?");
                     $mobile_pattern = '%' . $mobile_clean . '%';
                     $stmt->bind_param("ss", $mobile_clean, $mobile_pattern);
                 } catch (Exception $e) {
@@ -268,7 +268,11 @@ try {
             $_SESSION['patient_id'] = $user_data['id'];
             $_SESSION['patient_name'] = $user_data['name'];
             $_SESSION['patient_email'] = $user_data['email'];
-            $redirect_url = 'patient-dashboard.php';
+            if (isset($user_data['requires_password_change']) && $user_data['requires_password_change'] == 1) {
+                $redirect_url = 'change-patient-password.php';
+            } else {
+                $redirect_url = 'patient-dashboard.php';
+            }
             break;
     }
     

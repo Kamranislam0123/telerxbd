@@ -484,5 +484,118 @@ try {
     });
 })();
 </script>
+<!-- 24/7 Emergency Floating Popup -->
+<div class="emergency-popup-container" id="emergencyPopup">
+    <div class="emergency-popup-content">
+        <div class="emergency-icon-wrap">
+            <i class="fa-solid fa-truck-medical pulse-animation"></i>
+        </div>
+        <div class="emergency-text">
+            <h4>24/7 Emergency Care</h4>
+            <p>Get immediate consultation with an available doctor now.</p>
+        </div>
+        <a href="emergency-booking.php" class="btn btn-danger emergency-btn">Book Now</a>
+        <button class="emergency-close-btn" onclick="document.getElementById('emergencyPopup').style.display='none'"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+</div>
+
+<style>
+.emergency-popup-container {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    z-index: 9999;
+    animation: slideUp 0.5s ease-out;
+}
+.emergency-popup-content {
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 10px 30px rgba(220,53,69,0.2);
+    padding: 20px;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    border-left: 5px solid #dc3545;
+    position: relative;
+    max-width: 450px;
+}
+.emergency-icon-wrap {
+    background: #dc3545;
+    color: white;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    flex-shrink: 0;
+}
+.pulse-animation {
+    animation: pulse 2s infinite;
+}
+.emergency-text {
+    flex-grow: 1;
+}
+.emergency-text h4 {
+    margin: 0 0 5px;
+    font-size: 16px;
+    font-weight: 700;
+    color: #dc3545;
+}
+.emergency-text p {
+    margin: 0;
+    font-size: 13px;
+    color: #6c757d;
+    line-height: 1.4;
+}
+.emergency-btn {
+    white-space: nowrap;
+    padding: 8px 15px;
+    font-weight: 600;
+    border-radius: 6px;
+}
+.emergency-close-btn {
+    position: absolute;
+    top: -10px;
+    right: -10px;
+    background: #fff;
+    border: 1px solid #eee;
+    color: #666;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+@keyframes slideUp {
+    from { transform: translateY(100px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+}
+@keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+    100% { transform: scale(1); }
+}
+@media (max-width: 768px) {
+    .emergency-popup-container {
+        bottom: 20px;
+        right: 15px;
+        left: 15px;
+    }
+    .emergency-popup-content {
+        max-width: 100%;
+        flex-direction: column;
+        text-align: center;
+        padding: 25px 20px 20px;
+    }
+    .emergency-btn {
+        width: 100%;
+    }
+}
+</style>
 
 <?php include 'footer.php'; ?>
