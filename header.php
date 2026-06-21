@@ -177,7 +177,12 @@ $current_page = basename($_SERVER['PHP_SELF']);
                 </div>
 
                 <!-- Right side navigation -->
-                <ul class="nav header-navbar-rht">
+                <ul class="nav header-navbar-rht align-items-center">
+                    <li class="nav-item me-3 d-none d-sm-block">
+                        <a href="emergency-booking.php" class="btn btn-danger text-white d-flex align-items-center" style="font-weight: 600; padding: 8px 16px; border-radius: 6px; box-shadow: 0 4px 6px rgba(220,53,69,0.3); animation: pulse-red 2s infinite;">
+                            <i class="fa-solid fa-truck-medical me-2"></i> Emergency
+                        </a>
+                    </li>
                     <?php if(isset($_SESSION['logged_in']) && $_SESSION['logged_in'] === true): ?>
                         <!-- Logged in user menu -->
                         <?php if(isset($_SESSION['user_type']) && $_SESSION['user_type'] == 'doctor'): ?>
