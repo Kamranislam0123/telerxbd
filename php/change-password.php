@@ -111,7 +111,7 @@ try {
     $upd    = $conn->prepare("UPDATE `$table` SET password = ? WHERE id = ?");
     $upd->bind_param('si', $hashed, $user_id);
 
-    if ($upd->execute() && $upd->affected_rows > 0) {
+    if ($upd->execute()) {
         // Clear requires_password_change flag for patients
         if ($user_type === 'patient') {
             try {
