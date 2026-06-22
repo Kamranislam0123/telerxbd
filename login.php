@@ -2,13 +2,7 @@
 // Use config so session cookie path is '/' and works for dashboard after login
 require_once __DIR__ . '/php/config.php';
 // Full same-origin URL for login AJAX (avoids status 0 / CORS / mixed content issues on live)
-$is_https = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off')
-    || (!empty($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] === 'https')
-    || (!empty($_SERVER['HTTP_X_FORWARDED_SSL']) && (strtolower($_SERVER['HTTP_X_FORWARDED_SSL'] ?? '') === 'on' || $_SERVER['HTTP_X_FORWARDED_SSL'] === '1'));
-$login_host = $_SERVER['HTTP_HOST'] ?? $_SERVER['SERVER_NAME'] ?? 'localhost';
-$login_base = rtrim(dirname($_SERVER['SCRIPT_NAME'] ?? ''), '/');
-$login_path = ($login_base === '' || $login_base === '/') ? '' : $login_base;
-$login_ajax_url = ($is_https ? 'https://' : 'http://') . $login_host . $login_path . '/php/login.php';
+$login_ajax_url = (defined('APP_BASE') ? APP_BASE : '') . '/php/login.php';
 include 'header.php';?>
 
 <head>

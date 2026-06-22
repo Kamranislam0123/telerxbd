@@ -26,14 +26,9 @@ if (($_SESSION['user_type'] ?? '') === 'patient' && !empty($_SESSION['patient_id
     }
 }
 
-// Build AJAX URL
-$is_https = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off')
-    || (!empty($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] === 'https')
-    || (!empty($_SERVER['HTTP_X_FORWARDED_SSL']) && (strtolower($_SERVER['HTTP_X_FORWARDED_SSL'] ?? '') === 'on' || $_SERVER['HTTP_X_FORWARDED_SSL'] === '1'));
-$rp_host  = $_SERVER['HTTP_HOST'] ?? $_SERVER['SERVER_NAME'] ?? 'localhost';
-$rp_base  = rtrim(dirname($_SERVER['SCRIPT_NAME'] ?? ''), '/');
-$rp_path  = ($rp_base === '' || $rp_base === '/') ? '' : $rp_base;
-$ajax_url = ($is_https ? 'https://' : 'http://') . $rp_host . $rp_path . '/php/change-password.php';
+// Build AJAX URL. Use APP_BASE when available or a root-relative path to avoid hostname/scheme mismatches
+// (absolute host-based URLs can cause session cookies to be omitted on some live setups).
+$ajax_url = (defined('APP_BASE') ? APP_BASE : '') . '/php/change-password.php';
 
 // Determine where to redirect after success (back to dashboard)
 $user_type = $_SESSION['user_type'] ?? '';
