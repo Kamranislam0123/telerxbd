@@ -32,13 +32,13 @@ $ajax_url = (defined('APP_BASE') ? APP_BASE : '') . '/php/change-password.php';
 
 // Determine where to redirect after success (back to dashboard)
 $user_type = $_SESSION['user_type'] ?? '';
-$redirect_after = match($user_type) {
+$redirect_map = [
     'doctor'      => 'doctor-profile-settings.php',
     'healthcare'  => 'health-worker-profile-settings.php',
     'special_tid' => 'health-worker-dashboard.php',
     'patient'     => 'patient-profile-settings.php',
-    default       => 'login.php',
-};
+];
+$redirect_after = isset($redirect_map[$user_type]) ? $redirect_map[$user_type] : 'login.php';
 
 include 'header.php';
 ?>
