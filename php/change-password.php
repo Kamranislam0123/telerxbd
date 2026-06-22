@@ -112,6 +112,17 @@ try {
     $upd->bind_param('si', $hashed, $user_id);
 
     if ($upd->execute() && $upd->affected_rows > 0) {
+        // Clear requires_password_change flag for patients
+        if ($user_type === 'patient') {
+            try {
+                $clear = $conn->prepare("UPDATE patients SET requires_password_change = 0 WHERE id = ?");
+                $clear->bind_param('i', $user_id);
+                $clear->execute();
+                $clear->close();
+            } catch (Exception $e) {
+                // Column may not exist, ignore
+            }
+        }
         ob_clean();
         echo json_encode(['success' => true, 'message' => 'Password changed successfully!']);
     } else {

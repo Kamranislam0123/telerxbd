@@ -268,11 +268,7 @@ try {
             $_SESSION['patient_id'] = $user_data['id'];
             $_SESSION['patient_name'] = $user_data['name'];
             $_SESSION['patient_email'] = $user_data['email'];
-            if (isset($user_data['requires_password_change']) && $user_data['requires_password_change'] == 1) {
-                $redirect_url = 'change-patient-password.php';
-            } else {
-                $redirect_url = 'patient-dashboard.php';
-            }
+            $redirect_url = 'patient-dashboard.php';
             break;
     }
     
