@@ -7,6 +7,25 @@ if (empty($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true) {
     exit;
 }
 
+// Check if this is an emergency patient who needs to set their password
+$is_emergency_patient = false;
+if (($_SESSION['user_type'] ?? '') === 'patient' && !empty($_SESSION['patient_id'])) {
+    try {
+        $conn_check = getDBConnection();
+        $chk = $conn_check->prepare("SELECT requires_password_change FROM patients WHERE id = ? LIMIT 1");
+        $chk->bind_param('i', $_SESSION['patient_id']);
+        $chk->execute();
+        $chk_res = $chk->get_result();
+        if ($chk_res && $row = $chk_res->fetch_assoc()) {
+            $is_emergency_patient = ((int)$row['requires_password_change'] === 1);
+        }
+        $chk->close();
+        $conn_check->close();
+    } catch (Exception $e) {
+        // ignore
+    }
+}
+
 // Build AJAX URL
 $is_https = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off')
     || (!empty($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] === 'https')
@@ -61,7 +80,12 @@ include 'header.php';
 
                             <div class="login-header">
                                 <h3>Change <span>Password</span></h3>
+                                <?php if ($is_emergency_patient): ?>
+                                <p class="text-muted small mt-2">Welcome! Please set a new password for your account. Your default password is <strong>123456</strong>.</p>
+                                <div class="alert alert-info small"><i class="fa-solid fa-circle-info me-1"></i> You were auto-registered via Emergency Booking. Please set a secure password to protect your account.</div>
+                                <?php else: ?>
                                 <p class="text-muted small mt-2">Enter your current password, then set a new one.</p>
+                                <?php endif; ?>
                             </div>
 
                             <!-- Alert message -->
@@ -172,6 +196,12 @@ include 'header.php';
 <script>
 $(document).ready(function () {
     var redirectAfter = <?php echo json_encode($redirect_after); ?>;
+    var isEmergencyPatient = <?php echo json_encode($is_emergency_patient); ?>;
+
+    // Auto-fill default password for emergency patients
+    if (isEmergencyPatient) {
+        $('#rp-current').val('123456').closest('.mb-3').hide();
+    }
 
     $('#reset-password-form').on('submit', function (e) {
         e.preventDefault();
