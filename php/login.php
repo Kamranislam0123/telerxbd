@@ -8,6 +8,7 @@
 // Start output buffering to catch any accidental output (e.g. from config or whitespace)
 ob_start();
 
+
 // Turn off error display to prevent warnings from breaking JSON
 ini_set('display_errors', 0);
 error_reporting(E_ALL & ~E_WARNING & ~E_NOTICE);
@@ -162,14 +163,14 @@ try {
             $stmt = null;
             if ($is_email) {
                 // Login with email
-                $stmt = $conn->prepare("SELECT id, name, email, password FROM patients WHERE email = ?");
+                $stmt = $conn->prepare("SELECT id, name, email, password, requires_password_change FROM patients WHERE email = ?");
                 $stmt->bind_param("s", $email_or_mobile);
             } elseif ($is_mobile) {
                 // Login with mobile - check if phone column exists
                 $mobile_clean = preg_replace('/[^0-9]/', '', $email_or_mobile);
                 // Try with phone column first, fallback to email if phone doesn't exist
                 try {
-                    $stmt = $conn->prepare("SELECT id, name, email, password FROM patients WHERE phone = ? OR phone LIKE ?");
+                    $stmt = $conn->prepare("SELECT id, name, email, password, requires_password_change FROM patients WHERE phone = ? OR phone LIKE ?");
                     $mobile_pattern = '%' . $mobile_clean . '%';
                     $stmt->bind_param("ss", $mobile_clean, $mobile_pattern);
                 } catch (Exception $e) {

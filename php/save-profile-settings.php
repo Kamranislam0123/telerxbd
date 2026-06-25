@@ -45,6 +45,11 @@ try {
             $phone = isset($_POST['phone']) ? trim($_POST['phone']) : '';
             $gender = isset($_POST['gender']) ? $_POST['gender'] : '';
             $consultation_fee = isset($_POST['consultation_fee']) ? (float)$_POST['consultation_fee'] : 0;
+            if ($consultation_fee > 500) {
+                ob_clean();
+                echo json_encode(['success' => false, 'message' => 'Consultation fee cannot exceed 500 taka']);
+                exit;
+            }
             $account_number = isset($_POST['account_number']) ? trim($_POST['account_number']) : '';
             $degrees = isset($_POST['degrees']) ? trim($_POST['degrees']) : '';
             $currently_working = isset($_POST['currently_working']) ? trim($_POST['currently_working']) : '';
@@ -273,6 +278,11 @@ try {
             $bio = isset($_POST['bio']) ? trim($_POST['bio']) : '';
             $languages = isset($_POST['languages']) ? trim($_POST['languages']) : '';
             $consultation_fee = isset($_POST['consultation_fee']) ? (float)$_POST['consultation_fee'] : 0;
+            if ($consultation_fee > 500) {
+                ob_clean();
+                echo json_encode(['success' => false, 'message' => 'Consultation fee cannot exceed 500 taka']);
+                exit;
+            }
 
             // Handle profile image upload
             $profile_image = '';
@@ -480,6 +490,11 @@ try {
             $email = isset($_POST['email']) ? trim($_POST['email']) : '';
             $website = isset($_POST['website']) ? trim($_POST['website']) : '';
             $consultation_fee = isset($_POST['consultation_fee']) ? (float)$_POST['consultation_fee'] : 0;
+            if ($consultation_fee > 500) {
+                ob_clean();
+                echo json_encode(['success' => false, 'message' => 'Consultation fee cannot exceed 500 taka']);
+                exit;
+            }
 
             // Handle clinic logo upload
             $clinic_logo = '';

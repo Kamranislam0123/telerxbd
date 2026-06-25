@@ -2466,7 +2466,7 @@ Version      : 1.3
 	if ($('.toggle-password').length > 0) {
 		$(document).on('click', '.toggle-password', function () {
 			$(this).toggleClass("feather-eye");
-			var input = $(".pass-input");
+			var input = $(this).closest('.pass-group').find('input');
 			if (input.attr("type") == "password") {
 				input.attr("type", "text");
 			} else {
@@ -2478,7 +2478,7 @@ Version      : 1.3
 	if ($('.toggle-password-sub').length > 0) {
 		$(document).on('click', '.toggle-password-sub', function () {
 			$(this).toggleClass("feather-eye");
-			var input = $(".pass-input-sub");
+			var input = $(this).closest('.pass-group').find('input');
 			if (input.attr("type") == "password") {
 				input.attr("type", "text");
 			} else {

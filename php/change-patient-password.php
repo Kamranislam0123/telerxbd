@@ -85,7 +85,7 @@ try {
     $hashed_password = password_hash($new_password, PASSWORD_DEFAULT);
 
     // Update password
-    $stmt = $conn->prepare("UPDATE patients SET password = ? WHERE id = ?");
+    $stmt = $conn->prepare("UPDATE patients SET password = ?, requires_password_change = 0 WHERE id = ?");
     $stmt->bind_param("si", $hashed_password, $patient_id);
 
     if ($stmt->execute()) {

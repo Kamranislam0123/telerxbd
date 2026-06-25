@@ -621,7 +621,7 @@ if ($appointment_id) {
 								<div class="col-md-6">
 									<div class="form-group mb-3">
 										<label class="form-label">Chief Complaints</label>
-										<textarea class="form-control" name="chief_complaints" rows="3" placeholder="Symptoms, duration..."><?php echo htmlspecialchars($appointment['notes'] ?? ''); ?></textarea>
+										<textarea class="form-control" name="chief_complaints" rows="3" placeholder="Symptoms, duration..."><?php echo htmlspecialchars($appointment['chief_complaints'] ?? $appointment['notes'] ?? ''); ?></textarea>
 									</div>
 									<div id="prescription_message_area" class="mt-2"></div>
 								</div>
@@ -629,13 +629,13 @@ if ($appointment_id) {
 								<div class="col-md-6">
 									<div class="form-group mb-3">
 										<label class="form-label">On Examination</label>
-										<textarea class="form-control" name="on_examination" rows="3" placeholder="Vitals, physical findings..."></textarea>
+										<textarea class="form-control" name="on_examination" rows="3" placeholder="Vitals, physical findings..."><?php echo htmlspecialchars($appointment['on_examination'] ?? ''); ?></textarea>
 									</div>
 								</div>
 								<div class="col-md-12">
 									<div class="form-group mb-4">
 										<label class="form-label">Diagnosis</label>
-										<input type="text" class="form-control" name="diagnosis" placeholder="Primary diagnosis">
+										<input type="text" class="form-control" name="diagnosis" placeholder="Primary diagnosis" value="<?php echo htmlspecialchars($appointment['diagnosis'] ?? ''); ?>">
 									</div>
 								</div>
 							</div>
@@ -643,40 +643,50 @@ if ($appointment_id) {
 							<hr>
 							<h6 class="mb-3">Medications (Rx)</h6>
 							<div id="medicine_list">
-								<!-- Medicine Row -->
+								<?php 
+								$medications = [];
+								if (!empty($appointment['medications'])) {
+									$medications = json_decode($appointment['medications'], true) ?: [];
+								}
+								if (empty($medications)) {
+									$medications = [['name' => '', 'dose' => '', 'duration' => '']];
+								}
+								foreach ($medications as $index => $med): 
+								?>
 								<div class="medicine-row mt-2">
 									<div class="row g-2">
 										<div class="col-md-5">
-											<input type="text" class="form-control" name="medicine_name[]" placeholder="Medicine name" required>
+											<input type="text" class="form-control" name="medicine_name[]" placeholder="Medicine name" value="<?php echo htmlspecialchars($med['name'] ?? ''); ?>" required>
 										</div>
 										<div class="col-md-3">
-											<input type="text" class="form-control" name="medicine_dose[]" placeholder="Dose (e.g. 1+0+1)">
+											<input type="text" class="form-control" name="medicine_dose[]" placeholder="Dose (e.g. 1+0+1)" value="<?php echo htmlspecialchars($med['dose'] ?? ''); ?>">
 										</div>
 										<div class="col-md-3">
-											<input type="text" class="form-control" name="medicine_duration[]" placeholder="Duration (e.g. 7 days)">
+											<input type="text" class="form-control" name="medicine_duration[]" placeholder="Duration (e.g. 7 days)" value="<?php echo htmlspecialchars($med['duration'] ?? ''); ?>">
 										</div>
 										<div class="col-md-1">
-											<button type="button" class="btn btn-link btn-remove-medicine" style="display:none;"><i class="fa-solid fa-trash"></i></button>
+											<button type="button" class="btn btn-link btn-remove-medicine" style="<?php echo count($medications) === 1 ? 'display:none;' : ''; ?>"><i class="fa-solid fa-trash"></i></button>
 										</div>
 									</div>
 								</div>
+								<?php endforeach; ?>
 							</div>
 							<button type="button" class="btn btn-sm btn-outline-info mt-2" id="btn_add_medicine"><i class="fa-solid fa-plus me-1"></i>Add Medicine</button>
 
 							<hr class="mt-4">
 							<div class="form-group mb-3">
 								<label class="form-label">Advice / Instructions</label>
-								<textarea class="form-control" name="advice" rows="3" placeholder="Diet, rest, follow-up..."></textarea>
+								<textarea class="form-control" name="advice" rows="3" placeholder="Diet, rest, follow-up..."><?php echo htmlspecialchars($appointment['advice'] ?? ''); ?></textarea>
 							</div>
 
 							<div class="form-group mb-3">
 								<label class="form-label">Note / Reference</label>
-								<textarea class="form-control" name="note_reference" rows="2" placeholder="Additional note or reference..."></textarea>
+								<textarea class="form-control" name="note_reference" rows="2" placeholder="Additional note or reference..."><?php echo htmlspecialchars($appointment['note_reference'] ?? ''); ?></textarea>
 							</div>
 
 							<div class="form-group mb-4">
 								<label class="form-label">Prescription Footer (Optional)</label>
-								<textarea class="form-control" name="prescription_footer" rows="2" placeholder="e.g. Free Medical Camp address..."></textarea>
+								<textarea class="form-control" name="prescription_footer" rows="2" placeholder="e.g. Free Medical Camp address..."><?php echo htmlspecialchars($appointment['prescription_footer'] ?? ''); ?></textarea>
 							</div>
 
 
@@ -892,6 +902,18 @@ if ($appointment_id) {
 
 					$("#join-btn-container").hide();
 					$("#video-toggle, #audio-toggle, #leave-btn, #view-details-btn").show();
+
+					// If the user is a doctor or health provider, notify the database that the call has started
+					<?php if (in_array($_SESSION['user_type'], ['doctor', 'healthcare', 'special_tid'])): ?>
+					try {
+						await $.post('php/handle-call-status.php', {
+							appointment_id: "<?php echo (int) $appointment_id; ?>",
+							action: 'start_call'
+						});
+					} catch (err) {
+						console.error("Failed to notify call start to server:", err);
+					}
+					<?php endif; ?>
 				} catch (err) {
 					console.error("Join call failed:", err);
 					alert("Failed to join call. Please check your camera/microphone permissions.");
@@ -899,6 +921,18 @@ if ($appointment_id) {
 			};
 
 			const leaveCall = async () => {
+				// Clear the calling status on the backend
+				<?php if (in_array($_SESSION['user_type'], ['doctor', 'healthcare', 'special_tid'])): ?>
+				try {
+					await $.post('php/handle-call-status.php', {
+						appointment_id: "<?php echo (int) $appointment_id; ?>",
+						action: 'end_call'
+					});
+				} catch (err) {
+					console.error("Failed to notify call end to server:", err);
+				}
+				<?php endif; ?>
+
 				for (let trackName in localTracks) {
 					let track = localTracks[trackName];
 					if (track) {
@@ -945,22 +979,31 @@ if ($appointment_id) {
 			$("#join-btn").click(joinCall);
 			$("#leave-btn").click(leaveCall);
 
-			let isVideoMuted = false;
-			$("#video-toggle").click(function () {
-				if (!isVideoMuted) {
-					localTracks.videoTrack.setEnabled(false);
-					isVideoMuted = true;
-					$(this).find('i').removeClass('isax-video').addClass('isax-video-slash');
-					$(this).attr('title', 'Enable Video');
-				} else {
-					localTracks.videoTrack.setEnabled(true);
-					isVideoMuted = false;
-					$(this).find('i').removeClass('isax-video-slash').addClass('isax-video');
-					$(this).attr('title', 'Disable Video');
-				}
-			});
+            <?php if (in_array($_SESSION['user_type'], ['patient', 'healthcare', 'special_tid']) && !empty($appointment['call_status']) && $appointment['call_status'] === 'in_progress'): ?>
+            // Automatically join the video when a receiver answers an incoming call.
+            setTimeout(function() {
+                if ($('#join-btn').is(':visible')) {
+                    joinCall();
+                }
+            }, 500);
+            <?php endif; ?>
 
-			let isAudioMuted = false;
+            let isVideoMuted = false;
+            $("#video-toggle").click(function () {
+                if (!isVideoMuted) {
+                    localTracks.videoTrack.setEnabled(false);
+                    isVideoMuted = true;
+                    $(this).find('i').removeClass('isax-video').addClass('isax-video-slash');
+                    $(this).attr('title', 'Enable Video');
+                } else {
+                    localTracks.videoTrack.setEnabled(true);
+                    isVideoMuted = false;
+                    $(this).find('i').removeClass('isax-video-slash').addClass('isax-video');
+                    $(this).attr('title', 'Disable Video');
+                }
+            });
+
+            let isAudioMuted = false;
 			$("#audio-toggle").click(function () {
 				if (!isAudioMuted) {
 					localTracks.audioTrack.setEnabled(false);
@@ -1064,6 +1107,16 @@ if ($appointment_id) {
 			$(document).on('click', '.btn-remove-medicine', function () {
 				$(this).closest('.medicine-row').remove();
 			});
+
+			// If the provider closes the window/tab or navigates away, clear the call status
+			<?php if (in_array($_SESSION['user_type'], ['doctor', 'healthcare', 'special_tid'])): ?>
+			$(window).on('beforeunload', function() {
+				const formData = new FormData();
+				formData.append('appointment_id', '<?php echo (int)$appointment_id; ?>');
+				formData.append('action', 'end_call');
+				navigator.sendBeacon('php/handle-call-status.php', formData);
+			});
+			<?php endif; ?>
 		});
 	</script>
 	<script src="assets/js/script.js"></script>

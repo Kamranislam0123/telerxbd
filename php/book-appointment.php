@@ -59,7 +59,7 @@ $mobile = $mobile_clean;
 $patient_id = isset($_SESSION['patient_id']) ? (int) $_SESSION['patient_id'] : 0;
 $booked_by_special_tid_id = (isset($_SESSION['user_type']) && $_SESSION['user_type'] === 'special_tid' && isset($_SESSION['special_tid_id']))
     ? (int) $_SESSION['special_tid_id']
-    : 0;
+    : null;
 $notes = isset($_POST['notes']) ? trim($_POST['notes']) : '';
 $age = isset($_POST['age']) ? trim($_POST['age']) : '';
 $weight = isset($_POST['weight']) ? trim($_POST['weight']) : '';
@@ -491,12 +491,21 @@ try {
             $attachment_path
         );
     }
+    if (!$ins) {
+        $conn->rollback();
+        $msg = "Prepare failed: " . $conn->error;
+        error_log($msg);
+        echo json_encode(['success' => false, 'message' => $msg]);
+        exit;
+    }
+
     if (!$ins->execute()) {
+        $msg = "Execute failed: " . $ins->error . " (Conn Error: " . $conn->error . ")";
         $conn->rollback();
         $ins->close();
         $conn->close();
-        error_log('book-appointment insert: ' . $conn->error);
-        echo json_encode(['success' => false, 'message' => 'Failed to save booking.']);
+        error_log('book-appointment insert error: ' . $msg);
+        echo json_encode(['success' => false, 'message' => $msg]);
         exit;
     }
     $appointment_id = $conn->insert_id;

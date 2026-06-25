@@ -111,8 +111,8 @@ if (!empty($speciality_display)) {
                     <small class="unread-msg">7</small>
                 </a>
             </li> -->
-            <li class="active">
-                <a href="doctor-profile-settings">
+            <li class="<?php echo (basename($_SERVER['PHP_SELF']) == 'doctor-profile-settings.php') ? 'active' : ''; ?>">
+                <a href="<?php echo (defined('APP_BASE') && APP_BASE) ? APP_BASE . '/doctor-profile-settings' : 'doctor-profile-settings'; ?>">
                     <i class="isax isax-setting-2"></i>
                     <span>Profile Settings</span>
                 </a>
@@ -123,12 +123,12 @@ if (!empty($speciality_display)) {
                     <span>Social Media</span>
                 </a>
             </li> -->
-            <!-- <li>
-                <a href="doctor-change-password.html">
+            <li class="<?php echo (basename($_SERVER['PHP_SELF']) == 'change-password.php') ? 'active' : ''; ?>">
+                <a href="<?php echo (defined('APP_BASE') && APP_BASE) ? APP_BASE . '/change-password' : 'change-password'; ?>">
                     <i class="isax isax-key"></i>
                     <span>Change Password</span>
                 </a>
-            </li> -->
+            </li>
             <li>
                 <a href="php/logout.php">  <!-- এই লাইনটি সঠিক? -->
                     <i class="isax isax-logout"></i>

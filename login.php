@@ -2,13 +2,7 @@
 // Use config so session cookie path is '/' and works for dashboard after login
 require_once __DIR__ . '/php/config.php';
 // Full same-origin URL for login AJAX (avoids status 0 / CORS / mixed content issues on live)
-$is_https = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off')
-    || (!empty($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] === 'https')
-    || (!empty($_SERVER['HTTP_X_FORWARDED_SSL']) && (strtolower($_SERVER['HTTP_X_FORWARDED_SSL'] ?? '') === 'on' || $_SERVER['HTTP_X_FORWARDED_SSL'] === '1'));
-$login_host = $_SERVER['HTTP_HOST'] ?? $_SERVER['SERVER_NAME'] ?? 'localhost';
-$login_base = rtrim(dirname($_SERVER['SCRIPT_NAME'] ?? ''), '/');
-$login_path = ($login_base === '' || $login_base === '/') ? '' : $login_base;
-$login_ajax_url = ($is_https ? 'https://' : 'http://') . $login_host . $login_path . '/php/login.php';
+$login_ajax_url = (defined('APP_BASE') ? APP_BASE : '') . '/php/login.php';
 include 'header.php';?>
 
 <head>
@@ -59,11 +53,11 @@ include 'header.php';?>
 											<div class="mb-3">
 												<div class="form-group-flex">
 													<label class="form-label">Password</label>
-													<a href="forgot-password.html" class="forgot-link">Forgot password?</a>
+
 												</div>
 												<div class="pass-group">
 													<input type="password" class="form-control pass-input" name="password" id="login-password" required>
-													<span class="feather-eye-off toggle-password"></span>
+													<span class="custom-toggle-password feather-eye-off" style="cursor: pointer; position: absolute; right: 15px; top: 50%; transform: translateY(-50%);"></span>
 												</div>
 											</div>
 											<div class="mb-3 form-check-box">
@@ -219,6 +213,17 @@ include 'header.php';?>
 			});
 			$(document).on('click', '.btn-login-fallback', function() {
 				document.getElementById('doctor-login-form').submit();
+			});
+
+			// Fix for eye button password show/hide
+			$(document).off('click', '.custom-toggle-password').on('click', '.custom-toggle-password', function () {
+				$(this).toggleClass("feather-eye feather-eye-off");
+				var input = $(this).closest('.pass-group').find('input');
+				if (input.attr("type") === "password") {
+					input.attr("type", "text");
+				} else {
+					input.attr("type", "password");
+				}
 			});
 		});
 		</script>

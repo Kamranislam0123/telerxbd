@@ -262,7 +262,7 @@ include 'header.php';
                                 <div class="col-lg-6 col-md-6">
                                     <div class="form-wrap">
                                         <label class="form-label">Fees (৳)</label>
-                                        <input type="number" class="form-control" name="consultation_fee" value="<?php echo htmlspecialchars($doctor['consultation_fee']); ?>">
+                                        <input type="number" class="form-control" name="consultation_fee" min="0" max="500" value="<?php echo htmlspecialchars($doctor['consultation_fee']); ?>">
                                     </div>
                                 </div>
                                 <div class="col-lg-6 col-md-6">
@@ -289,36 +289,61 @@ include 'header.php';
                                         <input type="text" class="form-control" name="bmdc_no" value="<?php echo htmlspecialchars($doctor['bmdc_no']); ?>">
                                     </div>
                                 </div>
-                                <div class="col-lg-6 col-md-6">
-                                    <div class="form-wrap">
-                                        <label class="form-label">Speciality <small class="text-muted">(Select multiple)</small></label>
-                                        <?php
-                                        // Get the current selected specialities (check both specialty and speciality fields)
-                                        $current_speciality_str = !empty($doctor['speciality']) ? $doctor['speciality'] : (!empty($doctor['specialty']) ? $doctor['specialty'] : '');
-                                        // Parse comma-separated specialities into an array
-                                        $selected_specialities = [];
-                                        if (!empty($current_speciality_str)) {
-                                            $selected_specialities = array_map('trim', explode(',', $current_speciality_str));
-                                        }
+                                <div class="col-lg-12">
+                                    <div class="row">
+                                        <div class="col-lg-6 col-md-6">
+                                            <div class="form-wrap">
+                                                <label class="form-label">Speciality <small class="text-muted">(Select multiple)</small></label>
+                                                <?php
+                                                // Get the current selected specialities (check both specialty and speciality fields)
+                                                $current_speciality_str = !empty($doctor['speciality']) ? $doctor['speciality'] : (!empty($doctor['specialty']) ? $doctor['specialty'] : '');
+                                                // Parse comma-separated specialities into an array
+                                                $selected_specialities = [];
+                                                if (!empty($current_speciality_str)) {
+                                                    $selected_specialities = array_map('trim', explode(',', $current_speciality_str));
+                                                }
 
-                                        // Define all available specialities
-                                        $all_specialities = [
-                                            'General Physician', 'Pediatrician', 'Gynecologist', 'Dermatologist', 'ENT Specialist',
-                                            'Psychiatrist', 'Diabetologist', 'Cardiologist', 'Neurologist', 'Orthopedic Specialist',
-                                            'Urologist', 'Gastroenterologist', 'Physiotherapist', 'Pulmonologist', 'Nephrologist',
-                                            'Oncologist', 'Sexologist', 'Rheumatologist', 'Allergist/Immunologist', 'Ophthalmologist',
-                                            'Psychologist', 'Internal Medicine', 'Family Medicine', 'Physical Medicine'
-                                        ];
-                                        ?>
-                                        <div class="speciality-checkboxes" style="max-height: 200px; overflow-y: auto; border: 1px solid #ddd; border-radius: 4px; padding: 10px; background-color: #f9f9f9;">
-                                            <?php foreach ($all_specialities as $spec): ?>
-                                                <div class="form-check mb-2">
-                                                    <input class="form-check-input speciality-checkbox" type="checkbox" name="speciality[]" value="<?php echo htmlspecialchars($spec); ?>" id="speciality-<?php echo str_replace([' ', '/'], ['-', '-'], strtolower($spec)); ?>" <?php echo in_array($spec, $selected_specialities) ? 'checked' : ''; ?>>
-                                                    <label class="form-check-label" for="speciality-<?php echo str_replace([' ', '/'], ['-', '-'], strtolower($spec)); ?>">
-                                                        <?php echo htmlspecialchars($spec); ?>
-                                                    </label>
+                                                // Define all available specialities
+                                                $all_specialities = [
+                                                    'General Physician', 'Pediatrician', 'Gynecologist', 'Dermatologist', 'ENT Specialist',
+                                                    'Psychiatrist', 'Diabetologist', 'Cardiologist', 'Neurologist', 'Orthopedic Specialist',
+                                                    'Urologist', 'Gastroenterologist', 'Physiotherapist', 'Pulmonologist', 'Nephrologist',
+                                                    'Oncologist', 'Sexologist', 'Rheumatologist', 'Allergist/Immunologist', 'Ophthalmologist',
+                                                    'Psychologist', 'Internal Medicine', 'Family Medicine', 'Physical Medicine'
+                                                ];
+                                                ?>
+                                                <div class="speciality-checkboxes" id="speciality-section" style="max-height: 200px; overflow-y: auto; border: 1px solid #ddd; border-radius: 4px; padding: 10px; background-color: #f9f9f9;">
+                                                    <?php foreach ($all_specialities as $spec): ?>
+                                                        <div class="form-check mb-2">
+                                                            <input class="form-check-input speciality-checkbox" type="checkbox" name="speciality[]" value="<?php echo htmlspecialchars($spec); ?>" id="speciality-<?php echo str_replace([' ', '/'], ['-', '-'], strtolower($spec)); ?>" <?php echo in_array($spec, $selected_specialities) ? 'checked' : ''; ?>>
+                                                            <label class="form-check-label" for="speciality-<?php echo str_replace([' ', '/'], ['-', '-'], strtolower($spec)); ?>">
+                                                                <?php echo htmlspecialchars($spec); ?>
+                                                            </label>
+                                                        </div>
+                                                    <?php endforeach; ?>
                                                 </div>
-                                            <?php endforeach; ?>
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-6 col-md-6">
+                                            <div class="form-wrap">
+                                                <label class="form-label">Experience <small class="text-muted">(Select multiple)</small></label>
+                                                <?php
+                                                // Define all available experiences
+                                                $all_experiences = [
+                                                    'Gynecology', 'Diabetology', 'Cardiology', 'Neurology', 'Urology', 'Gastroenterology', 'Pulmonology', 'Nephrology', 'Oncology', 'Sexology', 'Rheumatology', 'Allergy & Immunology', 'Ophthalmology'
+                                                ];
+                                                ?>
+                                                <div class="speciality-checkboxes" id="experience-section" style="max-height: 200px; overflow-y: auto; border: 1px solid #ddd; border-radius: 4px; padding: 10px; background-color: #f9f9f9;">
+                                                    <?php foreach ($all_experiences as $exp): ?>
+                                                        <div class="form-check mb-2">
+                                                            <input class="form-check-input experience-checkbox" type="checkbox" name="speciality[]" value="<?php echo htmlspecialchars($exp); ?>" id="experience-<?php echo str_replace([' ', '&', '/'], ['-', 'and', '-'], strtolower($exp)); ?>" <?php echo in_array($exp, $selected_specialities) ? 'checked' : ''; ?>>
+                                                            <label class="form-check-label" for="experience-<?php echo str_replace([' ', '&', '/'], ['-', 'and', '-'], strtolower($exp)); ?>">
+                                                                <?php echo htmlspecialchars($exp); ?>
+                                                            </label>
+                                                        </div>
+                                                    <?php endforeach; ?>
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -1055,6 +1080,30 @@ include 'header.php';
 				// Scroll to top to show alert
 				$('html, body').animate({ scrollTop: 0 }, 500);
 			}
+			// Handle Specialty and Experience Checkbox Toggling
+			function updateSpecialtyExperienceState() {
+				var hasSpecialty = $('.speciality-checkbox:checked').length > 0;
+				var hasExperience = $('.experience-checkbox:checked').length > 0;
+
+				if (hasSpecialty) {
+					$('.experience-checkbox').prop('disabled', true);
+				} else {
+					$('.experience-checkbox').prop('disabled', false);
+				}
+
+				if (hasExperience) {
+					$('.speciality-checkbox').prop('disabled', true);
+				} else {
+					$('.speciality-checkbox').prop('disabled', false);
+				}
+			}
+
+			$('.speciality-checkbox, .experience-checkbox').on('change', function() {
+				updateSpecialtyExperienceState();
+			});
+
+			// Initialize on load
+			updateSpecialtyExperienceState();
 		});
 		</script>
 
