@@ -150,6 +150,9 @@ $current_page = basename($_SERVER['PHP_SELF']);
                         <li class="<?php echo ($current_page == 'welfare') ? 'active' : ''; ?>">
                             <a href="welfare">Welfare</a>
                         </li>
+                        <li class="<?php echo ($current_page == 'subscription.php') ? 'active' : ''; ?>">
+                           <a href="subscription.php">Subscription</a>
+                        </li>
                         <li class="<?php echo ($current_page == 'about-us') ? 'active' : ''; ?>">
                             <a href="about-us">About Us</a>
                         </li>
