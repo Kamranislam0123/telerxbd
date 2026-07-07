@@ -5,8 +5,14 @@
 RewriteEngine On
 
 # 1. Externally redirect /file.php to /file
+# RewriteCond %{THE_REQUEST} ^[A-Z]{3,}\s([^.]+)\.php [NC]
+# RewriteRule ^ %1 [R=301,L]
+
+
 RewriteCond %{THE_REQUEST} ^[A-Z]{3,}\s([^.]+)\.php [NC]
+RewriteCond %{REQUEST_METHOD} !POST
 RewriteRule ^ %1 [R=301,L]
+
 
 # 2. Internally redirect /file to /file.php
 RewriteCond %{REQUEST_FILENAME} !-d
@@ -14,8 +20,15 @@ RewriteCond %{REQUEST_FILENAME}.php -f
 RewriteRule ^(.*?)/?$ $1.php [NC,L]
 
 # Handle PHP files
-AddType application/x-httpd-php .php
-AddHandler application/x-httpd-php .php
+ AddType application/x-httpd-php .php
+ AddHandler application/x-httpd-php .php
+
+# AddType application/x-httpd-ea-php81 .php
+# AddHandler application/x-httpd-ea-php81 .php
+
+
+# AddHandler application/x-httpd-alt-php81___lsphp .php
+
 
 # Security headers
 <IfModule mod_headers.c>

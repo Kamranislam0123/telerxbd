@@ -51,7 +51,7 @@ $current_page = basename($_SERVER['PHP_SELF']);
     <title>TeleRx Bangladesh</title>
 
     <!-- Favicon -->
-    <link rel="shortcut icon" href="assets/img/favicon.png" type="image/x-icon">
+    <link rel="shortcut icon" type="image/x-icon" sizes="48x48" href="assets/img/favicon.png">
 
     <!-- Apple Touch Icon -->
     <link rel="apple-touch-icon" sizes="180x180" href="assets/img/apple-touch-icon.png">
@@ -109,11 +109,12 @@ $current_page = basename($_SERVER['PHP_SELF']);
                     <a href="#" aria-label="Twitter X"><i class="fa-brands fa-x-twitter" aria-hidden="true"></i></a>
                     <a href="#" aria-label="Instagram"><i class="fa-brands fa-instagram" aria-hidden="true"></i></a>
                 </div>
-                <div>
+                <!-- <div>
                     <marquee width="100%" behavior="scroll" direction="left">TeleRx website in under maintenance.</marquee>
                 </div>
+                -->
                 <div class="telerx-top-right">
-                    <span> Emergency Call: <i class="fa-solid fa-phone" aria-hidden="true"></i> +880 1836 838888</span>
+                    <span> Helpline: <i class="fa-solid fa-phone" aria-hidden="true"></i> +880 1836 838888</span>
                 </div>
             </div>
         </div>
@@ -149,6 +150,9 @@ $current_page = basename($_SERVER['PHP_SELF']);
                         </li>
                         <li class="<?php echo ($current_page == 'welfare') ? 'active' : ''; ?>">
                             <a href="welfare">Welfare</a>
+                        </li>
+                        <li class="<?php echo ($current_page == 'subscription.php') ? 'active' : ''; ?>">
+                           <a href="subscription.php">Subscription</a>
                         </li>
                         <li class="<?php echo ($current_page == 'about-us') ? 'active' : ''; ?>">
                             <a href="about-us">About Us</a>
