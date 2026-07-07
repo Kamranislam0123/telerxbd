@@ -46,6 +46,7 @@ include 'header.php';?>
 										<div class="alert alert-danger">Invalid email or password. Please try again.</div>
 										<?php endif; ?>
 										<form id="doctor-login-form" method="POST" action="<?php echo htmlspecialchars($login_ajax_url); ?>">
+											<input type="hidden" id="login-redirect" value="<?php echo htmlspecialchars($_GET['redirect'] ?? ''); ?>">
 											<div class="mb-3">
 												<label class="form-label">E-mail or Mobile</label>
 												<input type="text" class="form-control" name="email" id="login-email" placeholder="Enter email or mobile number" required>
@@ -122,7 +123,8 @@ include 'header.php';?>
 				var formData = {
 					email: $('#login-email').val(),
 					password: $('#login-password').val(),
-					remember_me: $('#remember').is(':checked') ? 1 : 0
+					remember_me: $('#remember').is(':checked') ? 1 : 0,
+					redirect: $('#login-redirect').val()
 				};
 				
 				// Submit via AJAX (full same-origin URL; server redirects if not AJAX)

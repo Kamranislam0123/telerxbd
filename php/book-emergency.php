@@ -14,58 +14,17 @@ if (strlen($mobile_clean) < 10 || strlen($mobile_clean) > 15) {
 $mobile = $mobile_clean;
 
 try {
+    // Check if patient session exists
+    if (!isset($_SESSION['patient_id']) || !isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true || $_SESSION['user_type'] !== 'patient') {
+        echo json_encode(['success' => false, 'message' => 'Please log in to your account first.']);
+        exit;
+    }
+    
+    $patient_id = (int)$_SESSION['patient_id'];
+    $patient_name = $_SESSION['patient_name'];
+
     $conn = getDBConnection();
     $conn->begin_transaction();
-
-    // 1. Find or create patient
-    $patient_id = 0;
-    $patient_name = 'Emergency Patient';
-    
-    $patient_lookup = $conn->prepare("SELECT id, name FROM patients WHERE phone = ? LIMIT 1");
-    $patient_lookup->bind_param("s", $mobile);
-    $patient_lookup->execute();
-    $patient_res = $patient_lookup->get_result();
-
-    if ($patient_res && $patient_res->num_rows > 0) {
-        $existing_patient = $patient_res->fetch_assoc();
-        $patient_id = (int) $existing_patient['id'];
-        $patient_name = $existing_patient['name'];
-    } else {
-        // Create new patient
-        $base_email = 'emergency' . $mobile . '@auto.telerx.local';
-        $auto_email = $base_email;
-        $counter = 1;
-        while (true) {
-            $email_check = $conn->prepare("SELECT id FROM patients WHERE email = ? LIMIT 1");
-            $email_check->bind_param("s", $auto_email);
-            $email_check->execute();
-            $email_exists = $email_check->get_result()->num_rows > 0;
-            $email_check->close();
-            if (!$email_exists) {
-                break;
-            }
-            $counter++;
-            $auto_email = 'emergency' . $mobile . '+' . $counter . '@auto.telerx.local';
-        }
-
-        $default_password_hash = password_hash('123456', PASSWORD_DEFAULT);
-        $patient_create = $conn->prepare("INSERT INTO patients (name, email, phone, password, requires_password_change) VALUES (?, ?, ?, ?, 1)");
-        $patient_create->bind_param("ssss", $patient_name, $auto_email, $mobile, $default_password_hash);
-        if (!$patient_create->execute()) {
-            throw new Exception("Failed to auto-register patient.");
-        }
-        $patient_id = (int) $conn->insert_id;
-        $patient_create->close();
-    }
-    $patient_lookup->close();
-
-    // 2. Auto log in the patient
-    $_SESSION['logged_in'] = true;
-    $_SESSION['user_type'] = 'patient';
-    $_SESSION['patient_id'] = $patient_id;
-    $_SESSION['patient_name'] = $patient_name;
-    $_SESSION['patient_email'] = $auto_email ?? ''; // if new
-    $_SESSION['patient_phone'] = $mobile;
 
     // 3. Find Emergency Doctor ID
     $doctor_email = 'emergency@telerx.com';
@@ -83,7 +42,7 @@ try {
     $appointment_date = date('Y-m-d');
     $slot_time = date('H:i'); // Adjusted format to avoid overflow
     $appointment_time = $slot_time;
-    $status = 'confirmed'; // As requested by user, confirm immediately
+    $status = 'pending'; // Change from confirmed to pending until paid
     $appointment_number = 'EMG00000';
     $is_emergency = 1;
 

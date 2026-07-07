@@ -59,7 +59,6 @@ try {
         }
         $apt_stmt->close();
     }
-    
     $conn->close();
 
     // Set default values if profile data is missing

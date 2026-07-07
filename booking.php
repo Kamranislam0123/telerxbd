@@ -20,6 +20,9 @@ $booking_doctor_id = isset($_GET['doctor_id']) ? (int) $_GET['doctor_id'] : (iss
 $doctor = null;
 $period_labels = ['morning' => 'Morning', 'afternoon' => 'Afternoon', 'evening' => 'Evening', 'night' => 'Night'];
 
+$patient_prefill_name = '';
+$patient_prefill_mobile = '';
+
 if ($booking_doctor_id > 0) {
 	try {
 		require_once __DIR__ . '/php/config.php';
@@ -38,6 +41,22 @@ if ($booking_doctor_id > 0) {
 		}
 		$res->free();
 		$stmt->close();
+
+		// Fetch patient prefill info if logged in as patient
+		if (isset($_SESSION['logged_in']) && $_SESSION['logged_in'] === true && (($_SESSION['user_type'] ?? '') === 'patient') && isset($_SESSION['patient_id'])) {
+			$patient_prefill_name = $_SESSION['patient_name'] ?? '';
+			$stmt_pat = $conn->prepare("SELECT phone FROM patients WHERE id = ? LIMIT 1");
+			if ($stmt_pat) {
+				$stmt_pat->bind_param("i", $_SESSION['patient_id']);
+				$stmt_pat->execute();
+				$res_pat = $stmt_pat->get_result();
+				if ($res_pat && $row_pat = $res_pat->fetch_assoc()) {
+					$patient_prefill_mobile = $row_pat['phone'] ?? '';
+				}
+				$stmt_pat->close();
+			}
+		}
+
 		$conn->close();
 	} catch (Exception $e) {
 		error_log('booking.php: ' . $e->getMessage());
@@ -165,15 +184,34 @@ function format_slot_time_12($t)
 													<div class="mb-3">
 														<label class="form-label">Full Name</label>
 														<input type="text" class="form-control" name="booking_full_name"
-															id="booking_full_name" required>
+															id="booking_full_name" value="<?php echo htmlspecialchars($patient_prefill_name); ?>" required>
 													</div>
 												</div>
 												<div class="col-lg-6 col-md-6">
 													<div class="mb-3">
 														<label class="form-label">Mobile Number</label>
 														<input type="text" class="form-control" name="booking_mobile"
-															id="booking_mobile" required>
+															id="booking_mobile" value="<?php echo htmlspecialchars($patient_prefill_mobile); ?>" required>
 													</div>
+												</div>
+												<!-- Dynamic Follow-up/Appointment Type Selection -->
+												<div class="col-lg-12 col-md-12 mb-3" id="booking_type_section" style="display:none;">
+													<label class="form-label d-block fw-semibold text-dark">Appointment Type</label>
+													<div class="d-flex align-items-center gap-4">
+														<div class="form-check">
+															<input class="form-check-input" type="radio" name="booking_type" id="booking_type_regular" value="regular" checked>
+															<label class="form-check-label fw-medium text-dark" for="booking_type_regular">Regular Consultation (100% Fee)</label>
+														</div>
+														<div class="form-check" id="booking_type_with_report_wrapper" style="display:none;">
+															<input class="form-check-input" type="radio" name="booking_type" id="booking_type_with_report" value="follow_up_with_report">
+															<label class="form-check-label fw-medium text-success" for="booking_type_with_report"><i class="fa-solid fa-circle-check me-1"></i>Follow-up with Report (Free)</label>
+														</div>
+														<div class="form-check" id="booking_type_without_report_wrapper" style="display:none;">
+															<input class="form-check-input" type="radio" name="booking_type" id="booking_type_without_report" value="follow_up_without_report">
+															<label class="form-check-label fw-medium text-indigo" for="booking_type_without_report"><i class="fa-solid fa-percent me-1"></i>Follow-up without Report (50% Fee)</label>
+														</div>
+													</div>
+													<div id="booking_type_message" class="small text-muted mt-1"></div>
 												</div>
 												<div class="col-lg-3 col-md-6">
 													<div class="mb-3">
@@ -469,25 +507,25 @@ function format_slot_time_12($t)
 															class="d-flex align-items-center flex-wrap rpw-gap-2 justify-content-between mb-2">
 															<p class="mb-0">Doctor Fee</p>
 															<span
-																class="fw-medium d-block"><?php echo number_format($consultation_fee, 0); ?>/-</span>
+																class="fw-medium d-block" id="booking_display_doctor_fee"><?php echo number_format($consultation_fee, 0); ?>/-</span>
 														</div>
 														<div
 															class="d-flex align-items-center flex-wrap rpw-gap-2 justify-content-between mb-2">
 															<p class="mb-0">Tax</p>
 															<span
-																class="fw-medium d-block"><?php echo number_format($tax, 0); ?>/-</span>
+																class="fw-medium d-block" id="booking_display_tax"><?php echo number_format($tax, 0); ?>/-</span>
 														</div>
 														<div
 															class="d-flex align-items-center flex-wrap rpw-gap-2 justify-content-between mb-2">
 															<p class="mb-0">Discount</p>
 															<span
-																class="fw-medium text-danger d-block"><?php echo $discount > 0 ? '-' : ''; ?><?php echo number_format($discount, 0); ?>/-</span>
+																class="fw-medium text-danger d-block" id="booking_display_discount"><?php echo $discount > 0 ? '-' : ''; ?><?php echo number_format($discount, 0); ?>/-</span>
 														</div>
 													</div>
 													<div
 														class="bg-primary d-flex align-items-center flex-wrap rpw-gap-2 justify-content-between p-3 rounded">
 														<h6 class="text-white">Total</h6>
-														<h6 class="text-white">
+														<h6 class="text-white" id="booking_display_total">
 															<?php echo number_format($total_fee, 0); ?>/-</h6>
 													</div>
 													<div id="optional_tid_wrapper">

@@ -69,6 +69,8 @@ try {
 		$apt_stmt->close();
 	}
 
+
+
 	$conn->close();
 
 } catch (Exception $e) {
@@ -132,6 +134,8 @@ include 'header.php';
 							<div class="dashboard-header">
 								<h3>My Appointments</h3>
 							</div>
+
+
 							
 							<!-- Appointment Tabs -->
 							<div class="appointment-tab-head">
@@ -201,9 +205,37 @@ include 'header.php';
 																		</ul>												
 																	</li>
 																	<li class="mail-info-patient">
-																		<ul>
-																			<li><i class="isax isax-sms5"></i><?php echo htmlspecialchars($appointment['doctor_email'] ?? 'N/A'); ?></li>
-																			<li><i class="isax isax-call5"></i><?php echo htmlspecialchars($appointment['doctor_phone'] ?? 'N/A'); ?></li>
+																		<ul class="list-unstyled mb-0">
+																			<?php 
+																			$is_followup_eligible = false;
+																			if (!empty($appointment['follow_up_type'])): 
+																			?>
+																				<?php
+																				$target_date = new DateTime();
+																				$target_date->setTime(0, 0, 0);
+																				$apt_date = new DateTime($appointment['appointment_date']);
+																				$apt_date->setTime(0, 0, 0);
+																				$interval = $apt_date->diff($target_date);
+																				$days_diff = (int)$interval->format('%r%a');
+																				$days_remaining = 14 - $days_diff;
+																				?>
+																				<?php 
+																				if ($days_remaining >= 0): 
+																					$is_followup_eligible = true;
+																				?>
+																					<?php if ($appointment['follow_up_type'] === 'with_report'): ?>
+																						<li><span class="badge bg-success-light text-success" style="background-color: #e1fcef; color: #147a50;"><i class="fa-solid fa-circle-check me-1"></i>Free Follow-up (Report)</span></li>
+																						<li class="small text-danger mt-1"><i class="isax isax-clock5 me-1"></i><?php echo $days_remaining; ?> days left</li>
+																					<?php else: ?>
+																						<li><span class="badge bg-info-light text-indigo" style="background-color: #eef2ff; color: #4f46e5;"><i class="fa-solid fa-percent me-1"></i>50% Off Follow-up</span></li>
+																						<li class="small text-danger mt-1"><i class="isax isax-clock5 me-1"></i><?php echo $days_remaining; ?> days left</li>
+																					<?php endif; ?>
+																				<?php else: ?>
+																					<li><span class="badge bg-secondary-light text-muted"><i class="fa-solid fa-ban me-1"></i>Follow-up Expired</span></li>
+																				<?php endif; ?>
+																			<?php else: ?>
+																				<li class="text-muted small">No follow-up prescribed</li>
+																			<?php endif; ?>
 																		</ul>
 																	</li>
 																	<li class="appointment-action">
@@ -229,6 +261,8 @@ include 'header.php';
 																	<li class="appointment-detail-btn">
 																		<?php if ($status !== 'cancelled' && $status !== 'completed'): ?>
 																			<a href="video-call.php?appointment_id=<?php echo (int)$appointment['id']; ?>" class="btn btn-md btn-primary-gradient"><i class="isax isax-calendar-tick5 me-1"></i>Attend</a>
+																		<?php elseif ($status === 'completed' && isset($is_followup_eligible) && $is_followup_eligible): ?>
+																			<a href="booking.php?doctor_id=<?php echo (int)$appointment['doctor_id']; ?>" class="btn btn-md btn-outline-primary">Book Followup</a>
 																		<?php else: ?>
 																			<a href="appointment-detail.php?id=<?php echo (int)$appointment['id']; ?>" class="btn btn-md btn-outline-primary">View Details</a>
 																		<?php endif; ?>

@@ -73,6 +73,7 @@ try {
 
     // 5. Prepare Date
     $prescription_date = date('d M Y', strtotime($appointment['appointment_date']));
+    $generated_at = date('d M Y, h:i A');
 
     // 6. Generate HTML Content (Matches the requested design)
     // Dynamic Logo Logic
@@ -195,6 +196,12 @@ try {
                 font-size: 9pt;
                 line-height: 1.45;
             }
+            .follow-up-text {
+                margin-top: 28px;
+                font-size: 10pt;
+                font-weight: bold;
+                line-height: 1.5;
+            }
             
             /* Bengali Support */
             .bn { font-family: "SolaimanLipi", "HindSiliguri", "DejaVu Sans", sans-serif; }
@@ -207,6 +214,13 @@ try {
                 padding-top: 5px; 
                 border-top: 1px solid #eee;
                 line-height: 1.5;
+                font-family: "HindSiliguri", "DejaVu Sans", sans-serif;
+            }
+            .generated-time {
+                text-align: right;
+                font-size: 8pt;
+                color: #666;
+                margin-top: 8px;
                 font-family: "HindSiliguri", "DejaVu Sans", sans-serif;
             }
         </style>
@@ -319,6 +333,15 @@ try {
                     }
                 }
 
+                $selected_follow_up = $appointment['follow_up_type'] ?? '';
+                if ($selected_follow_up === 'with_report') {
+                    $html .= '
+                <div class="follow-up-text"><strong>Follow-up:</strong> Follow-up with Report</div>';
+                } else if ($selected_follow_up === 'without_report') {
+                    $html .= '
+                <div class="follow-up-text"><strong>Follow-up:</strong> Follow-up without Report</div>';
+                }
+
     $html .= '
                 </div>
             </td>
@@ -344,6 +367,8 @@ try {
                 This is a computer-generated prescription. No signature is required. | TeleRx Bangladesh<br>
                 www.telerxbd.com | Emergency Call: 01335053237
             </div>
+
+            <div class="generated-time">Generated: ' . htmlspecialchars($generated_at) . '</div>
 
         </div>
     </body>

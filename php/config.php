@@ -70,14 +70,65 @@ if (session_status() === PHP_SESSION_NONE) {
 // Set timezone (adjust according to your location)
 date_default_timezone_set('Asia/Dhaka');
 
-// Compute application base path for building absolute links that work from subfolders
-// Example: if app is served from http://localhost/Telerx, APP_BASE will be '/Telerx'
-$script_dir = dirname($_SERVER['SCRIPT_NAME'] ?? '/');
-$app_base = dirname($script_dir);
-if ($app_base === '/' || $app_base === '\\' || $app_base === '.') {
+// Application base path (web path to app root). Derived from config location so it is
+// correct whether config is loaded from login.php, php/login.php, or any other file.
+// Example: http://localhost/Telerx → APP_BASE = '/Telerx'; at domain root → ''.
+if (!defined('APP_BASE')) {
+    $doc_root = rtrim(str_replace('\\', '/', realpath($_SERVER['DOCUMENT_ROOT'] ?? '') ?: ''), '/');
+    $app_root = str_replace('\\', '/', realpath(dirname(__DIR__)) ?: '');
     $app_base = '';
+    if ($doc_root !== '' && $app_root !== '' && strpos($app_root, $doc_root) === 0) {
+        $app_base = substr($app_root, strlen($doc_root));
+        if ($app_base === '/') {
+            $app_base = '';
+        }
+    } else {
+        $script_dir = str_replace('\\', '/', dirname($_SERVER['SCRIPT_NAME'] ?? '/'));
+        $app_base = (basename($script_dir) === 'php') ? dirname($script_dir) : $script_dir;
+        if ($app_base === '/' || $app_base === '\\' || $app_base === '.') {
+            $app_base = '';
+        }
+    }
+    define('APP_BASE', $app_base);
 }
-if (!defined('APP_BASE')) define('APP_BASE', $app_base);
+
+// Shared emergency doctor account used for emergency video calls
+if (!defined('EMERGENCY_DOCTOR_EMAIL')) {
+    define('EMERGENCY_DOCTOR_EMAIL', 'emergency@telerx.com');
+}
+
+/**
+ * Whether the given (or logged-in) doctor is the shared emergency doctor account.
+ */
+function isEmergencyDoctor($doctor_id = null) {
+    if ($doctor_id === null) {
+        if (!isset($_SESSION['doctor_id'])) {
+            return false;
+        }
+        $doctor_id = (int) $_SESSION['doctor_id'];
+        if (!empty($_SESSION['doctor_email'])) {
+            return strcasecmp(trim($_SESSION['doctor_email']), EMERGENCY_DOCTOR_EMAIL) === 0;
+        }
+    } else {
+        $doctor_id = (int) $doctor_id;
+    }
+
+    try {
+        $conn = getDBConnection();
+        $stmt = $conn->prepare("SELECT email FROM doctors WHERE id = ? LIMIT 1");
+        $stmt->bind_param("i", $doctor_id);
+        $stmt->execute();
+        $row = $stmt->get_result()->fetch_assoc();
+        $stmt->close();
+        $conn->close();
+        if (!$row || empty($row['email'])) {
+            return false;
+        }
+        return strcasecmp(trim($row['email']), EMERGENCY_DOCTOR_EMAIL) === 0;
+    } catch (Exception $e) {
+        return false;
+    }
+}
 
 // Error reporting (disable in production)
 // Note: display_errors is set per-file for API endpoints to prevent breaking JSON

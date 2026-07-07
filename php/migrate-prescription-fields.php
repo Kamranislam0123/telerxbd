@@ -11,6 +11,7 @@ $columns = [
     'diagnosis' => 'TEXT NULL',
     'medications' => 'TEXT NULL', // Will store JSON or text
     'advice' => 'TEXT NULL',
+    'follow_up_type' => 'VARCHAR(32) NULL',
     'prescription_path' => 'VARCHAR(255) NULL'
 ];
 

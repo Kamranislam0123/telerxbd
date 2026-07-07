@@ -78,6 +78,7 @@ try {
             dp.district,
             dp.profile_image,
             dp.gender,
+            dp.degrees,
             (SELECT COUNT(*) FROM doctor_experiences de WHERE de.doctor_id = d.id) as experience_count,
             (SELECT COUNT(*) FROM doctor_education ded WHERE ded.doctor_id = d.id) as education_count,
             (SELECT COUNT(*) FROM doctor_awards da WHERE da.doctor_id = d.id) as awards_count
@@ -624,8 +625,12 @@ try {
                                                                 <div>
                                                                     <h6 class="d-flex align-items-center mb-1">
                                                                         <a href="doctor-profile.php?id=<?php echo $doctor['id']; ?>">Dr. <?php echo htmlspecialchars($doctor['name']); ?></a>
+                                                                       
                                                                         <i class="isax isax-tick-circle5 text-success ms-2"></i>
                                                                     </h6>
+                                                                    <?php if (!empty(trim($doctor['degrees'] ?? ''))): ?>
+                                                                        <p class="mb-2 fs-14 text-muted"><?php echo htmlspecialchars(trim($doctor['degrees'])); ?></p>
+                                                                    <?php endif; ?>
                                                                     <p class="mb-2"><?php $speciality_display = $doctor['specialty'] ?? 'Medical Doctor'; echo htmlspecialchars(!empty($speciality_display) ? implode(', ', array_map('trim', explode(',', $speciality_display))) : 'Medical Doctor'); ?></p>
                                                                     <p class="d-flex align-items-center mb-0 fs-14"><i class="isax isax-location me-2"></i><?php $location_parts = array_filter([$doctor['district'] ?? '', $doctor['city'] ?? '', $doctor['state'] ?? '']); echo htmlspecialchars(!empty($location_parts) ? implode(', ', $location_parts) : 'Dhaka, Bangladesh'); ?></p>
                                                                 </div>
@@ -701,6 +706,9 @@ try {
                                             <div class="p-3 pt-0">
                                                 <div class="doctor-info-detail mb-3 pb-3">
                                                     <h3 class="mb-1"><a href="doctor-profile.php?id=<?php echo $doctor['id']; ?>">Dr. <?php echo htmlspecialchars($doctor['name']); ?></a></h3>
+                                                    <?php if (!empty(trim($doctor['degrees'] ?? ''))): ?>
+                                                        <p class="mb-2 fs-14 text-muted"><?php echo htmlspecialchars(trim($doctor['degrees'])); ?></p>
+                                                    <?php endif; ?>
                                                     <div class="d-flex align-items-center">
                                                         <?php
                                                         $location_parts = array_filter([$doctor['district'] ?? '', $doctor['city'] ?? '', $doctor['state'] ?? '']);

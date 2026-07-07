@@ -3990,6 +3990,117 @@ $(document).ready(function () {
 		});
 	});
 
+	// Dynamic follow-up eligibility checking
+	function recalculateFollowUpEligibility() {
+		var doctorId = $('#booking_doctor_id').val();
+		var mobile = $('#booking_mobile').val();
+		var appointmentDate = $('#booking_appointment_date').val();
+
+		if (!doctorId || !mobile || mobile.length < 10) {
+			$('#booking_type_section').slideUp();
+			resetBookingFeeToRegular();
+			return;
+		}
+
+		$.ajax({
+			url: 'php/check-followup-eligibility.php',
+			type: 'GET',
+			data: {
+				doctor_id: doctorId,
+				mobile: mobile,
+				appointment_date: appointmentDate
+			},
+			dataType: 'json',
+			success: function(r) {
+				if (r && r.success) {
+					var hasEligibility = false;
+					if (r.eligible_with_report) {
+						$('#booking_type_with_report_wrapper').show();
+						hasEligibility = true;
+					} else {
+						$('#booking_type_with_report_wrapper').hide();
+						if ($('#booking_type_with_report').is(':checked')) {
+							$('#booking_type_regular').prop('checked', true);
+						}
+					}
+
+					if (r.eligible_without_report) {
+						$('#booking_type_without_report_wrapper').show();
+						hasEligibility = true;
+					} else {
+						$('#booking_type_without_report_wrapper').hide();
+						if ($('#booking_type_without_report').is(':checked')) {
+							$('#booking_type_regular').prop('checked', true);
+						}
+					}
+
+					if (hasEligibility) {
+						$('#booking_type_section').slideDown();
+						$('#booking_type_message').html('<span class="text-success"><i class="fa-solid fa-gift me-1"></i>You have active follow-up options with this doctor from your visit on ' + moment(r.previous_appointment_date).format('D MMM YYYY') + '!</span>');
+					} else {
+						$('#booking_type_section').slideUp();
+						$('#booking_type_message').text('');
+						resetBookingFeeToRegular();
+					}
+					
+					updateBookingFees();
+				} else {
+					$('#booking_type_section').slideUp();
+					resetBookingFeeToRegular();
+				}
+			},
+			error: function() {
+				$('#booking_type_section').slideUp();
+				resetBookingFeeToRegular();
+			}
+		});
+	}
+
+	var originalDoctorFee = null;
+
+	function resetBookingFeeToRegular() {
+		$('#booking_type_regular').prop('checked', true);
+		updateBookingFees();
+	}
+
+	function updateBookingFees() {
+		if (originalDoctorFee === null) {
+			originalDoctorFee = parseFloat($('#booking_display_doctor_fee').text().replace(/[^\d.]/g, '')) || 0;
+		}
+		var selectedType = $('input[name="booking_type"]:checked').val() || 'regular';
+		var doctorFee = originalDoctorFee;
+		var discount = 0;
+		
+		if (selectedType === 'follow_up_with_report') {
+			discount = doctorFee;
+		} else if (selectedType === 'follow_up_without_report') {
+			discount = doctorFee * 0.5;
+		}
+		
+		var total = doctorFee - discount;
+		if (total < 0) total = 0;
+
+		$('#booking_display_doctor_fee').text(doctorFee.toFixed(0) + '/-');
+		$('#booking_display_discount').text((discount > 0 ? '-' : '') + discount.toFixed(0) + '/-');
+		$('#booking_display_total').text(total.toFixed(0) + '/-');
+	}
+
+	$('#booking_mobile').on('input change blur', function() {
+		recalculateFollowUpEligibility();
+	});
+
+	$('#booking_appointment_date').on('change', function() {
+		recalculateFollowUpEligibility();
+	});
+
+	$(document).on('change', 'input[name="booking_type"]', function() {
+		updateBookingFees();
+	});
+
+	if ($('#booking_mobile').val()) {
+		setTimeout(recalculateFollowUpEligibility, 1000);
+	}
+
 	// Confirm & Pay: save booking to DB, then go to confirmation step
 	$('#booking_confirm_pay_btn').on('click', function(e) {
 		e.preventDefault();
@@ -4039,6 +4150,9 @@ $(document).ready(function () {
 		formData.append('rbs_fbs', $('#booking_rbs_fbs').val() || '');
 		formData.append('telerx_id', telerxId || '');
 		formData.append('payment_method', paymentMethod);
+		
+		var bookingType = $('input[name="booking_type"]:checked').val() || 'regular';
+		formData.append('booking_type', bookingType);
 
 		// Append attachment file if selected
 		var attachInput = document.getElementById('booking_attachment');
@@ -4125,7 +4239,7 @@ if ($('#datetimepickershow').length > 0) {
 		const doctorId = $('#booking_doctor_id').val();
 		const container = $('#booking-slots-container');
 		if (!container.length) return;
-		$('#booking_appointment_date').val(slotDate);
+		$('#booking_appointment_date').val(slotDate).trigger('change');
 		$('#booking_slot_time').val('');
 		container.find('input[name="appointment_slot"]').prop('checked', false);
 		if (!doctorId) {

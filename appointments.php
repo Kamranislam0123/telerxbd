@@ -668,6 +668,17 @@ include 'header.php';
 
 							<hr class="mt-4">
 							<div class="form-group mb-3">
+								<label class="form-label d-block">Follow-up</label>
+								<div class="form-check">
+									<input class="form-check-input" type="radio" name="follow_up_type" id="modal_follow_up_with_report" value="with_report">
+									<label class="form-check-label" for="modal_follow_up_with_report">Follow-up with Report</label>
+								</div>
+								<div class="form-check">
+									<input class="form-check-input" type="radio" name="follow_up_type" id="modal_follow_up_without_report" value="without_report">
+									<label class="form-check-label" for="modal_follow_up_without_report">Follow-up without Report</label>
+								</div>
+							</div>
+							<div class="form-group mb-3">
 								<label class="form-label">Note / Reference</label>
 								<textarea class="form-control" name="note_reference" rows="2" placeholder="Additional note or reference..."></textarea>
 							</div>
