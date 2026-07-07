@@ -1,5 +1,34 @@
 <?php
 session_start();
+
+// Force patient log in before booking
+if (!isset($_SESSION['patient_id']) || !isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true || $_SESSION['user_type'] !== 'patient') {
+    header('Location: login.php?redirect=emergency-booking.php');
+    exit;
+}
+
+// Prefill mobile number if available
+$prefill_mobile = $_SESSION['patient_phone'] ?? '';
+if (empty($prefill_mobile)) {
+    try {
+        require_once __DIR__ . '/php/config.php';
+        $conn = getDBConnection();
+        $stmt = $conn->prepare("SELECT phone FROM patients WHERE id = ? LIMIT 1");
+        if ($stmt) {
+            $stmt->bind_param("i", $_SESSION['patient_id']);
+            $stmt->execute();
+            $res = $stmt->get_result();
+            if ($res && $row = $res->fetch_assoc()) {
+                $prefill_mobile = $row['phone'] ?? '';
+            }
+            $stmt->close();
+        }
+        $conn->close();
+    } catch (Exception $e) {
+        error_log('emergency-booking.php prefill: ' . $e->getMessage());
+    }
+}
+
 include 'header.php';
 ?>
 
@@ -36,7 +65,7 @@ include 'header.php';
                 <form id="emergency-booking-form">
                     <div class="mb-4">
                         <label class="form-label">Mobile Number <span class="text-danger">*</span></label>
-                        <input type="text" class="form-control form-control-lg" name="mobile" id="emergency-mobile" placeholder="e.g. 01XXXXXXXXX" required>
+                        <input type="text" class="form-control form-control-lg" name="mobile" id="emergency-mobile" placeholder="e.g. 01XXXXXXXXX" value="<?php echo htmlspecialchars($prefill_mobile); ?>" required>
                     </div>
 
                     <div class="mb-4">
@@ -98,9 +127,9 @@ $(document).ready(function() {
             dataType: 'json',
             success: function(response) {
                 if (response.success) {
-                    messageDiv.removeClass('alert-danger').addClass('alert-success').html('<strong>Success!</strong> Connecting you...').fadeIn();
+                    messageDiv.removeClass('alert-danger').addClass('alert-success').html('<strong>Booking Saved!</strong> Redirecting to payment page...').fadeIn();
                     setTimeout(function() {
-                        window.location.href = 'emergency-live-dashboard.php?appointment_id=' + response.appointment_id;
+                        window.location.href = 'payment.php?appointment_id=' + response.appointment_id;
                     }, 1000);
                 } else {
                     messageDiv.removeClass('alert-success').addClass('alert-danger').html('<strong>Error!</strong> ' + response.message).fadeIn();

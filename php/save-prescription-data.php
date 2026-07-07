@@ -28,6 +28,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $advice = $_POST['advice'] ?? '';
     $note_reference = $_POST['note_reference'] ?? '';
     $prescription_footer = $_POST['prescription_footer'] ?? '';
+    $follow_up_type = $_POST['follow_up_type'] ?? '';
+    $allowed_follow_up = ['with_report', 'without_report'];
+    if (!in_array($follow_up_type, $allowed_follow_up, true)) {
+        $follow_up_type = '';
+    }
     
     // Process medications into JSON
     $medications = [];
@@ -78,6 +83,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $conn->query("ALTER TABLE appointments ADD COLUMN note_reference TEXT NULL");
         }
 
+        // Ensure follow_up_type column exists
+        $follow_up_col_check = $conn->query("SHOW COLUMNS FROM appointments LIKE 'follow_up_type'");
+        if ($follow_up_col_check->num_rows === 0) {
+            $conn->query("ALTER TABLE appointments ADD COLUMN follow_up_type VARCHAR(32) NULL");
+        }
+
         // Update appointment with prescription details
         $update_sql = "UPDATE appointments SET 
                         chief_complaints = ?, 
@@ -86,11 +97,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                         medications = ?, 
                         advice = ?,
                         note_reference = ?,
-                        prescription_footer = ?
+                        prescription_footer = ?,
+                        follow_up_type = ?
                        WHERE id = ?";
         
         $update_stmt = $conn->prepare($update_sql);
-        $update_stmt->bind_param("sssssssi", $chief_complaints, $on_examination, $diagnosis, $meds_json, $advice, $note_reference, $prescription_footer, $appointment_id);
+        $update_stmt->bind_param("ssssssssi", $chief_complaints, $on_examination, $diagnosis, $meds_json, $advice, $note_reference, $prescription_footer, $follow_up_type, $appointment_id);
         
         if ($update_stmt->execute()) {
             ob_clean();

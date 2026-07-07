@@ -268,7 +268,12 @@ try {
             $_SESSION['patient_id'] = $user_data['id'];
             $_SESSION['patient_name'] = $user_data['name'];
             $_SESSION['patient_email'] = $user_data['email'];
-            $redirect_url = 'patient-dashboard.php';
+            $redirect_param = isset($_POST['redirect']) ? trim($_POST['POST_redirect'] ?? $_POST['redirect']) : '';
+            if (!empty($redirect_param) && preg_match('/^[a-zA-Z0-9_\-\.\/]+\.php(\?.*)?$/', $redirect_param)) {
+                $redirect_url = $redirect_param;
+            } else {
+                $redirect_url = 'patient-dashboard.php';
+            }
             break;
     }
     

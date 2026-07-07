@@ -680,6 +680,19 @@ if ($appointment_id) {
 							</div>
 
 							<div class="form-group mb-3">
+								<label class="form-label d-block">Follow-up</label>
+								<?php $saved_follow_up = $appointment['follow_up_type'] ?? ''; ?>
+								<div class="form-check">
+									<input class="form-check-input" type="radio" name="follow_up_type" id="follow_up_with_report" value="with_report" <?php echo $saved_follow_up === 'with_report' ? 'checked' : ''; ?>>
+									<label class="form-check-label" for="follow_up_with_report">Follow-up with Report</label>
+								</div>
+								<div class="form-check">
+									<input class="form-check-input" type="radio" name="follow_up_type" id="follow_up_without_report" value="without_report" <?php echo $saved_follow_up === 'without_report' ? 'checked' : ''; ?>>
+									<label class="form-check-label" for="follow_up_without_report">Follow-up without Report</label>
+								</div>
+							</div>
+
+							<div class="form-group mb-3">
 								<label class="form-label">Note / Reference</label>
 								<textarea class="form-control" name="note_reference" rows="2" placeholder="Additional note or reference..."><?php echo htmlspecialchars($appointment['note_reference'] ?? ''); ?></textarea>
 							</div>

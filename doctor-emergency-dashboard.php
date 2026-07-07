@@ -9,6 +9,10 @@ require_once 'php/config.php';
 
 // Ensure the logged-in doctor is the emergency doctor
 $doctor_id = $_SESSION['doctor_id'];
+if (!isEmergencyDoctor($doctor_id)) {
+    header('Location: doctor-dashboard.php');
+    exit;
+}
 
 include 'header.php';
 ?>

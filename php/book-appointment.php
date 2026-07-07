@@ -97,6 +97,11 @@ if (isset($_FILES['booking_attachment']) && $_FILES['booking_attachment']['error
 // Accept TID from either field name (booking form uses booking_telerx_id, JS sends telerx_id)
 $referrer_tid = isset($_POST['telerx_id']) ? trim($_POST['telerx_id']) : (isset($_POST['booking_telerx_id']) ? trim($_POST['booking_telerx_id']) : '');
 $payment_method = isset($_POST['payment_method']) ? trim($_POST['payment_method']) : 'bkash';
+$booking_type = isset($_POST['booking_type']) ? trim($_POST['booking_type']) : 'regular';
+$allowed_booking_types = ['regular', 'follow_up_with_report', 'follow_up_without_report'];
+if (!in_array($booking_type, $allowed_booking_types, true)) {
+    $booking_type = 'regular';
+}
 
 try {
     $conn = getDBConnection();
@@ -259,6 +264,59 @@ try {
         }
     }
 
+    // Validation of follow-up eligibility
+    if ($booking_type !== 'regular') {
+        $eligible_with_report = false;
+        $eligible_without_report = false;
+
+        $check_sql = "
+            SELECT appointment_date, follow_up_type 
+            FROM appointments 
+            WHERE (patient_id = ? OR mobile = ?) 
+              AND doctor_id = ? 
+              AND status = 'completed' 
+            ORDER BY appointment_date DESC 
+            LIMIT 1";
+        $stmt_check = $conn->prepare($check_sql);
+        if ($stmt_check) {
+            $stmt_check->bind_param("isi", $patient_id, $mobile, $doctor_id);
+            $stmt_check->execute();
+            $res_check = $stmt_check->get_result();
+            if ($row_check = $res_check->fetch_assoc()) {
+                $prev_date = new DateTime($row_check['appointment_date']);
+                $prev_date->setTime(0, 0, 0);
+                $new_date = new DateTime($appointment_date);
+                $new_date->setTime(0, 0, 0);
+                
+                $interval = $prev_date->diff($new_date);
+                $days_diff = (int)$interval->format('%r%a');
+                
+                if ($days_diff >= 0 && $days_diff <= 14) {
+                    if ($row_check['follow_up_type'] === 'with_report') {
+                        $eligible_with_report = true;
+                        $eligible_without_report = true;
+                    } else {
+                        $eligible_without_report = true;
+                    }
+                }
+            }
+            $stmt_check->close();
+        }
+
+        if ($booking_type === 'follow_up_with_report' && !$eligible_with_report) {
+            $conn->rollback();
+            $conn->close();
+            echo json_encode(['success' => false, 'message' => 'You are not eligible for a free Follow-up with Report.']);
+            exit;
+        }
+        if ($booking_type === 'follow_up_without_report' && !$eligible_without_report) {
+            $conn->rollback();
+            $conn->close();
+            echo json_encode(['success' => false, 'message' => 'You are not eligible for a discounted Follow-up without Report.']);
+            exit;
+        }
+    }
+
     // 3) Insert appointment (patient_id 0 for guest booking). Include referrer_tid if column exists.
     $appointment_number = 'APT00000';
     $status = 'confirmed';
@@ -306,11 +364,11 @@ try {
             INSERT INTO appointments (
                 patient_id, doctor_id, appointment_date, slot_time, appointment_time,
                 status, appointment_number, notes, patient_name, mobile, patient_phone,
-                age, weight, body_temperature, blood_pressure, pulse, spo2, rbs_fbs, referrer_tid, payment_method, attachment_path, created_by_special_tid_id
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                age, weight, body_temperature, blood_pressure, pulse, spo2, rbs_fbs, referrer_tid, payment_method, attachment_path, created_by_special_tid_id, booking_type
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         ");
         $ins->bind_param(
-            "iisssssssssssssssssssi",
+            "iisssssssssssssssssssis",
             $patient_id,
             $doctor_id,
             $appointment_date,
@@ -332,14 +390,81 @@ try {
             $referrer_tid,
             $payment_method,
             $attachment_path,
-            $booked_by_special_tid_id
+            $booked_by_special_tid_id,
+            $booking_type
         );
     } else if ($has_referrer_tid && $has_payment_method) {
         $ins = $conn->prepare("
             INSERT INTO appointments (
                 patient_id, doctor_id, appointment_date, slot_time, appointment_time,
                 status, appointment_number, notes, patient_name, mobile, patient_phone,
-                age, weight, body_temperature, blood_pressure, pulse, spo2, rbs_fbs, referrer_tid, payment_method, attachment_path
+                age, weight, body_temperature, blood_pressure, pulse, spo2, rbs_fbs, referrer_tid, payment_method, attachment_path, booking_type
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        ");
+        $ins->bind_param(
+            "iissssssssssssssssssss",
+            $patient_id,
+            $doctor_id,
+            $appointment_date,
+            $slot_time,
+            $slot_time,
+            $status,
+            $appointment_number,
+            $notes,
+            $patient_name,
+            $mobile,
+            $mobile_phone,
+            $age,
+            $weight,
+            $body_temperature,
+            $blood_pressure,
+            $pulse,
+            $spo2,
+            $rbs_fbs,
+            $referrer_tid,
+            $payment_method,
+            $attachment_path,
+            $booking_type
+        );
+    } else if ($has_referrer_tid && $has_created_by_special_tid) {
+        $ins = $conn->prepare("
+            INSERT INTO appointments (
+                patient_id, doctor_id, appointment_date, slot_time, appointment_time,
+                status, appointment_number, notes, patient_name, mobile, patient_phone,
+                age, weight, body_temperature, blood_pressure, pulse, spo2, rbs_fbs, referrer_tid, attachment_path, created_by_special_tid_id, booking_type
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        ");
+        $ins->bind_param(
+            "iissssssssssssssssssis",
+            $patient_id,
+            $doctor_id,
+            $appointment_date,
+            $slot_time,
+            $slot_time,
+            $status,
+            $appointment_number,
+            $notes,
+            $patient_name,
+            $mobile,
+            $mobile_phone,
+            $age,
+            $weight,
+            $body_temperature,
+            $blood_pressure,
+            $pulse,
+            $spo2,
+            $rbs_fbs,
+            $referrer_tid,
+            $attachment_path,
+            $booked_by_special_tid_id,
+            $booking_type
+        );
+    } else if ($has_referrer_tid) {
+        $ins = $conn->prepare("
+            INSERT INTO appointments (
+                patient_id, doctor_id, appointment_date, slot_time, appointment_time,
+                status, appointment_number, notes, patient_name, mobile, patient_phone,
+                age, weight, body_temperature, blood_pressure, pulse, spo2, rbs_fbs, referrer_tid, attachment_path, booking_type
             ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         ");
         $ins->bind_param(
@@ -363,19 +488,19 @@ try {
             $spo2,
             $rbs_fbs,
             $referrer_tid,
-            $payment_method,
-            $attachment_path
+            $attachment_path,
+            $booking_type
         );
-    } else if ($has_referrer_tid && $has_created_by_special_tid) {
+    } else if ($has_created_by_special_tid) {
         $ins = $conn->prepare("
             INSERT INTO appointments (
                 patient_id, doctor_id, appointment_date, slot_time, appointment_time,
                 status, appointment_number, notes, patient_name, mobile, patient_phone,
-                age, weight, body_temperature, blood_pressure, pulse, spo2, rbs_fbs, referrer_tid, attachment_path, created_by_special_tid_id
+                age, weight, body_temperature, blood_pressure, pulse, spo2, rbs_fbs, attachment_path, created_by_special_tid_id, booking_type
             ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         ");
         $ins->bind_param(
-            "iissssssssssssssssssi",
+            "iisssssssssssssssssis",
             $patient_id,
             $doctor_id,
             $appointment_date,
@@ -394,16 +519,16 @@ try {
             $pulse,
             $spo2,
             $rbs_fbs,
-            $referrer_tid,
             $attachment_path,
-            $booked_by_special_tid_id
+            $booked_by_special_tid_id,
+            $booking_type
         );
-    } else if ($has_referrer_tid) {
+    } else {
         $ins = $conn->prepare("
             INSERT INTO appointments (
                 patient_id, doctor_id, appointment_date, slot_time, appointment_time,
                 status, appointment_number, notes, patient_name, mobile, patient_phone,
-                age, weight, body_temperature, blood_pressure, pulse, spo2, rbs_fbs, referrer_tid, attachment_path
+                age, weight, body_temperature, blood_pressure, pulse, spo2, rbs_fbs, attachment_path, booking_type
             ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         ");
         $ins->bind_param(
@@ -426,69 +551,8 @@ try {
             $pulse,
             $spo2,
             $rbs_fbs,
-            $referrer_tid,
-            $attachment_path
-        );
-    } else if ($has_created_by_special_tid) {
-        $ins = $conn->prepare("
-            INSERT INTO appointments (
-                patient_id, doctor_id, appointment_date, slot_time, appointment_time,
-                status, appointment_number, notes, patient_name, mobile, patient_phone,
-                age, weight, body_temperature, blood_pressure, pulse, spo2, rbs_fbs, attachment_path, created_by_special_tid_id
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-        ");
-        $ins->bind_param(
-            "iisssssssssssssssssi",
-            $patient_id,
-            $doctor_id,
-            $appointment_date,
-            $slot_time,
-            $slot_time,
-            $status,
-            $appointment_number,
-            $notes,
-            $patient_name,
-            $mobile,
-            $mobile_phone,
-            $age,
-            $weight,
-            $body_temperature,
-            $blood_pressure,
-            $pulse,
-            $spo2,
-            $rbs_fbs,
             $attachment_path,
-            $booked_by_special_tid_id
-        );
-    } else {
-        $ins = $conn->prepare("
-            INSERT INTO appointments (
-                patient_id, doctor_id, appointment_date, slot_time, appointment_time,
-                status, appointment_number, notes, patient_name, mobile, patient_phone,
-                age, weight, body_temperature, blood_pressure, pulse, spo2, rbs_fbs, attachment_path
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-        ");
-        $ins->bind_param(
-            "iisssssssssssssssss",
-            $patient_id,
-            $doctor_id,
-            $appointment_date,
-            $slot_time,
-            $slot_time,
-            $status,
-            $appointment_number,
-            $notes,
-            $patient_name,
-            $mobile,
-            $mobile_phone,
-            $age,
-            $weight,
-            $body_temperature,
-            $blood_pressure,
-            $pulse,
-            $spo2,
-            $rbs_fbs,
-            $attachment_path
+            $booking_type
         );
     }
     if (!$ins) {
