@@ -129,696 +129,696 @@ $total_names = count($people_list);
 $total_pages = ceil($total_names / $names_per_page);
 ?>
 
-<head>
-    <style>
-        /* ... (your existing styles remain exactly the same) ... */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Poppins', sans-serif;
+<style>
+    .welfare-page * {
+    box-sizing: border-box;
+    }
+
+    .welfare-page {
+        font-family: inherit;
+    }
+
+    body {
+        overflow-x: hidden;
+    }
+    
+    /* Hero Section with Background */
+    .welfare-hero {
+        position: relative;
+        min-height: 50vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        color: white;
+        overflow: hidden;
+        padding: 100px 0;
+    }
+    
+    /* Background Image */
+    .welfare-bg {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-image: url('assets/img/bg/donation.jpg');
+        background-size: cover;
+        background-position: center;
+        background-attachment: fixed;
+        z-index: -2;
+    }
+    
+    /* Dark Overlay */
+    .welfare-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(135deg, rgba(0, 0, 0, 0.8) 0%, rgba(0, 0, 0, 0.6) 100%);
+        z-index: -1;
+    }
+    
+    /* Content Wrapper */
+    .welfare-content {
+        position: relative;
+        z-index: 1;
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 0 20px;
+    }
+    
+    /* Title Styles */
+    .welfare-title {
+        font-size: 56px;
+        font-weight: 800;
+        margin: 30px;
+        color: white;
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        animation: fadeInDown 1s ease;
+    }
+    
+    .welfare-title span {
+        color: #ff6b6b;
+        display: inline-block;
+        position: relative;
+    }
+    
+    .welfare-title span::after {
+        content: '';
+        position: absolute;
+        bottom: -10px;
+        left: 0;
+        width: 100%;
+        height: 4px;
+        background: linear-gradient(90deg, #ff6b6b, #ff8e8e);
+        border-radius: 2px;
+    }
+    
+    .welfare-tagline {
+        font-size: 32px;
+        margin-bottom: 30px;
+        opacity: 0.9;
+        color: #fff;
+        text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+        animation: fadeInUp 1s ease 0.2s both;
+    }
+    
+    /* Counter Section */
+    .counter-section {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 30px;
+        background: none;
+        animation: fadeInUp 1s ease 0.4s both;
+    }
+    
+    /* Counter Card */
+    .counter-card {
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        border-radius: 20px;
+        padding: 40px 20px;
+        text-align: center;
+        transition: all 0.3s ease;
+        cursor: pointer;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .counter-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+        transition: left 0.5s ease;
+    }
+    
+    .counter-card:hover::before {
+        left: 100%;
+    }
+    
+    .counter-card:hover {
+        transform: translateY(-10px);
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+        background: rgba(255, 255, 255, 0.15);
+    }
+    
+    /* Counter Icon */
+    .counter-icon {
+        width: 80px;
+        height: 80px;
+        margin: 0 auto 20px;
+        background: rgba(255, 255, 255, 0.2);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 2.5rem;
+        color: #fff;
+        transition: all 0.3s ease;
+    }
+    
+    .counter-card:hover .counter-icon {
+        background: #ff6b6b;
+        color: white;
+        transform: rotateY(180deg);
+    }
+    
+    /* Counter Number */
+    .counter-number {
+        font-size: 3.5rem;
+        font-weight: 800;
+        margin-bottom: 10px;
+        color: #fff;
+        line-height: 1.2;
+    }
+    
+    .counter-number span {
+        font-size: 2rem;
+        opacity: 0.8;
+    }
+    
+    /* Counter Label */
+    .counter-label {
+        font-size: 1.2rem;
+        font-weight: 500;
+        color: rgba(255, 255, 255, 0.9);
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+    
+    /* Counter Description */
+    .counter-desc {
+        font-size: 0.9rem;
+        color: rgba(255, 255, 255, 0.7);
+        margin-top: 10px;
+        font-style: italic;
+    }
+    
+    /* Donate Button */
+    .donate-btn {
+        margin-top: 60px;
+        animation: fadeInUp 1s ease 0.6s both;
+    }
+    
+    .btn-donate {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        padding: 18px 50px;
+        font-size: 1.3rem;
+        font-weight: 600;
+        color: white;
+        background: linear-gradient(135deg, #ff6b6b 0%, #ff8e8e 100%);
+        border: none;
+        border-radius: 50px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        text-decoration: none;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        box-shadow: 0 10px 30px rgba(255, 107, 107, 0.3);
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .btn-donate::before {
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 0;
+        height: 0;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.3);
+        transform: translate(-50%, -50%);
+        transition: width 0.6s ease, height 0.6s ease;
+    }
+    
+    .btn-donate:hover::before {
+        width: 300px;
+        height: 300px;
+    }
+    
+    .btn-donate:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 15px 40px rgba(255, 107, 107, 0.4);
+        color: white;
+    }
+    
+    .btn-donate i {
+        font-size: 1.2rem;
+        transition: transform 0.3s ease;
+    }
+    
+    .btn-donate:hover i {
+        transform: translateX(5px);
+    }
+    
+    /* Payment Details Section - Hidden by default */
+    .payment-details {
+        max-width: 600px;
+        margin: 30px auto 0;
+        display: none;
+        animation: slideDown 0.4s ease forwards;
+    }
+    
+    .payment-details.show {
+        display: block;
+    }
+    
+    @keyframes slideDown {
+        from {
+            opacity: 0;
+            transform: translateY(-20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    
+    /* Payment Item */
+    /* Payment Card */
+    .payment-card {
+        background: white;
+        border-radius: 15px;
+        padding: 25px;
+        margin-bottom: 20px;
+        box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+        border: 1px solid #e9ecef;
+    }
+
+    .payment-card:last-child {
+        margin-bottom: 0;
+    }
+
+    /* Payment Card Header */
+    .payment-card-header {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 20px;
+        padding-bottom: 15px;
+        border-bottom: 2px solid #f1f3f5;
+    }
+
+    .payment-card-icon {
+        width: 45px;
+        height: 45px;
+        background: #ff6b6b;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 22px;
+        color: white;
+    }
+
+    .payment-card-title {
+        font-size: 18px;
+        font-weight: 600;
+        color: #212529;
+        font-family: 'Poppins', sans-serif;
+        margin: 0;
+    }
+
+    /* Payment Row */
+    .payment-row {
+        display: flex;
+        align-items: flex-start;
+        padding: 12px 0;
+        border-bottom: 1px dashed #e9ecef;
+    }
+
+    .payment-row:last-child {
+        border-bottom: none;
+    }
+
+    .payment-row-label {
+        font-size: 16px;
+        font-weight: 500;
+        color: #6c757d;
+        font-family: 'Inter', sans-serif;
+        min-width: 130px;  /* একটু বড় করুন */
+        text-align: left;   /* বামে align নিশ্চিত করুন */
+    }
+
+    .payment-row-value {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        flex: 1;
+        justify-content: flex-end;
+    }
+
+    .payment-row-value span {
+        font-size: 16px;
+        font-weight: 500;
+        color: #212529;
+        font-family: 'Poppins', sans-serif;
+        word-break: break-word;
+        text-align: right;
+    }
+    
+    /* Copy Button */
+    .copy-btn {
+        background: transparent;
+        border: 1px solid #dee2e6;
+        color: #6c757d;
+        width: 32px;
+        height: 32px;
+        border-radius: 6px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        font-size: 14px;
+        flex-shrink: 0;
+    }
+
+    .copy-btn:hover {
+        background: #ff6b6b;
+        border-color: #ff6b6b;
+        color: white;
+        transform: scale(1.05);
+    }
+
+    /* Copy notification */
+    .copy-notification {
+        position: fixed;
+        top: 100px;
+        right: 20px;
+        background: #28a745;
+        color: white;
+        padding: 12px 25px;
+        border-radius: 50px;
+        font-size: 14px;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        transform: translateX(120%);
+        transition: transform 0.3s ease;
+        z-index: 9999;
+        font-family: 'Inter', sans-serif;
+    }
+
+    .copy-notification.show {
+        transform: translateX(0);
+    }
+            
+    /* Floating Hearts Animation */
+    .floating-heart {
+        position: absolute;
+        color: rgba(255, 107, 107, 0.3);
+        font-size: 1rem;
+        pointer-events: none;
+        z-index: -1;
+    }
+    
+    @keyframes float {
+        0% {
+            transform: translateY(0) rotate(0deg);
+            opacity: 1;
+        }
+        100% {
+            transform: translateY(-100vh) rotate(360deg);
+            opacity: 0;
+        }
+    }
+    
+    /* Copy notification */
+    .copy-notification {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background: #ff6b6b;
+        color: white;
+        padding: 12px 25px;
+        border-radius: 50px;
+        font-size: 0.9rem;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        transform: translateX(120%);
+        transition: transform 0.3s ease;
+        z-index: 9999;
+    }
+    
+    .copy-notification.show {
+        transform: translateX(0);
+    }
+    
+    /* Responsive Design */
+    @media (max-width: 576px) {
+        .payment-card {
+            padding: 20px;
         }
         
-        body {
-            overflow-x: hidden;
-        }
-        
-        /* Hero Section with Background */
-        .welfare-hero {
-            position: relative;
-            min-height: 50vh;
-            display: flex;
+        .payment-row {
+            flex-direction: column;
             align-items: center;
-            justify-content: center;
-            text-align: center;
-            color: white;
-            overflow: hidden;
-            padding: 100px 0;
+            gap: 8px;
         }
         
-        /* Background Image */
-        .welfare-bg {
-            position: absolute;
-            top: 0;
-            left: 0;
+        .payment-row-label {
+            min-width: auto;
+        }
+        
+        .payment-row-value {
+            margin-left: 0;    
             width: 100%;
-            height: 100%;
-            background-image: url('assets/img/bg/donation.jpg');
-            background-size: cover;
-            background-position: center;
-            background-attachment: fixed;
-            z-index: -2;
+            justify-content: space-between;
         }
         
-        /* Dark Overlay */
-        .welfare-overlay {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(135deg, rgba(0, 0, 0, 0.8) 0%, rgba(0, 0, 0, 0.6) 100%);
-            z-index: -1;
+        .payment-row-value span {
+            text-align: left;
         }
-        
-        /* Content Wrapper */
-        .welfare-content {
-            position: relative;
-            z-index: 1;
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 20px;
-        }
-        
-        /* Title Styles */
+    }
+    
+    @media (max-width: 768px) {
         .welfare-title {
-            font-size: 56px;
-            font-weight: 800;
-            margin: 30px;
-            color: white;
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
-            animation: fadeInDown 1s ease;
-        }
-        
-        .welfare-title span {
-            color: #ff6b6b;
-            display: inline-block;
-            position: relative;
-        }
-        
-        .welfare-title span::after {
-            content: '';
-            position: absolute;
-            bottom: -10px;
-            left: 0;
-            width: 100%;
-            height: 4px;
-            background: linear-gradient(90deg, #ff6b6b, #ff8e8e);
-            border-radius: 2px;
+            font-size: 2.8rem;
         }
         
         .welfare-tagline {
-            font-size: 32px;
-            margin-bottom: 30px;
-            opacity: 0.9;
-            color: #fff;
-            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
-            animation: fadeInUp 1s ease 0.2s both;
-        }
-        
-        /* Counter Section */
-        .counter-section {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 30px;
-            background: none;
-            animation: fadeInUp 1s ease 0.4s both;
-        }
-        
-        /* Counter Card */
-        .counter-card {
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            border-radius: 20px;
-            padding: 40px 20px;
-            text-align: center;
-            transition: all 0.3s ease;
-            cursor: pointer;
-            position: relative;
-            overflow: hidden;
-        }
-        
-        .counter-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
-            transition: left 0.5s ease;
-        }
-        
-        .counter-card:hover::before {
-            left: 100%;
-        }
-        
-        .counter-card:hover {
-            transform: translateY(-10px);
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
-            background: rgba(255, 255, 255, 0.15);
-        }
-        
-        /* Counter Icon */
-        .counter-icon {
-            width: 80px;
-            height: 80px;
-            margin: 0 auto 20px;
-            background: rgba(255, 255, 255, 0.2);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 2.5rem;
-            color: #fff;
-            transition: all 0.3s ease;
-        }
-        
-        .counter-card:hover .counter-icon {
-            background: #ff6b6b;
-            color: white;
-            transform: rotateY(180deg);
-        }
-        
-        /* Counter Number */
-        .counter-number {
-            font-size: 3.5rem;
-            font-weight: 800;
-            margin-bottom: 10px;
-            color: #fff;
-            line-height: 1.2;
-        }
-        
-        .counter-number span {
-            font-size: 2rem;
-            opacity: 0.8;
-        }
-        
-        /* Counter Label */
-        .counter-label {
             font-size: 1.2rem;
-            font-weight: 500;
-            color: rgba(255, 255, 255, 0.9);
-            text-transform: uppercase;
-            letter-spacing: 1px;
         }
         
-        /* Counter Description */
-        .counter-desc {
-            font-size: 0.9rem;
-            color: rgba(255, 255, 255, 0.7);
-            margin-top: 10px;
-            font-style: italic;
-        }
-        
-        /* Donate Button */
-        .donate-btn {
-            margin-top: 60px;
-            animation: fadeInUp 1s ease 0.6s both;
+        .counter-number {
+            font-size: 2.5rem;
         }
         
         .btn-donate {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
+            padding: 15px 40px;
+            font-size: 1.1rem;
+        }
+        
+        .payment-item {
+            flex-direction: column;
+            text-align: center;
+        }
+        
+        .payment-info {
+            text-align: center;
+        }
+        
+        .payment-value {
+            flex-direction: column;
             gap: 10px;
-            padding: 18px 50px;
-            font-size: 1.3rem;
-            font-weight: 600;
-            color: white;
-            background: linear-gradient(135deg, #ff6b6b 0%, #ff8e8e 100%);
-            border: none;
-            border-radius: 50px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            text-decoration: none;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            box-shadow: 0 10px 30px rgba(255, 107, 107, 0.3);
-            position: relative;
-            overflow: hidden;
+        }
+    }
+    
+    @media (max-width: 480px) {
+        .welfare-title {
+            font-size: 2rem;
         }
         
-        .btn-donate::before {
-            content: '';
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            width: 0;
-            height: 0;
-            border-radius: 50%;
-            background: rgba(255, 255, 255, 0.3);
-            transform: translate(-50%, -50%);
-            transition: width 0.6s ease, height 0.6s ease;
+        .counter-section {
+            grid-template-columns: 1fr;
         }
         
-        .btn-donate:hover::before {
-            width: 300px;
-            height: 300px;
+        .counter-card {
+            padding: 30px 15px;
         }
-        
-        .btn-donate:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 15px 40px rgba(255, 107, 107, 0.4);
-            color: white;
+    }
+    
+    /* Animations */
+    @keyframes fadeInDown {
+        from {
+            opacity: 0;
+            transform: translateY(-30px);
         }
-        
-        .btn-donate i {
-            font-size: 1.2rem;
-            transition: transform 0.3s ease;
+        to {
+            opacity: 1;
+            transform: translateY(0);
         }
-        
-        .btn-donate:hover i {
-            transform: translateX(5px);
+    }
+    
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
         }
-        
-        /* Payment Details Section - Hidden by default */
-        .payment-details {
-            max-width: 600px;
-            margin: 30px auto 0;
-            display: none;
-            animation: slideDown 0.4s ease forwards;
+        to {
+            opacity: 1;
+            transform: translateY(0);
         }
-        
-        .payment-details.show {
-            display: block;
+    }
+    
+    /* Pulse Animation for Numbers */
+    @keyframes pulse {
+        0% {
+            transform: scale(1);
         }
-        
-        @keyframes slideDown {
-            from {
-                opacity: 0;
-                transform: translateY(-20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-        
-        /* Payment Item */
-        /* Payment Card */
-        .payment-card {
-            background: white;
-            border-radius: 15px;
-            padding: 25px;
-            margin-bottom: 20px;
-            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
-            border: 1px solid #e9ecef;
-        }
-
-        .payment-card:last-child {
-            margin-bottom: 0;
-        }
-
-        /* Payment Card Header */
-        .payment-card-header {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            margin-bottom: 20px;
-            padding-bottom: 15px;
-            border-bottom: 2px solid #f1f3f5;
-        }
-
-        .payment-card-icon {
-            width: 45px;
-            height: 45px;
-            background: #ff6b6b;
-            border-radius: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 22px;
-            color: white;
-        }
-
-        .payment-card-title {
-            font-size: 18px;
-            font-weight: 600;
-            color: #212529;
-            font-family: 'Poppins', sans-serif;
-            margin: 0;
-        }
-
-        /* Payment Row */
-        .payment-row {
-            display: flex;
-            align-items: flex-start;
-            padding: 12px 0;
-            border-bottom: 1px dashed #e9ecef;
-        }
-
-        .payment-row:last-child {
-            border-bottom: none;
-        }
-
-        .payment-row-label {
-            font-size: 16px;
-            font-weight: 500;
-            color: #6c757d;
-            font-family: 'Inter', sans-serif;
-            min-width: 130px;  /* একটু বড় করুন */
-            text-align: left;   /* বামে align নিশ্চিত করুন */
-        }
-
-        .payment-row-value {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            flex: 1;
-            justify-content: flex-end;
-        }
-
-        .payment-row-value span {
-            font-size: 16px;
-            font-weight: 500;
-            color: #212529;
-            font-family: 'Poppins', sans-serif;
-            word-break: break-word;
-            text-align: right;
-        }
-        
-        /* Copy Button */
-        .copy-btn {
-            background: transparent;
-            border: 1px solid #dee2e6;
-            color: #6c757d;
-            width: 32px;
-            height: 32px;
-            border-radius: 6px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            font-size: 14px;
-            flex-shrink: 0;
-        }
-
-        .copy-btn:hover {
-            background: #ff6b6b;
-            border-color: #ff6b6b;
-            color: white;
+        50% {
             transform: scale(1.05);
         }
+        100% {
+            transform: scale(1);
+        }
+    }
+    
+    .counter-number {
+        animation: pulse 2s infinite;
+    }
 
-        /* Copy notification */
-        .copy-notification {
-            position: fixed;
-            top: 100px;
-            right: 20px;
-            background: #28a745;
-            color: white;
-            padding: 12px 25px;
-            border-radius: 50px;
-            font-size: 14px;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-            transform: translateX(120%);
-            transition: transform 0.3s ease;
-            z-index: 9999;
-            font-family: 'Inter', sans-serif;
-        }
+    /* ---------- New Styles for the Popup Modal ---------- */
+    /* Modal Background */
+    .modal-popup {
+        display: none; /* Hidden by default */
+        position: fixed;
+        z-index: 10000; /* Sit on top */
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0,0,0,0.5); /* Black w/ opacity */
+        align-items: center;
+        justify-content: center;
+    }
 
-        .copy-notification.show {
-            transform: translateX(0);
-        }
-                
-        /* Floating Hearts Animation */
-        .floating-heart {
-            position: absolute;
-            color: rgba(255, 107, 107, 0.3);
-            font-size: 1rem;
-            pointer-events: none;
-            z-index: -1;
-        }
-        
-        @keyframes float {
-            0% {
-                transform: translateY(0) rotate(0deg);
-                opacity: 1;
-            }
-            100% {
-                transform: translateY(-100vh) rotate(360deg);
-                opacity: 0;
-            }
-        }
-        
-        /* Copy notification */
-        .copy-notification {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            background: #ff6b6b;
-            color: white;
-            padding: 12px 25px;
-            border-radius: 50px;
-            font-size: 0.9rem;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
-            transform: translateX(120%);
-            transition: transform 0.3s ease;
-            z-index: 9999;
-        }
-        
-        .copy-notification.show {
-            transform: translateX(0);
-        }
-        
-        /* Responsive Design */
-        @media (max-width: 576px) {
-            .payment-card {
-                padding: 20px;
-            }
-            
-            .payment-row {
-                flex-direction: column;
-                align-items: center;
-                gap: 8px;
-            }
-            
-            .payment-row-label {
-                min-width: auto;
-            }
-            
-            .payment-row-value {
-                margin-left: 0;    
-                width: 100%;
-                justify-content: space-between;
-            }
-            
-            .payment-row-value span {
-                text-align: left;
-            }
-        }
-        
-        @media (max-width: 768px) {
-            .welfare-title {
-                font-size: 2.8rem;
-            }
-            
-            .welfare-tagline {
-                font-size: 1.2rem;
-            }
-            
-            .counter-number {
-                font-size: 2.5rem;
-            }
-            
-            .btn-donate {
-                padding: 15px 40px;
-                font-size: 1.1rem;
-            }
-            
-            .payment-item {
-                flex-direction: column;
-                text-align: center;
-            }
-            
-            .payment-info {
-                text-align: center;
-            }
-            
-            .payment-value {
-                flex-direction: column;
-                gap: 10px;
-            }
-        }
-        
-        @media (max-width: 480px) {
-            .welfare-title {
-                font-size: 2rem;
-            }
-            
-            .counter-section {
-                grid-template-columns: 1fr;
-            }
-            
-            .counter-card {
-                padding: 30px 15px;
-            }
-        }
-        
-        /* Animations */
-        @keyframes fadeInDown {
-            from {
-                opacity: 0;
-                transform: translateY(-30px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-        
-        @keyframes fadeInUp {
-            from {
-                opacity: 0;
-                transform: translateY(30px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-        
-        /* Pulse Animation for Numbers */
-        @keyframes pulse {
-            0% {
-                transform: scale(1);
-            }
-            50% {
-                transform: scale(1.05);
-            }
-            100% {
-                transform: scale(1);
-            }
-        }
-        
-        .counter-number {
-            animation: pulse 2s infinite;
-        }
+    /* Modal Content Box */
+    .modal-content {
+        background-color: #fff;
+        width: 500px;
+        height: 610px;
+        border-radius: 10px;
+        box-shadow: 0 5px 30px rgba(0,0,0,0.3);
+        display: flex;
+        flex-direction: column;
+        position: relative;
+        animation: fadeInUp 0.3s ease;
+    }
 
-        /* ---------- New Styles for the Popup Modal ---------- */
-        /* Modal Background */
-        .modal-popup {
-            display: none; /* Hidden by default */
-            position: fixed;
-            z-index: 10000; /* Sit on top */
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0,0,0,0.5); /* Black w/ opacity */
-            align-items: center;
-            justify-content: center;
-        }
+    /* Modal Header */
+    .modal-header {
+        padding: 15px 20px;
+        border-bottom: 1px solid #e9ecef;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-shrink: 0;
+    }
+    .modal-header h3 {
+        margin: 0;
+        font-size: 1.3rem;
+        font-weight: 600;
+        color: #212529;
+    }
+    .close-modal {
+        background: none;
+        border: none;
+        font-size: 28px;
+        cursor: pointer;
+        color: #6c757d;
+        line-height: 1;
+        padding: 0 5px;
+    }
+    .close-modal:hover {
+        color: #ff6b6b;
+    }
 
-        /* Modal Content Box */
-        .modal-content {
-            background-color: #fff;
-            width: 500px;
-            height: 610px;
-            border-radius: 10px;
-            box-shadow: 0 5px 30px rgba(0,0,0,0.3);
-            display: flex;
-            flex-direction: column;
-            position: relative;
-            animation: fadeInUp 0.3s ease;
-        }
+    /* Modal Body (List Area) */
+    .modal-body {
+        flex: 1;
+        overflow-y: auto; /* Enables scroll if content overflows */
+        padding: 20px;
+    }
 
-        /* Modal Header */
-        .modal-header {
-            padding: 15px 20px;
-            border-bottom: 1px solid #e9ecef;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-shrink: 0;
-        }
-        .modal-header h3 {
-            margin: 0;
-            font-size: 1.3rem;
-            font-weight: 600;
-            color: #212529;
-        }
-        .close-modal {
-            background: none;
-            border: none;
-            font-size: 28px;
-            cursor: pointer;
-            color: #6c757d;
-            line-height: 1;
-            padding: 0 5px;
-        }
-        .close-modal:hover {
-            color: #ff6b6b;
-        }
+    /* Two-column list */
+    .people-list {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 10px 20px;
+    }
+    .people-list .list-item {
+        padding: 5px 0;
+        color: #212529;
+        font-size: 0.95rem;
+        text-align: left;
+        border-bottom: 1px dotted #f1f3f5;
+    }
 
-        /* Modal Body (List Area) */
-        .modal-body {
-            flex: 1;
-            overflow-y: auto; /* Enables scroll if content overflows */
-            padding: 20px;
-        }
+    /* Modal Footer (Pagination) */
+    .modal-footer {
+        padding: 15px 20px;
+        border-top: 1px solid #e9ecef;
+        display: flex;
+        justify-content: flex-end;
+        gap: 10px;
+        flex-shrink: 0;
+    }
+    .pagination-btn {
+        padding: 8px 15px;
+        border: 1px solid #dee2e6;
+        background: white;
+        border-radius: 5px;
+        cursor: pointer;
+        color: #495057;
+        font-weight: 500;
+        transition: all 0.2s;
+    }
+    .pagination-btn:hover:not(:disabled) {
+        background: #ff6b6b;
+        border-color: #ff6b6b;
+        color: white;
+    }
+    .pagination-btn:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+    }
 
-        /* Two-column list */
-        .people-list {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 10px 20px;
-        }
-        .people-list .list-item {
-            padding: 5px 0;
-            color: #212529;
-            font-size: 0.95rem;
-            text-align: left;
-            border-bottom: 1px dotted #f1f3f5;
-        }
+    /* List item container */
+    .people-list .list-item {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 5px 0;
+        color: #212529;
+        font-size: 0.95rem;
+        text-align: left;
+        border-bottom: 1px dotted #f1f3f5;
+    }
 
-        /* Modal Footer (Pagination) */
-        .modal-footer {
-            padding: 15px 20px;
-            border-top: 1px solid #e9ecef;
-            display: flex;
-            justify-content: flex-end;
-            gap: 10px;
-            flex-shrink: 0;
-        }
-        .pagination-btn {
-            padding: 8px 15px;
-            border: 1px solid #dee2e6;
-            background: white;
-            border-radius: 5px;
-            cursor: pointer;
-            color: #495057;
-            font-weight: 500;
-            transition: all 0.2s;
-        }
-        .pagination-btn:hover:not(:disabled) {
-            background: #ff6b6b;
-            border-color: #ff6b6b;
-            color: white;
-        }
-        .pagination-btn:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-        }
+    /* Serial number style */
+    .list-serial {
+        display: inline-block;
+        min-width: 10px;
+        color: #ff6b6b;
+        font-weight: 600;
+        font-size: 0.9rem;
+    }
+    /* ------------------------------------------------ */
+</style>
 
-        /* List item container */
-        .people-list .list-item {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            padding: 5px 0;
-            color: #212529;
-            font-size: 0.95rem;
-            text-align: left;
-            border-bottom: 1px dotted #f1f3f5;
-        }
+<main class="welfare-page">
 
-        /* Serial number style */
-        .list-serial {
-            display: inline-block;
-            min-width: 10px;
-            color: #ff6b6b;
-            font-weight: 600;
-            font-size: 0.9rem;
-        }
-        /* ------------------------------------------------ */
-    </style>
-</head>
-<body>
     <!-- Copy Notification -->
     <div class="copy-notification" id="copyNotification">
         <i class="fas fa-check-circle me-2"></i>
@@ -1001,10 +1001,10 @@ $total_pages = ceil($total_names / $names_per_page);
     <!-- Scripts -->
     <script src="assets/js/jquery-3.7.1.min.js"></script>
     <script src="assets/js/bootstrap.bundle.min.js"></script>
-    
+
     <!-- AOS Animation JS -->
     <script src="assets/js/aos.js"></script>
-    
+
     <script>
         $(document).ready(function() {
             // Initialize AOS
@@ -1236,5 +1236,6 @@ $total_pages = ceil($total_names / $names_per_page);
             }, 2000);
         }
     </script>
-</body>
+</main>
+
 <?php include 'footer.php'; ?>

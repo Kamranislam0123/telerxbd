@@ -60902,3 +60902,133 @@ ul li {
 }
 
 /*# sourceMappingURL=custom.css.map */
+
+
+
+
+
+/* =====================================================
+   TeleRx Global Width Fix
+   Makes all pages match Home page layout width
+===================================================== */
+
+html,
+body {
+    width: 100%;
+    max-width: 100%;
+    overflow-x: hidden;
+}
+
+/* Main site wrapper should always take full browser width */
+.main-wrapper,
+.main-wrapper.home-one {
+    width: 100%;
+    max-width: 100%;
+    margin: 0 auto;
+    overflow-x: hidden;
+    transform: none !important;
+    zoom: 1 !important;
+}
+
+/* Prevent inner page sections from shrinking the whole page */
+section.main-wrapper,
+div.main-wrapper {
+    width: 100%;
+    max-width: 100%;
+}
+
+/* Keep all page containers same as Home page */
+.main-wrapper .container,
+.main-wrapper .container-sm,
+.main-wrapper .container-md,
+.main-wrapper .container-lg,
+.main-wrapper .container-xl,
+.main-wrapper .container-xxl {
+    width: 100%;
+    margin-left: auto;
+    margin-right: auto;
+    padding-left: 12px;
+    padding-right: 12px;
+}
+
+/* Desktop width same as Home */
+@media (min-width: 1400px) {
+    .main-wrapper .container,
+    .main-wrapper .container-sm,
+    .main-wrapper .container-md,
+    .main-wrapper .container-lg,
+    .main-wrapper .container-xl,
+    .main-wrapper .container-xxl {
+        max-width: 1320px;
+    }
+}
+
+@media (min-width: 1200px) and (max-width: 1399.98px) {
+    .main-wrapper .container,
+    .main-wrapper .container-sm,
+    .main-wrapper .container-md,
+    .main-wrapper .container-lg,
+    .main-wrapper .container-xl,
+    .main-wrapper .container-xxl {
+        max-width: 1140px;
+    }
+}
+
+@media (min-width: 992px) and (max-width: 1199.98px) {
+    .main-wrapper .container,
+    .main-wrapper .container-sm,
+    .main-wrapper .container-md,
+    .main-wrapper .container-lg,
+    .main-wrapper .container-xl,
+    .main-wrapper .container-xxl {
+        max-width: 960px;
+    }
+}
+
+@media (min-width: 768px) and (max-width: 991.98px) {
+    .main-wrapper .container,
+    .main-wrapper .container-sm,
+    .main-wrapper .container-md,
+    .main-wrapper .container-lg,
+    .main-wrapper .container-xl,
+    .main-wrapper .container-xxl {
+        max-width: 720px;
+    }
+}
+
+@media (min-width: 576px) and (max-width: 767.98px) {
+    .main-wrapper .container,
+    .main-wrapper .container-sm,
+    .main-wrapper .container-md,
+    .main-wrapper .container-lg,
+    .main-wrapper .container-xl,
+    .main-wrapper .container-xxl {
+        max-width: 540px;
+    }
+}
+
+@media (max-width: 575.98px) {
+    .main-wrapper .container,
+    .main-wrapper .container-sm,
+    .main-wrapper .container-md,
+    .main-wrapper .container-lg,
+    .main-wrapper .container-xl,
+    .main-wrapper .container-xxl {
+        max-width: 100%;
+        padding-left: 16px;
+        padding-right: 16px;
+    }
+}
+
+/* Stop page-specific CSS from making pages look smaller */
+.about-page,
+.about-us-page,
+.welfare-page,
+.subscription-page,
+.global-care-page,
+.contact-page {
+    width: 100%;
+    max-width: 100%;
+    transform: none !important;
+    zoom: 1 !important;
+}

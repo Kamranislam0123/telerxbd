@@ -46,8 +46,8 @@
                                             <img src="assets/img/clients/client-08.jpg" class="img-fluid" alt="James Anderson">
                                         </div>
                                         <div class="testimonial-user-name">
-                                            <h5>Rumon Hossain</h5>
-                                            <p>Maymansing, Bangladesh</p>
+                                            <h5>Kamranul Islam</h5>
+                                            <p>Kushtia, Bangladesh</p>
                                         </div>
                                     </div>
                                     <div class="rating">
