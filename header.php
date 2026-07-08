@@ -86,6 +86,9 @@ $current_page = basename($_SERVER['PHP_SELF']);
     <!-- Main CSS -->
     <link rel="stylesheet" href="assets/css/custom.css">
 
+    <!-- Subscription CSS -->
+    <link rel="stylesheet" href="assets/css/subscription.css">
+
     <!-- Rangeslider CSS -->
     <link rel="stylesheet" href="assets/plugins/ion-rangeslider/css/ion.rangeSlider.css">
     <link rel="stylesheet" href="assets/plugins/ion-rangeslider/css/ion.rangeSlider.min.css">
