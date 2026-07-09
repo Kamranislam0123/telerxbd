@@ -86,6 +86,9 @@ $current_page = basename($_SERVER['PHP_SELF']);
     <!-- Main CSS -->
     <link rel="stylesheet" href="assets/css/custom.css">
 
+    <!-- Subscription CSS -->
+    <link rel="stylesheet" href="assets/css/subscription.css">
+
     <!-- Rangeslider CSS -->
     <link rel="stylesheet" href="assets/plugins/ion-rangeslider/css/ion.rangeSlider.css">
     <link rel="stylesheet" href="assets/plugins/ion-rangeslider/css/ion.rangeSlider.min.css">
@@ -150,7 +153,10 @@ $current_page = basename($_SERVER['PHP_SELF']);
                         <li class="<?php echo ($current_page == 'welfare') ? 'active' : ''; ?>">
                             <a href="welfare">Welfare</a>
                         </li>
-                        <li class="<?php echo ($current_page == 'subscription.php') ? 'active' : ''; ?>">
+                        <li class="<?php echo ($current_page == 'Products/products') ? 'active' : ''; ?>">
+                            <a href="Products/products.php">Products</a>
+                        </li>
+                        <li class="<?php echo ($current_page == 'subscription') ? 'active' : ''; ?>">
                            <a href="subscription.php">Subscription</a>
                         </li>
                         <li class="<?php echo ($current_page == 'about-us') ? 'active' : ''; ?>">

@@ -330,7 +330,7 @@ include 'header.php';
                                                 <?php
                                                 // Define all available experiences
                                                 $all_experiences = [
-                                                    'Gynecology', 'Diabetology', 'Cardiology', 'Neurology', 'Urology', 'Gastroenterology', 'Pulmonology', 'Nephrology', 'Oncology', 'Sexology', 'Rheumatology', 'Allergy & Immunology', 'Ophthalmology'
+                                                    'General Medicine', 'Family Medicine', 'Internal Medicine', 'Pediatrics', 'Gynecology & Obstetrics', 'Dermatology', 'Psychiatry/Mental Health', 'Cardiology', 'Endocrinology', 'Neurology', 'Orthopedics', 'Nephrology', 'Gastroenterology', 'Pulmonology', 'Ophthalmology', 'ENT', 'Urology', 'Nutrition and Dietetics', 'Physiotherapy', 'Sexology'
                                                 ];
                                                 ?>
                                                 <div class="speciality-checkboxes" id="experience-section" style="max-height: 200px; overflow-y: auto; border: 1px solid #ddd; border-radius: 4px; padding: 10px; background-color: #f9f9f9;">
