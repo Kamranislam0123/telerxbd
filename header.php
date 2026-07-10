@@ -153,27 +153,33 @@ $current_page = basename($_SERVER['PHP_SELF']);
                         <li class="<?php echo ($current_page == 'welfare') ? 'active' : ''; ?>">
                             <a href="welfare">Welfare</a>
                         </li>
+                        <li class="<?php echo ($current_page == 'HomeService/home-service') ? 'active' : ''; ?>">
+                           <a href="HomeService/home-service">Home Care</a>
+                        </li>
+                        <li class="<?php echo ($current_page == 'corporate') ? 'active' : ''; ?>">
+                           <a href="corporate">Corporate/NGO</a>
+                        </li>
                         <li class="<?php echo ($current_page == 'Products/products') ? 'active' : ''; ?>">
-                            <a href="Products/products.php">Products</a>
+                            <a href="Products/products">Products</a>
                         </li>
-                        <li class="<?php echo ($current_page == 'subscription') ? 'active' : ''; ?>">
-                           <a href="subscription.php">Subscription</a>
-                        </li>
-                        <li class="<?php echo ($current_page == 'about-us') ? 'active' : ''; ?>">
-                            <a href="about-us">About Us</a>
-                        </li>
-                        <li class="nav-item-contact-more <?php echo ($current_page == 'contact') ? 'active' : ''; ?>">
-                            <a href="contact">Contact</a>
-                            <div class="dropdown nav-more-hover">
-                                <a href="#" class="nav-more-ellipsis" data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="false" role="button" aria-label="More menu">
-                                    <i class="fa-solid fa-ellipsis-vertical" aria-hidden="true"></i>
-                                </a>
-                                <ul class="dropdown-menu dropdown-menu-end nav-more-dropdown">
-                                    <li>
-                                        <a class="dropdown-item<?php echo ($current_page === 'global-care.php') ? ' active' : ''; ?>" href="global-care">Global Care</a>
-                                    </li>
-                                </ul>
-                            </div>
+                        <li class="has-submenu trx-more-menu <?php echo in_array($current_page, ['about-us', 'contact']) ? 'active' : ''; ?>">
+                            <a href="javascript:void(0);">
+                                More <i class="fas fa-chevron-down"></i>
+                            </a>
+                            <ul class="submenu trx-more-dropdown">
+                                <li class="<?php echo ($current_page == 'subscription') ? 'active' : ''; ?>">
+                                <a href="subscription">Subscription</a>
+                                </li>
+                                <li class="<?php echo ($current_page == 'global-care') ? 'active' : ''; ?>">
+                                    <a href="global-care">Global Care</a>
+                                </li>
+                                <li class="<?php echo ($current_page == 'about-us.php') ? 'active' : ''; ?>">
+                                    <a href="about-us">About Us</a>
+                                </li>
+                                <li class="<?php echo ($current_page == 'contact.php') ? 'active' : ''; ?>">
+                                    <a href="contact">Contact Us</a>
+                                </li>
+                            </ul>
                         </li>
                         <!-- Mobile view login/signup link -->
                         <li class="login-link">
