@@ -107,16 +107,20 @@ $current_page = basename($_SERVER['PHP_SELF']);
             <div class="container telerx-header-top-inner">
                 <div class="telerx-top-left">
                     <span class="telerx-top-label">Follow us :</span>
-                    <a href="#" aria-label="Facebook"><i class="fa-brands fa-facebook-f" aria-hidden="true"></i></a>
-                    <a href="#" aria-label="Twitter X"><i class="fa-brands fa-x-twitter" aria-hidden="true"></i></a>
-                    <a href="#" aria-label="Instagram"><i class="fa-brands fa-instagram" aria-hidden="true"></i></a>
+                    <a href="https://www.facebook.com/telerxbd" aria-label="Facebook" target="_blank"><i class="fa-brands fa-facebook-f" aria-hidden="true"></i></a>
+                    <a href="https://www.youtube.com/@TeleRxBD" aria-label="YouTube" target="_blank"><i class="fa-brands fa-youtube" aria-hidden="true"></i></a>
+                    <a href="https://www.instagram.com/telerxbd" aria-label="Instagram" target="_blank"><i class="fa-brands fa-instagram" aria-hidden="true"></i></a>
+                    <a href="https://bd.linkedin.com/company/telerxbd" aria-label="LinkedIn" target="_blank"><i class="fa-brands fa-linkedin-in" aria-hidden="true"></i></a>
                 </div>
                 <!-- <div>
                     <marquee width="100%" behavior="scroll" direction="left">TeleRx website in under maintenance.</marquee>
                 </div>
                 -->
                 <div class="telerx-top-right">
-                    <span> Helpline: <i class="fa-solid fa-phone" aria-hidden="true"></i> +880 1836 838888</span>
+                    <a href="https://wa.me/8801836838888" target="_blank" rel="noopener noreferrer" class="telerx-helpline">
+                        <span class="helpline-icon"><i class="fa-brands fa-whatsapp" aria-hidden="true"></i></span>
+                        <span class="helpline-content">24/7 Helpline:<strong>01836-838888</strong></span>
+                    </a>
                 </div>
             </div>
         </div>
@@ -195,8 +199,8 @@ $current_page = basename($_SERVER['PHP_SELF']);
                 <!-- Right side navigation -->
                 <ul class="nav header-navbar-rht align-items-center">
                     <li class="nav-item me-3 d-none d-sm-block">
-                        <a href="emergency-booking.php" class="btn btn-danger text-white d-flex align-items-center" style="font-weight: 600; padding: 8px 16px; border-radius: 6px; box-shadow: 0 4px 6px rgba(220,53,69,0.3); animation: pulse-red 2s infinite;">
-                            <i class="fa-solid fa-truck-medical me-2"></i> Emergency
+                        <a href="emergency-booking" class="btn btn-danger reg-btn">
+                            <i class="fa-solid fa-truck-medical me-2"></i>Emergency
                         </a>
                     </li>
                     <?php if(isset($_SESSION['logged_in']) && $_SESSION['logged_in'] === true): ?>

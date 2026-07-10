@@ -49,10 +49,10 @@
                             <div class="footer-links-middle">
                                 <h4>Our Activities on Social Media</h4>
                                 <ul class="social-icons">
-                                    <li><a href="javascript:void(0);" class="social-media"><i class="fa-brands fa-facebook-f"></i></a></li>
-                                    <li><a href="javascript:void(0);" class="social-media"><i class="fa-brands fa-youtube"></i></a></li>
-                                    <li><a href="javascript:void(0);" class="social-media"><i class="fa-brands fa-instagram"></i></a></li>
-                                    <li><a href="javascript:void(0);" class="social-media"><i class="fa-brands fa-linkedin-in"></i></a></li>
+                                    <li><a href="https://www.facebook.com/telerxbd" class="social-media"  target="_blank"><i class="fa-brands fa-facebook-f"></i></a></li>
+                                    <li><a href="https://www.youtube.com/@TeleRxBD" class="social-media"  target="_blank"><i class="fa-brands fa-youtube"></i></a></li>
+                                    <li><a href="https://www.instagram.com/telerxbd" class="social-media"  target="_blank"><i class="fa-brands fa-instagram"></i></a></li>
+                                    <li><a href="https://bd.linkedin.com/company/telerxbd" class="social-media"  target="_blank"><i class="fa-brands fa-linkedin-in"></i></a></li>
                                 </ul>
                             </div>
                         </div>
