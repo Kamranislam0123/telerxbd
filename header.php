@@ -51,10 +51,10 @@ $current_page = basename($_SERVER['PHP_SELF']);
     <title>TeleRx Bangladesh</title>
 
     <!-- Favicon -->
-    <link rel="shortcut icon" type="image/x-icon" sizes="48x48" href="assets/img/favicon.png">
+    <link rel="shortcut icon" type="image/x-icon" sizes="48x48" href="assets/img/fav.png">
 
     <!-- Apple Touch Icon -->
-    <link rel="apple-touch-icon" sizes="180x180" href="assets/img/apple-touch-icon.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="assets/img/appleicon.png">
 
     <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="assets/css/bootstrap.min.css">
@@ -89,6 +89,9 @@ $current_page = basename($_SERVER['PHP_SELF']);
 
     <!-- Subscription CSS -->
     <link rel="stylesheet" href="assets/css/subscription.css">
+
+    <!-- Login CSS -->
+    <link rel="stylesheet" href="assets/css/login.css">
 
     <!-- Rangeslider CSS -->
     <link rel="stylesheet" href="assets/plugins/ion-rangeslider/css/ion.rangeSlider.css">
