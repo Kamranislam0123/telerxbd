@@ -694,6 +694,7 @@ include 'header.php';
 						</div>
 						<div class="modal-footer">
 							<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+							<button type="button" class="btn btn-outline-primary" id="btn_preview_prescription">Preview Design</button>
 							<button type="submit" class="btn btn-primary" id="btn_submit_prescription">Generate & Save PDF</button>
 						</div>
 					</form>
@@ -808,38 +809,52 @@ include 'header.php';
 
 			$('#prescription_form').submit(function(e) {
 				e.preventDefault();
-				
+				savePrescriptionAndOpen(false);
+			});
+
+			$('#btn_preview_prescription').click(function() {
+				savePrescriptionAndOpen(true);
+			});
+
+			function savePrescriptionAndOpen(previewOnly) {
 				const $submitBtn = $('#btn_submit_prescription');
-				const originalText = $submitBtn.text();
-				$submitBtn.prop('disabled', true).html('<i class="fa-solid fa-spinner fa-spin me-1"></i> Generating...');
+				const $previewBtn = $('#btn_preview_prescription');
+				const originalSubmitText = $submitBtn.text();
+				const originalPreviewText = $previewBtn.text();
+
+				$submitBtn.prop('disabled', true);
+				$previewBtn.prop('disabled', true).html('<i class="fa-solid fa-spinner fa-spin me-1"></i> Saving...');
 
 				$.ajax({
 					url: 'php/save-prescription-data.php',
 					type: 'POST',
-					data: $(this).serialize(),
+					data: $('#prescription_form').serialize(),
 					dataType: 'json',
 					success: function(response) {
 						if (response.success) {
-							// Trigger PDF generation
-							window.open('php/generate-prescription.php?appointment_id=' + response.appointment_id, '_blank');
-							$('#prescription_modal').modal('hide');
-							
-							// Update the UI
-							const aptId = response.appointment_id;
-							// We need to find the right container to update
-							// For simplicity, let's just reload or update all buttons for this ID
-							location.reload(); 
+							const url = previewOnly
+								? 'php/generate-prescription.php?appointment_id=' + response.appointment_id + '&preview=html'
+								: 'php/generate-prescription.php?appointment_id=' + response.appointment_id;
+
+							window.open(url, '_blank');
+
+							if (!previewOnly) {
+								$('#prescription_modal').modal('hide');
+								location.reload();
+							}
 						} else {
 							alert('Error: ' + response.message);
-							$submitBtn.prop('disabled', false).text(originalText);
 						}
 					},
 					error: function() {
 						alert('An error occurred while saving prescription data.');
-						$submitBtn.prop('disabled', false).text(originalText);
+					},
+					complete: function() {
+						$submitBtn.prop('disabled', false).text(originalSubmitText);
+						$previewBtn.prop('disabled', false).text(originalPreviewText);
 					}
 				});
-			});
+			}
 
 		});
 		</script>

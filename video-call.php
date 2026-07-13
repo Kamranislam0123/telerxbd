@@ -705,6 +705,7 @@ if ($appointment_id) {
 
 							
 							<div class="text-end">
+								<button type="button" class="btn btn-outline-primary btn-lg px-4 me-2" id="btn_preview_prescription">Preview Design</button>
 								<button type="submit" class="btn btn-primary btn-lg px-5" id="btn_submit_prescription">Generate & Save Prescription PDF</button>
 							</div>
 						</form>
@@ -1061,37 +1062,55 @@ if ($appointment_id) {
 			});
 
 			// Handle Prescription Submission
-			$('#prescription_form').on('submit', function (e) {
-				e.preventDefault();
+			function savePrescriptionAndOpen(previewOnly) {
 				const btn = $('#btn_submit_prescription');
+				const previewBtn = $('#btn_preview_prescription');
 				const originalText = btn.html();
-				btn.prop('disabled', true).html('<i class="fa fa-spinner fa-spin me-1"></i> Generating PDF...');
+				const originalPreviewText = previewBtn.text();
+
+				btn.prop('disabled', true);
+				previewBtn.prop('disabled', true).html('<i class="fa fa-spinner fa-spin me-1"></i> Saving...');
 
 				$.ajax({
 					url: 'php/save-prescription-data.php',
 					type: 'POST',
-					data: $(this).serialize(),
+					data: $('#prescription_form').serialize(),
 					dataType: 'json',
 					success: function (res) {
 						if (res.success) {
-							// Open PDF in new tab
-							window.open('php/generate-prescription.php?appointment_id=' + res.appointment_id, '_blank');
-							
-							// Optional: Redirect back to dashboard after a delay
-							$('#prescription_message_area').html('<div class="alert alert-success alert-dismissible fade show" role="alert">Prescription generated! Redirecting to dashboard...<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button></div>');
-							setTimeout(() => {
-								window.location.href = 'doctor-dashboard.php';
-							}, 3000);
+							const url = previewOnly
+								? 'php/generate-prescription.php?appointment_id=' + res.appointment_id + '&preview=html'
+								: 'php/generate-prescription.php?appointment_id=' + res.appointment_id;
+
+							window.open(url, '_blank');
+
+							if (!previewOnly) {
+								$('#prescription_message_area').html('<div class="alert alert-success alert-dismissible fade show" role="alert">Prescription generated! Redirecting to dashboard...<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button></div>');
+								setTimeout(() => {
+									window.location.href = 'doctor-dashboard.php';
+								}, 3000);
+							}
 						} else {
 							$('#prescription_message_area').html('<div class="alert alert-danger alert-dismissible fade show" role="alert">' + res.message + '<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button></div>');
-							btn.prop('disabled', false).html(originalText);
 						}
 					},
 					error: function () {
 						$('#prescription_message_area').html('<div class="alert alert-danger alert-dismissible fade show" role="alert">An error occurred while saving prescription data.<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button></div>');
+					},
+					complete: function () {
 						btn.prop('disabled', false).html(originalText);
+						previewBtn.prop('disabled', false).text(originalPreviewText);
 					}
 				});
+			}
+
+			$('#prescription_form').on('submit', function (e) {
+				e.preventDefault();
+				savePrescriptionAndOpen(false);
+			});
+
+			$('#btn_preview_prescription').on('click', function () {
+				savePrescriptionAndOpen(true);
 			});
 
 			// Add Medicine Row
