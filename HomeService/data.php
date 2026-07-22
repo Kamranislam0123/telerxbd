@@ -68,7 +68,7 @@ $home_services = [
         'overview' => 'TeleRx Medical Equipment service helps families access essential healthcare equipment for home use. This may include monitoring devices, mobility support items and home-care equipment depending on availability.',
         'highlights' => ['Equipment purchase support', 'Rental coordination', 'Home care devices', 'Delivery assistance'],
         'included' => ['Equipment requirement guidance', 'Purchase or rental coordination', 'Delivery support', 'Basic usage instruction', 'After-sales coordination where applicable'],
-        'ideal_for' => ['Home care patients', 'Elderly care', 'Post-operative care', 'Long-term patient support', 'Families needing monitoring devices'],
+        'ideal_for' => ['Home care patients', 'Elderly care', 'Long-term patient support', 'Families needing monitoring devices'],
         'process' => ['Tell TeleRx what equipment is needed', 'Availability and pricing are checked', 'Delivery or rental arrangement is confirmed', 'Equipment is delivered with basic guidance'],
         'note' => 'Equipment availability, warranty and rental terms may vary by product and location.'
     ],
@@ -107,30 +107,6 @@ $home_services = [
         'ideal_for' => ['Elderly patients', 'Chronic disease medicine', 'Post-consultation prescriptions', 'Busy families', 'Homebound patients'],
         'process' => ['Send prescription or medicine list', 'Availability and price are confirmed', 'Delivery location is shared', 'Medicine is delivered after confirmation'],
         'note' => 'Prescription medicines should be used only under doctor advice.'
-    ],
-    'elderly-care-support' => [
-        'title' => 'Elderly Care Support',
-        'category' => 'Elderly Care',
-        'image' => 'assets/services/elderly-care-support.svg',
-        'short' => 'Structured home support for elderly family members who need monitoring, assistance and regular care coordination.',
-        'overview' => 'TeleRx Elderly Care Support is designed for families who want organized care for parents or elderly relatives at home. The service can combine caregiver assistance, nursing support, medicine routine, doctor consultation and follow-up coordination.',
-        'highlights' => ['Elderly monitoring', 'Medicine routine support', 'Care coordination', 'Family updates'],
-        'included' => ['Basic health monitoring coordination', 'Medicine and appointment reminder support', 'Caregiver or nursing arrangement', 'Doctor consultation support', 'Monthly follow-up guidance when needed'],
-        'ideal_for' => ['Parents living at home', 'Elderly with chronic illness', 'Elderly living alone', 'Families living away', 'Long-term care support'],
-        'process' => ['Share elderly patient profile', 'TeleRx identifies care needs', 'Care plan is discussed with family', 'Support begins after confirmation'],
-        'note' => 'Care scope depends on patient condition and available service resources.'
-    ],
-    'post-operative-care' => [
-        'title' => 'Post-Operative Care at Home',
-        'category' => 'Recovery Care',
-        'image' => 'assets/services/post-operative-care.svg',
-        'short' => 'Home-based recovery support after surgery, including monitoring, dressing coordination and follow-up care assistance.',
-        'overview' => 'TeleRx Post-Operative Care at Home supports patients after hospital discharge. It helps families arrange nursing support, dressing assistance, mobility guidance, medicine routine and doctor follow-up coordination based on the patient’s recovery plan.',
-        'highlights' => ['Recovery support', 'Wound dressing coordination', 'Medicine routine', 'Follow-up guidance'],
-        'included' => ['Recovery monitoring support', 'Dressing or wound-care coordination', 'Medicine schedule support', 'Mobility and safety guidance', 'Doctor follow-up coordination'],
-        'ideal_for' => ['After surgery discharge', 'Patients needing dressing support', 'Mobility-limited patients', 'Family-managed recovery', 'Elderly post-operative patients'],
-        'process' => ['Share discharge summary and prescription', 'Recovery need is reviewed', 'Care schedule is planned', 'Home care support begins'],
-        'note' => 'Any fever, bleeding, severe pain or sudden deterioration should be treated as urgent and reviewed by a doctor immediately.'
     ],
     'injection-dressing-iv-support' => [
         'title' => 'Injection, Dressing & IV Support',

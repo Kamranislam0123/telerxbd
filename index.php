@@ -65,7 +65,7 @@ try {
                                     <i class="fa-solid fa-star text-orange me-1"></i>
                                     <i class="fa-solid fa-star text-orange me-1"></i>
                                 </div>
-                                <p>4.8 Ratings</p>
+                                <p>4.9 Ratings</p>
                             </div>
                         </div>
                     </div>
@@ -146,7 +146,6 @@ try {
             </div>
         </div>
         <div class="owl-carousel doctor-slider-one owl-theme aos" data-aos="fade-up">
-
             <?php if (!empty($doctors_slider)): ?>
                 <?php foreach ($doctors_slider as $doctor): ?>
                     <!-- Doctor Item -->
@@ -203,7 +202,6 @@ try {
                     </div>
                 </div>
             <?php endif; ?>
-
         </div>
     </div>
 </section>
@@ -211,7 +209,7 @@ try {
 
 <!-- Services Section -->
 <section class="services-section aos" data-aos="fade-up">
-    <div class="horizontal-slide d-flex" data-direction="right" data-speed="slow">
+    <div class="horizontal-slide d-flex" data-direction="left" data-speed="slow">
         <div class="slide-list d-flex gap-4">
             <div class="services-slide">
                 <h6><a href="javascript:void(0);">Multi Speciality Treatments & Doctors</a></h6>
@@ -239,9 +237,12 @@ try {
 </section>
 <!-- /Services Section -->
 
-<!-- Slider Section -->
-<?php include 'slider_main.php'; ?>
-<!-- /Slider Section -->
+<?php include __DIR__ . '/index-subscription-section.php'; ?>
+<?php include __DIR__ . '/index-products-section.php'; ?>
+<?php include __DIR__ . '/index-homecare-section.php'; ?>
+<?php include __DIR__ . '/index-corporate-section.php'; ?>
+<?php include __DIR__ . '/index-welfare-section.php'; ?>
+<?php include __DIR__ . '/index-medical-camp-section.php'; ?>
 
 <!-- How TeleRx Works -->
 <section class="testimonial-section">
@@ -351,8 +352,6 @@ try {
     </div>
 </section>
 <!-- /Partners Section -->
-
-<?php include 'testimonial.php'; ?>
 
 <?php include 'footer-banner.php'; ?>
 
