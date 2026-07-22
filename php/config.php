@@ -41,6 +41,10 @@ function getDBConnection() {
 // Start session if not already started
 // Cookie path '/' so session works for all app pages (php/ and root) - fixes health-worker-dashboard redirect
 // is_https: support live proxies (Cloudflare, nginx, etc.) that set X-Forwarded-Proto / X-Forwarded-SSL
+
+if (headers_sent($__f, $__l)) {
+    error_log("HEADERS ALREADY SENT before config.php session block — sent at $__f:$__l");
+}
 if (session_status() === PHP_SESSION_NONE) {
     $is_secure = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off')
         || (!empty($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] === 'https')
@@ -188,4 +192,3 @@ function checkRememberMe() {
 // Call this at the start of every page
 checkRememberMe();
 
-?>

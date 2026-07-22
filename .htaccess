@@ -19,16 +19,26 @@ RewriteCond %{REQUEST_FILENAME} !-d
 RewriteCond %{REQUEST_FILENAME}.php -f
 RewriteRule ^(.*?)/?$ $1.php [NC,L]
 
-# Handle PHP files
- AddType application/x-httpd-php .php
- AddHandler application/x-httpd-php .php
+
+
+
+Handle PHP files
+#  AddType application/x-httpd-php .php
+#  AddHandler application/x-httpd-php .php
 
 # AddType application/x-httpd-ea-php81 .php
 # AddHandler application/x-httpd-ea-php81 .php
 
+AddType application/x-httpd-php81 .php
+AddHandler application/x-httpd-php81 .php
+
 
 # AddHandler application/x-httpd-alt-php81___lsphp .php
 
+
+# <IfModule mime_module>
+#     AddHandler application/x-httpd-alt-php83___lsphp .php
+# </IfModule>
 
 # Security headers
 <IfModule mod_headers.c>

@@ -7718,3 +7718,130 @@ Stack trace:
 [13-Jul-2026 05:07:07 UTC] PHP Warning:  session_start(): Cannot start session when headers already sent in /home/telerxb2/public_html/php/config.php on line 67
 [13-Jul-2026 06:58:33 UTC] PHP Warning:  session_set_cookie_params(): Cannot change session cookie parameters when headers already sent in /home/telerxb2/public_html/header.php on line 23
 [13-Jul-2026 06:58:33 UTC] PHP Warning:  session_start(): Cannot start session when headers already sent in /home/telerxb2/public_html/header.php on line 26
+[13-Jul-2026 08:20:32 UTC] PHP Warning:  session_set_cookie_params(): Cannot change session cookie parameters when headers already sent in /home/telerxb2/public_html/header.php on line 23
+[13-Jul-2026 08:20:32 UTC] PHP Warning:  session_start(): Cannot start session when headers already sent in /home/telerxb2/public_html/header.php on line 26
+[13-Jul-2026 08:20:32 UTC] PHP Warning:  session_set_cookie_params(): Cannot change session cookie parameters when headers already sent in /home/telerxb2/public_html/php/config.php on line 64
+[13-Jul-2026 08:20:32 UTC] PHP Warning:  session_start(): Cannot start session when headers already sent in /home/telerxb2/public_html/php/config.php on line 67
+[13-Jul-2026 08:30:00 UTC] PHP Warning:  session_set_cookie_params(): Cannot change session cookie parameters when headers already sent in /home/telerxb2/public_html/header.php on line 23
+[13-Jul-2026 08:30:00 UTC] PHP Warning:  session_start(): Cannot start session when headers already sent in /home/telerxb2/public_html/header.php on line 26
+[13-Jul-2026 08:30:00 UTC] PHP Warning:  session_set_cookie_params(): Cannot change session cookie parameters when headers already sent in /home/telerxb2/public_html/php/config.php on line 64
+[13-Jul-2026 08:30:00 UTC] PHP Warning:  session_start(): Cannot start session when headers already sent in /home/telerxb2/public_html/php/config.php on line 67
+[13-Jul-2026 09:50:19 UTC] PHP Warning:  session_set_cookie_params(): Session cookie parameters cannot be changed after headers have already been sent in /home/telerxb2/public_html/php/config.php on line 56
+[13-Jul-2026 09:50:19 UTC] PHP Warning:  session_start(): Session cannot be started after headers have already been sent in /home/telerxb2/public_html/php/config.php on line 67
+[13-Jul-2026 17:48:12 Asia/Dhaka] PHP Warning:  mysqli::__construct(): (HY000/1045): Access denied for user 'telerxb2_telerx'@'localhost' (using password: YES) in /home/telerxb2/public_html/php/config.php on line 41
+[13-Jul-2026 17:48:12 Asia/Dhaka] Error fetching doctors for slider: Database connection failed: Access denied for user 'telerxb2_telerx'@'localhost' (using password: YES). Please check your database credentials in config.php.
+[13-Jul-2026 18:16:21 Asia/Dhaka] PHP Fatal error:  Uncaught Error: Call to undefined method mysqli_stmt::get_result() in /home/telerxb2/public_html/index.php:31
+Stack trace:
+#0 {main}
+  thrown in /home/telerxb2/public_html/index.php on line 31
+[13-Jul-2026 18:16:27 Asia/Dhaka] PHP Fatal error:  Uncaught Error: Call to undefined method mysqli_stmt::get_result() in /home/telerxb2/public_html/index.php:31
+Stack trace:
+#0 {main}
+  thrown in /home/telerxb2/public_html/index.php on line 31
+[13-Jul-2026 18:16:28 Asia/Dhaka] PHP Fatal error:  Uncaught Error: Call to undefined method mysqli_stmt::get_result() in /home/telerxb2/public_html/index.php:31
+Stack trace:
+#0 {main}
+  thrown in /home/telerxb2/public_html/index.php on line 31
+[13-Jul-2026 18:38:26 Asia/Dhaka] PHP Fatal error:  Uncaught Error: Call to undefined method mysqli_stmt::get_result() in /home/telerxb2/public_html/index.php:31
+Stack trace:
+#0 {main}
+  thrown in /home/telerxb2/public_html/index.php on line 31
+[13-Jul-2026 19:39:22 Asia/Dhaka] PHP Fatal error:  Uncaught Error: Call to undefined method mysqli_stmt::get_result() in /home/telerxb2/public_html/index.php:31
+Stack trace:
+#0 {main}
+  thrown in /home/telerxb2/public_html/index.php on line 31
+[13-Jul-2026 19:57:22 Asia/Dhaka] PHP Fatal error:  Uncaught Error: Call to undefined method mysqli_stmt::get_result() in /home/telerxb2/public_html/index.php:31
+Stack trace:
+#0 {main}
+  thrown in /home/telerxb2/public_html/index.php on line 31
+[13-Jul-2026 20:36:44 Asia/Dhaka] PHP Fatal error:  Uncaught Error: Call to undefined method mysqli_stmt::get_result() in /home/telerxb2/public_html/index.php:31
+Stack trace:
+#0 {main}
+  thrown in /home/telerxb2/public_html/index.php on line 31
+[13-Jul-2026 21:24:06 Asia/Dhaka] PHP Fatal error:  Uncaught Error: Call to undefined method mysqli_stmt::get_result() in /home/telerxb2/public_html/index.php:31
+Stack trace:
+#0 {main}
+  thrown in /home/telerxb2/public_html/index.php on line 31
+[13-Jul-2026 21:25:19 Asia/Dhaka] PHP Fatal error:  Uncaught Error: Call to undefined method mysqli_stmt::get_result() in /home/telerxb2/public_html/index.php:31
+Stack trace:
+#0 {main}
+  thrown in /home/telerxb2/public_html/index.php on line 31
+[13-Jul-2026 22:09:07 Asia/Dhaka] PHP Fatal error:  Uncaught Error: Call to undefined method mysqli_stmt::get_result() in /home/telerxb2/public_html/index.php:31
+Stack trace:
+#0 {main}
+  thrown in /home/telerxb2/public_html/index.php on line 31
+[14-Jul-2026 00:09:09 Asia/Dhaka] PHP Fatal error:  Uncaught Error: Call to undefined method mysqli_stmt::get_result() in /home/telerxb2/public_html/index.php:31
+Stack trace:
+#0 {main}
+  thrown in /home/telerxb2/public_html/index.php on line 31
+[14-Jul-2026 00:36:58 Asia/Dhaka] PHP Fatal error:  Uncaught Error: Call to undefined method mysqli_stmt::get_result() in /home/telerxb2/public_html/index.php:31
+Stack trace:
+#0 {main}
+  thrown in /home/telerxb2/public_html/index.php on line 31
+[14-Jul-2026 01:21:30 Asia/Dhaka] PHP Fatal error:  Uncaught Error: Call to undefined method mysqli_stmt::get_result() in /home/telerxb2/public_html/index.php:31
+Stack trace:
+#0 {main}
+  thrown in /home/telerxb2/public_html/index.php on line 31
+[14-Jul-2026 01:51:32 Asia/Dhaka] PHP Fatal error:  Uncaught Error: Call to undefined method mysqli_stmt::get_result() in /home/telerxb2/public_html/index.php:31
+Stack trace:
+#0 {main}
+  thrown in /home/telerxb2/public_html/index.php on line 31
+[14-Jul-2026 08:45:08 UTC] PHP Warning:  session_set_cookie_params(): Cannot change session cookie parameters when headers already sent in /home/telerxb2/public_html/php/config.php on line 64
+[14-Jul-2026 08:45:08 UTC] PHP Warning:  session_start(): Cannot start session when headers already sent in /home/telerxb2/public_html/php/config.php on line 67
+[14-Jul-2026 08:51:13 UTC] PHP Warning:  session_set_cookie_params(): Cannot change session cookie parameters when headers already sent in /home/telerxb2/public_html/php/config.php on line 64
+[14-Jul-2026 08:51:13 UTC] PHP Warning:  session_start(): Cannot start session when headers already sent in /home/telerxb2/public_html/php/config.php on line 67
+[14-Jul-2026 08:51:31 UTC] PHP Warning:  session_set_cookie_params(): Cannot change session cookie parameters when headers already sent in /home/telerxb2/public_html/php/config.php on line 64
+[14-Jul-2026 08:51:31 UTC] PHP Warning:  session_start(): Cannot start session when headers already sent in /home/telerxb2/public_html/php/config.php on line 67
+[14-Jul-2026 08:53:57 UTC] PHP Warning:  session_set_cookie_params(): Cannot change session cookie parameters when headers already sent in /home/telerxb2/public_html/php/config.php on line 64
+[14-Jul-2026 08:53:57 UTC] PHP Warning:  session_start(): Cannot start session when headers already sent in /home/telerxb2/public_html/php/config.php on line 67
+[14-Jul-2026 09:00:46 UTC] PHP Warning:  session_set_cookie_params(): Cannot change session cookie parameters when headers already sent in /home/telerxb2/public_html/php/config.php on line 64
+[14-Jul-2026 09:00:46 UTC] PHP Warning:  session_start(): Cannot start session when headers already sent in /home/telerxb2/public_html/php/config.php on line 67
+[14-Jul-2026 10:06:03 UTC] PHP Warning:  session_set_cookie_params(): Cannot change session cookie parameters when headers already sent in /home/telerxb2/public_html/php/config.php on line 64
+[14-Jul-2026 10:06:03 UTC] PHP Warning:  session_start(): Cannot start session when headers already sent in /home/telerxb2/public_html/php/config.php on line 67
+[14-Jul-2026 12:03:26 UTC] PHP Warning:  session_set_cookie_params(): Cannot change session cookie parameters when headers already sent in /home/telerxb2/public_html/php/config.php on line 64
+[14-Jul-2026 12:03:26 UTC] PHP Warning:  session_start(): Cannot start session when headers already sent in /home/telerxb2/public_html/php/config.php on line 67
+[14-Jul-2026 14:20:37 UTC] PHP Warning:  session_set_cookie_params(): Cannot change session cookie parameters when headers already sent in /home/telerxb2/public_html/php/config.php on line 64
+[14-Jul-2026 14:20:37 UTC] PHP Warning:  session_start(): Cannot start session when headers already sent in /home/telerxb2/public_html/php/config.php on line 67
+[14-Jul-2026 14:36:53 UTC] PHP Warning:  session_set_cookie_params(): Cannot change session cookie parameters when headers already sent in /home/telerxb2/public_html/php/config.php on line 64
+[14-Jul-2026 14:36:53 UTC] PHP Warning:  session_start(): Cannot start session when headers already sent in /home/telerxb2/public_html/php/config.php on line 67
+[14-Jul-2026 16:21:24 UTC] PHP Warning:  session_set_cookie_params(): Cannot change session cookie parameters when headers already sent in /home/telerxb2/public_html/php/config.php on line 64
+[14-Jul-2026 16:21:24 UTC] PHP Warning:  session_start(): Cannot start session when headers already sent in /home/telerxb2/public_html/php/config.php on line 67
+[14-Jul-2026 16:24:06 UTC] PHP Warning:  session_set_cookie_params(): Cannot change session cookie parameters when headers already sent in /home/telerxb2/public_html/php/config.php on line 64
+[14-Jul-2026 16:24:06 UTC] PHP Warning:  session_start(): Cannot start session when headers already sent in /home/telerxb2/public_html/php/config.php on line 67
+[14-Jul-2026 18:53:50 UTC] PHP Warning:  session_set_cookie_params(): Cannot change session cookie parameters when headers already sent in /home/telerxb2/public_html/php/config.php on line 64
+[14-Jul-2026 18:53:50 UTC] PHP Warning:  session_start(): Cannot start session when headers already sent in /home/telerxb2/public_html/php/config.php on line 67
+[14-Jul-2026 22:46:51 UTC] PHP Warning:  session_set_cookie_params(): Cannot change session cookie parameters when headers already sent in /home/telerxb2/public_html/php/config.php on line 64
+[14-Jul-2026 22:46:51 UTC] PHP Warning:  session_start(): Cannot start session when headers already sent in /home/telerxb2/public_html/php/config.php on line 67
+[15-Jul-2026 02:12:53 UTC] PHP Warning:  session_set_cookie_params(): Cannot change session cookie parameters when headers already sent in /home/telerxb2/public_html/php/config.php on line 64
+[15-Jul-2026 02:12:53 UTC] PHP Warning:  session_start(): Cannot start session when headers already sent in /home/telerxb2/public_html/php/config.php on line 67
+[15-Jul-2026 02:58:33 UTC] PHP Warning:  session_set_cookie_params(): Cannot change session cookie parameters when headers already sent in /home/telerxb2/public_html/php/config.php on line 64
+[15-Jul-2026 02:58:33 UTC] PHP Warning:  session_start(): Cannot start session when headers already sent in /home/telerxb2/public_html/php/config.php on line 67
+[15-Jul-2026 04:24:42 UTC] PHP Warning:  session_set_cookie_params(): Cannot change session cookie parameters when headers already sent in /home/telerxb2/public_html/php/config.php on line 64
+[15-Jul-2026 04:24:42 UTC] PHP Warning:  session_start(): Cannot start session when headers already sent in /home/telerxb2/public_html/php/config.php on line 67
+[15-Jul-2026 07:40:50 UTC] PHP Warning:  session_set_cookie_params(): Cannot change session cookie parameters when headers already sent in /home/telerxb2/public_html/php/config.php on line 64
+[15-Jul-2026 07:40:50 UTC] PHP Warning:  session_start(): Cannot start session when headers already sent in /home/telerxb2/public_html/php/config.php on line 67
+[15-Jul-2026 09:08:05 UTC] PHP Warning:  session_set_cookie_params(): Cannot change session cookie parameters when headers already sent in /home/telerxb2/public_html/php/config.php on line 64
+[15-Jul-2026 09:08:05 UTC] PHP Warning:  session_start(): Cannot start session when headers already sent in /home/telerxb2/public_html/php/config.php on line 67
+[15-Jul-2026 11:56:57 UTC] PHP Warning:  session_start(): Session cannot be started after headers have already been sent in /home/telerxb2/public_html/phpinfo_check.php on line 5
+[16-Jul-2026 11:08:49 Asia/Dhaka] PHP Warning:  Cannot modify header information - headers already sent by (output started at /home/telerxb2/public_html/header.php:6) in /home/telerxb2/public_html/doctor-profile.php on line 21
+[16-Jul-2026 19:26:18 Asia/Dhaka] Doctor profile error: Too many connections
+[16-Jul-2026 19:26:18 Asia/Dhaka] PHP Warning:  Cannot modify header information - headers already sent by (output started at /home/telerxb2/public_html/header.php:6) in /home/telerxb2/public_html/doctor-profile.php on line 150
+[17-Jul-2026 02:58:21 Asia/Dhaka] PHP Warning:  Cannot modify header information - headers already sent by (output started at /home/telerxb2/public_html/header.php:6) in /home/telerxb2/public_html/doctor-profile.php on line 21
+[17-Jul-2026 10:14:09 Asia/Dhaka] Error fetching doctors for slider: Too many connections
+[17-Jul-2026 11:13:55 Asia/Dhaka] PHP Warning:  Cannot modify header information - headers already sent by (output started at /home/telerxb2/public_html/header.php:6) in /home/telerxb2/public_html/doctor-profile.php on line 21
+[17-Jul-2026 11:43:56 Asia/Dhaka] Error fetching doctors for slider: Too many connections
+[17-Jul-2026 14:57:27 Asia/Dhaka] Doctor profile error: Too many connections
+[17-Jul-2026 14:57:27 Asia/Dhaka] PHP Warning:  Cannot modify header information - headers already sent by (output started at /home/telerxb2/public_html/header.php:6) in /home/telerxb2/public_html/doctor-profile.php on line 150
+[17-Jul-2026 15:47:40 Asia/Dhaka] Doctor profile error: Too many connections
+[17-Jul-2026 15:47:40 Asia/Dhaka] PHP Warning:  Cannot modify header information - headers already sent by (output started at /home/telerxb2/public_html/header.php:6) in /home/telerxb2/public_html/doctor-profile.php on line 150
+[18-Jul-2026 00:25:10 Asia/Dhaka] PHP Warning:  Cannot modify header information - headers already sent by (output started at /home/telerxb2/public_html/header.php:6) in /home/telerxb2/public_html/doctor-profile.php on line 21
+[18-Jul-2026 05:15:59 Asia/Dhaka] PHP Warning:  Cannot modify header information - headers already sent by (output started at /home/telerxb2/public_html/header.php:6) in /home/telerxb2/public_html/doctor-profile.php on line 21
+[18-Jul-2026 14:09:27 Asia/Dhaka] PHP Warning:  Cannot modify header information - headers already sent by (output started at /home/telerxb2/public_html/header.php:6) in /home/telerxb2/public_html/doctor-profile.php on line 21
+[19-Jul-2026 01:22:04 Asia/Dhaka] Doctor profile error: Too many connections
+[19-Jul-2026 01:22:04 Asia/Dhaka] PHP Warning:  Cannot modify header information - headers already sent by (output started at /home/telerxb2/public_html/header.php:6) in /home/telerxb2/public_html/doctor-profile.php on line 150
+[20-Jul-2026 09:25:36 Asia/Dhaka] PHP Warning:  Cannot modify header information - headers already sent by (output started at /home/telerxb2/public_html/header.php:6) in /home/telerxb2/public_html/doctor-profile.php on line 21
+[20-Jul-2026 14:37:26 Asia/Dhaka] PHP Warning:  Cannot modify header information - headers already sent by (output started at /home/telerxb2/public_html/header.php:6) in /home/telerxb2/public_html/doctor-profile.php on line 21
+[20-Jul-2026 16:25:38 Asia/Dhaka] PHP Warning:  Cannot modify header information - headers already sent by (output started at /home/telerxb2/public_html/header.php:6) in /home/telerxb2/public_html/doctor-profile.php on line 21
+[20-Jul-2026 18:24:09 Asia/Dhaka] PHP Warning:  Cannot modify header information - headers already sent by (output started at /home/telerxb2/public_html/header.php:6) in /home/telerxb2/public_html/doctor-profile.php on line 21
+[20-Jul-2026 18:44:19 Asia/Dhaka] PHP Warning:  Cannot modify header information - headers already sent by (output started at /home/telerxb2/public_html/header.php:6) in /home/telerxb2/public_html/doctor-profile.php on line 21
+[22-Jul-2026 11:46:14 Asia/Dhaka] PHP Warning:  Cannot modify header information - headers already sent by (output started at /home/telerxb2/public_html/header.php:6) in /home/telerxb2/public_html/doctor-profile.php on line 21
