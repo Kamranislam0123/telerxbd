@@ -65,6 +65,15 @@ $current_page = basename($_SERVER['PHP_SELF']);
     <!-- Subscription CSS -->
     <link rel="stylesheet" href="assets/css/subscription.css">
 
+    <!-- Medical Camp CSS -->
+    <link rel="stylesheet" href="assets/css/medical-camp.css">
+
+    <!-- Training CSS -->
+    <link rel="stylesheet" href="assets/css/training.css">
+
+    <!-- Index Home Page CSS -->
+    <link rel="stylesheet" href="assets/css/index-program-sections.css">
+    
     <!-- Login CSS -->
     <link rel="stylesheet" href="assets/css/login.css">
 
@@ -139,28 +148,34 @@ $current_page = basename($_SERVER['PHP_SELF']);
                         <li class="<?php echo ($current_page == 'HomeService/home-service') ? 'active' : ''; ?>">
                            <a href="HomeService/home-service">Home Care</a>
                         </li>
-                        <li class="<?php echo ($current_page == 'corporate') ? 'active' : ''; ?>">
-                           <a href="corporate">Corporate/NGO</a>
-                        </li>
                         <li class="<?php echo ($current_page == 'Products/products') ? 'active' : ''; ?>">
                             <a href="Products/products">Products</a>
+                        </li>
+                        <li class="<?php echo ($current_page == 'subscription') ? 'active' : ''; ?>">
+                            <a href="subscription">Subscription</a>
                         </li>
                         <li class="has-submenu trx-more-menu <?php echo in_array($current_page, ['about-us', 'contact']) ? 'active' : ''; ?>">
                             <a href="javascript:void(0);">
                                 More <i class="fas fa-chevron-down"></i>
                             </a>
                             <ul class="submenu trx-more-dropdown">
-                                <li class="<?php echo ($current_page == 'subscription') ? 'active' : ''; ?>">
-                                <a href="subscription">Subscription</a>
+                                <li class="<?php echo ($current_page == 'medical-camp') ? 'active' : ''; ?>">
+                                <a href="medical-camp">Medical Camp</a>
                                 </li>
-                                <li class="<?php echo ($current_page == 'global-care') ? 'active' : ''; ?>">
-                                    <a href="global-care">Global Care</a>
+                                <li class="<?php echo ($current_page == 'corporate') ? 'active' : ''; ?>">
+                                    <a href="corporate">Corporate/NGO</a>
+                                </li>
+                                <li class="<?php echo ($current_page == 'training') ? 'active' : ''; ?>">
+                                <a href="training">Training</a>
                                 </li>
                                 <li class="<?php echo ($current_page == 'about-us.php') ? 'active' : ''; ?>">
                                     <a href="about-us">About Us</a>
                                 </li>
                                 <li class="<?php echo ($current_page == 'contact.php') ? 'active' : ''; ?>">
                                     <a href="contact">Contact Us</a>
+                                </li>
+                                <li class="<?php echo ($current_page == 'global-care') ? 'active' : ''; ?>">
+                                    <a href="global-care">Global Care</a>
                                 </li>
                             </ul>
                         </li>
@@ -268,7 +283,7 @@ $current_page = basename($_SERVER['PHP_SELF']);
                             </a>
                         </li>
                         <li class="register-btn">
-                            <a href="login.php" class="btn btn-primary log-btn">
+                            <a href="login" class="btn btn-primary log-btn">
                                 <i class="isax isax-lock"></i>Login
                             </a>
                         </li>
