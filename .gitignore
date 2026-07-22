@@ -5,7 +5,8 @@ php/config.php
 error_log
 php/error_log
 php/.htaccess
-
+error_log
+php/debug_trace.txt
 
 
 # Composer dependencies
