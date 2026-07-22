@@ -4,6 +4,7 @@ assets/img/patients/
 php/config.php
 error_log
 php/error_log
+php/.htaccess
 
 
 
