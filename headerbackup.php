@@ -1,5 +1,19 @@
 <?php
-require_once __DIR__ . '/php/config.php';
+if (session_status() === PHP_SESSION_NONE) {
+    $is_secure = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off')
+        || (!empty($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] === 'https')
+        || (!empty($_SERVER['HTTP_X_FORWARDED_SSL']) && (strtolower($_SERVER['HTTP_X_FORWARDED_SSL']) === 'on' || $_SERVER['HTTP_X_FORWARDED_SSL'] === '1'))
+        || (!empty($_SERVER['SERVER_PORT']) && (int) $_SERVER['SERVER_PORT'] === 443);
+    session_set_cookie_params([
+        'lifetime' => 0,
+        'path' => '/',
+        'domain' => '',
+        'secure' => $is_secure,
+        'httponly' => true,
+        'samesite' => 'Lax'
+    ]);
+    session_start();
+}
 
 $current_page = basename($_SERVER['PHP_SELF']);
 ?>
@@ -26,10 +40,10 @@ $current_page = basename($_SERVER['PHP_SELF']);
     <title>TeleRx Bangladesh</title>
 
     <!-- Favicon -->
-    <link rel="shortcut icon" type="image/x-icon" sizes="48x48" href="assets/img/fav.png">
+    <link rel="shortcut icon" href="assets/img/favicon.png" type="image/x-icon">
 
     <!-- Apple Touch Icon -->
-    <link rel="apple-touch-icon" sizes="180x180" href="assets/img/appleicon.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="assets/img/apple-touch-icon.png">
 
     <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="assets/css/bootstrap.min.css">
@@ -62,24 +76,6 @@ $current_page = basename($_SERVER['PHP_SELF']);
     <!-- Main CSS -->
     <link rel="stylesheet" href="assets/css/custom.css">
 
-    <!-- Subscription CSS -->
-    <link rel="stylesheet" href="assets/css/subscription.css">
-
-    <!-- Medical Camp CSS -->
-    <link rel="stylesheet" href="assets/css/medical-camp.css">
-
-    <!-- Training CSS -->
-    <link rel="stylesheet" href="assets/css/training.css">
-
-    <!-- Index Home Page CSS -->
-    <link rel="stylesheet" href="assets/css/index-program-sections.css">
-    
-    <!-- Login CSS -->
-    <link rel="stylesheet" href="assets/css/login.css">
-
-    <!-- Registration CSS -->
-    <link rel="stylesheet" href="assets/css/registration.css">
-
     <!-- Rangeslider CSS -->
     <link rel="stylesheet" href="assets/plugins/ion-rangeslider/css/ion.rangeSlider.css">
     <link rel="stylesheet" href="assets/plugins/ion-rangeslider/css/ion.rangeSlider.min.css">
@@ -94,27 +90,6 @@ $current_page = basename($_SERVER['PHP_SELF']);
 
     <!-- Header -->
     <header class="header header-custom header-fixed header-one home-head-one">
-        <div class="telerx-header-top d-none d-lg-block">
-            <div class="container telerx-header-top-inner">
-                <div class="telerx-top-left">
-                    <span class="telerx-top-label">Follow us :</span>
-                    <a href="https://www.facebook.com/telerxbd" aria-label="Facebook" target="_blank"><i class="fa-brands fa-facebook-f" aria-hidden="true"></i></a>
-                    <a href="https://www.youtube.com/@TeleRxBD" aria-label="YouTube" target="_blank"><i class="fa-brands fa-youtube" aria-hidden="true"></i></a>
-                    <a href="https://www.instagram.com/telerxbd" aria-label="Instagram" target="_blank"><i class="fa-brands fa-instagram" aria-hidden="true"></i></a>
-                    <a href="https://bd.linkedin.com/company/telerxbd" aria-label="LinkedIn" target="_blank"><i class="fa-brands fa-linkedin-in" aria-hidden="true"></i></a>
-                </div>
-                <!-- <div>
-                    <marquee width="100%" behavior="scroll" direction="left">TeleRx website in under maintenance.</marquee>
-                </div>
-                -->
-                <div class="telerx-top-right">
-                    <a href="https://wa.me/8801836838888" target="_blank" rel="noopener noreferrer" class="telerx-helpline">
-                        <span class="helpline-icon"><i class="fa-brands fa-whatsapp" aria-hidden="true"></i></span>
-                        <span class="helpline-content">24/7 Helpline:<strong>01836-838888</strong></span>
-                    </a>
-                </div>
-            </div>
-        </div>
         <div class="container">
             <nav class="navbar navbar-expand-lg header-nav">
                 <div class="navbar-header">
@@ -143,63 +118,40 @@ $current_page = basename($_SERVER['PHP_SELF']);
                             <a href="/">Home</a>
                         </li>
                         <li class="<?php echo ($current_page == 'doctors') ? 'active' : ''; ?>">
-                            <a href="doctors">Our Doctors</a>
+                            <a href="doctors.php">Our Doctors</a>
                         </li>
                         <li class="<?php echo ($current_page == 'welfare') ? 'active' : ''; ?>">
                             <a href="welfare">Welfare</a>
                         </li>
-                        <li class="<?php echo ($current_page == 'HomeService/home-service') ? 'active' : ''; ?>">
-                           <a href="HomeService/home-service">Home Care</a>
+                        <li class="<?php echo ($current_page == 'about-us') ? 'active' : ''; ?>">
+                            <a href="about-us">About Us</a>
                         </li>
-                        <li class="<?php echo ($current_page == 'Products/products') ? 'active' : ''; ?>">
-                            <a href="Products/products">Products</a>
-                        </li>
-                        <li class="<?php echo ($current_page == 'subscription') ? 'active' : ''; ?>">
-                            <a href="subscription">Subscription</a>
-                        </li>
-                        <li class="has-submenu trx-more-menu <?php echo in_array($current_page, ['about-us', 'contact']) ? 'active' : ''; ?>">
-                            <a href="javascript:void(0);">
-                                More <i class="fas fa-chevron-down"></i>
-                            </a>
-                            <ul class="submenu trx-more-dropdown">
-                                <li class="<?php echo ($current_page == 'medical-camp') ? 'active' : ''; ?>">
-                                <a href="medical-camp">Medical Camp</a>
-                                </li>
-                                <li class="<?php echo ($current_page == 'corporate') ? 'active' : ''; ?>">
-                                    <a href="corporate">Corporate/NGO</a>
-                                </li>
-                                <li class="<?php echo ($current_page == 'training') ? 'active' : ''; ?>">
-                                <a href="training">Training</a>
-                                </li>
-                                <li class="<?php echo ($current_page == 'about-us.php') ? 'active' : ''; ?>">
-                                    <a href="about-us">About Us</a>
-                                </li>
-                                <li class="<?php echo ($current_page == 'contact.php') ? 'active' : ''; ?>">
-                                    <a href="contact">Contact Us</a>
-                                </li>
-                                <li class="<?php echo ($current_page == 'global-care') ? 'active' : ''; ?>">
-                                    <a href="global-care">Global Care</a>
-                                </li>
-                            </ul>
+                        <li class="nav-item-contact-more <?php echo ($current_page == 'contact') ? 'active' : ''; ?>">
+                            <a href="contact">Contact</a>
+                            <div class="dropdown nav-more-hover">
+                                <a href="#" class="nav-more-ellipsis" data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="false" role="button" aria-label="More menu">
+                                    <i class="fa-solid fa-ellipsis-vertical" aria-hidden="true"></i>
+                                </a>
+                                <ul class="dropdown-menu dropdown-menu-end nav-more-dropdown">
+                                    <li>
+                                        <a class="dropdown-item<?php echo ($current_page === 'global-care.php') ? ' active' : ''; ?>" href="global-care">Global Care</a>
+                                    </li>
+                                </ul>
+                            </div>
                         </li>
                         <!-- Mobile view login/signup link -->
                         <li class="login-link">
                             <?php if(isset($_SESSION['logged_in']) && $_SESSION['logged_in'] === true): ?>
                                 <a href="php/logout.php">Logout</a>
                             <?php else: ?>
-                                <a href="login">Login / Signup</a>
+                                <a href="login.php">Login / Signup</a>
                             <?php endif; ?>
                         </li>
                     </ul>
                 </div>
 
                 <!-- Right side navigation -->
-                <ul class="nav header-navbar-rht align-items-center">
-                    <li class="nav-item me-3 d-none d-sm-block">
-                        <a href="emergency-booking" class="btn btn-danger reg-btn">
-                            <i class="fa-solid fa-truck-medical me-2"></i>Emergency
-                        </a>
-                    </li>
+                <ul class="nav header-navbar-rht">
                     <?php if(isset($_SESSION['logged_in']) && $_SESSION['logged_in'] === true): ?>
                         <!-- Logged in user menu -->
                         <?php if(isset($_SESSION['user_type']) && $_SESSION['user_type'] == 'doctor'): ?>
@@ -234,9 +186,6 @@ $current_page = basename($_SERVER['PHP_SELF']);
                                     } elseif($_SESSION['user_type'] == 'healthcare') {
                                         $profile_image = $_SESSION['profile_image'] ?? $profile_image;
                                         $user_name = $_SESSION['healthcare_name'] ?? 'Healthcare';
-                                    } elseif($_SESSION['user_type'] == 'special_tid') {
-                                        $profile_image = $_SESSION['profile_image'] ?? $profile_image;
-                                        $user_name = $_SESSION['special_tid_name'] ?? 'Special TID User';
                                     } elseif($_SESSION['user_type'] == 'patient') {
                                         $profile_image = $_SESSION['profile_image'] ?? $profile_image;
                                         $user_name = $_SESSION['patient_name'] ?? 'Patient';
@@ -255,24 +204,21 @@ $current_page = basename($_SERVER['PHP_SELF']);
                                         <p class="text-muted mb-0">
                                             <?php
                                             echo $_SESSION['user_type'] == 'doctor' ? 'Doctor' :
-                                                    ($_SESSION['user_type'] == 'healthcare' ? 'Healthcare Provider' :
-                                                    (($_SESSION['user_type'] == 'special_tid') ? 'Special TID User' : 'Patient'));
+                                                    ($_SESSION['user_type'] == 'healthcare' ? 'Healthcare Provider' : 'Patient');
                                             ?>
                                         </p>
                                     </div>
                                 </div>
 
                                 <?php if($_SESSION['user_type'] == 'doctor'): ?>
-                                    <a class="dropdown-item" href="doctor-dashboard">Dashboard</a>
-                                    <a class="dropdown-item" href="doctor-profile-settings">Profile Settings</a>
+                                    <a class="dropdown-item" href="doctor-dashboard.php">Dashboard</a>
+                                    <a class="dropdown-item" href="doctor-profile-settings.php">Profile Settings</a>
                                 <?php elseif($_SESSION['user_type'] == 'healthcare'): ?>
-                                    <a class="dropdown-item" href="health-worker-dashboard">Dashboard</a>
-                                    <a class="dropdown-item" href="health-worker-profile-settings">Profile Settings</a>
-                                <?php elseif($_SESSION['user_type'] == 'special_tid'): ?>
-                                    <a class="dropdown-item" href="health-worker-dashboard">Dashboard</a>
+                                    <a class="dropdown-item" href="health-worker-dashboard.php">Dashboard</a>
+                                    <a class="dropdown-item" href="health-worker-profile-settings.php">Profile Settings</a>
                                 <?php elseif($_SESSION['user_type'] == 'patient'): ?>
-                                    <a class="dropdown-item" href="patient-dashboard">Dashboard</a>
-                                    <a class="dropdown-item" href="patient-profile-settings">Profile Settings</a>
+                                    <a class="dropdown-item" href="patient-dashboard.php">Dashboard</a>
+                                    <a class="dropdown-item" href="patient-profile-settings.php">Profile Settings</a>
                                 <?php endif; ?>
 
                                 <a class="dropdown-item" href="php/logout.php">Logout</a>
@@ -281,12 +227,12 @@ $current_page = basename($_SERVER['PHP_SELF']);
                     <?php else: ?>
                         <!-- Guest/Non-logged in menu -->
                         <li class="register-btn">
-                            <a href="registration" class="btn btn-dark reg-btn">
+                            <a href="registration.php" class="btn btn-dark reg-btn">
                                 <i class="isax isax-user"></i>Register
                             </a>
                         </li>
                         <li class="register-btn">
-                            <a href="login" class="btn btn-primary log-btn">
+                            <a href="login.php" class="btn btn-primary log-btn">
                                 <i class="isax isax-lock"></i>Login
                             </a>
                         </li>
@@ -296,5 +242,4 @@ $current_page = basename($_SERVER['PHP_SELF']);
         </div>
     </header>
     <div class="header-margin"></div>
-
     <!-- /Header -->

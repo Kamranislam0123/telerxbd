@@ -1,27 +1,38 @@
+# TeleRx Bangladesh - Apache Configuration
+# Ensure PHP files are properly handled
+
 # Enable rewrite engine
 RewriteEngine On
 
-# Let Apache pass .php files to PHP
-# AddHandler application/x-httpd-php .php
+# Handle PHP files
+AddType application/x-httpd-php .php
+AddHandler application/x-httpd-php .php
 
-AddType application/x-httpd-php81 .php
-AddHandler application/x-httpd-php81 .php
+# Remove .php extension from URL
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_FILENAME}\.php -f
+RewriteRule ^([^\.]+)$ $1.php [L]
 
 # Security headers
 <IfModule mod_headers.c>
-    Header always set X-Content-Type-Options "nosniff"
-    Header always set X-Frame-Options "DENY"
+    Header always set X-Content-Type-Options nosniff
+    Header always set X-Frame-Options DENY
     Header always set X-XSS-Protection "1; mode=block"
 </IfModule>
 
-# Block access to sensitive files
+# Prevent access to sensitive files
 <FilesMatch "\.(htaccess|htpasswd|ini|log|sh|sql|conf)$">
-    Require all denied
+    Order Allow,Deny
+    Deny from all
 </FilesMatch>
 
-# Prevent direct PHP execution in specific folders (example: php/)
-# NOTE: No <Directory> allowed in .htaccess, use RewriteRule instead
-# RewriteRule ^php/.*\.php$ - [F]
+# Prevent access to PHP files in sensitive directories
+<Directory "php/">
+    <FilesMatch "\.(php)$">
+        Order Deny,Allow
+        Allow from all
+    </FilesMatch>
+</Directory>
 
 # Cache static assets
 <IfModule mod_expires.c>
@@ -33,8 +44,13 @@ AddHandler application/x-httpd-php81 .php
     ExpiresByType text/css "access plus 1 month"
     ExpiresByType application/pdf "access plus 1 year"
     ExpiresByType application/javascript "access plus 1 month"
+    ExpiresByType application/x-javascript "access plus 1 month"
     ExpiresByType application/x-shockwave-flash "access plus 1 month"
     ExpiresByType image/x-icon "access plus 1 year"
-</IfModule>
+# </IfModule>
+
+
+
+
 
 
