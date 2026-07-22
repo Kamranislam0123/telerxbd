@@ -1,17 +1,44 @@
+# TeleRx Bangladesh - Apache Configuration
+# Ensure PHP files are properly handled
+
+# Enable rewrite engine
 RewriteEngine On
 
-# 1. Redirect /file.php to /file (clean URL)
+# 1. Externally redirect /file.php to /file
+# RewriteCond %{THE_REQUEST} ^[A-Z]{3,}\s([^.]+)\.php [NC]
+# RewriteRule ^ %1 [R=301,L]
+
+
 RewriteCond %{THE_REQUEST} ^[A-Z]{3,}\s([^.]+)\.php [NC]
+RewriteCond %{REQUEST_METHOD} !POST
 RewriteRule ^ %1 [R=301,L]
 
-# 2. Internally rewrite /file to /file.php
+
+# 2. Internally redirect /file to /file.php
 RewriteCond %{REQUEST_FILENAME} !-d
 RewriteCond %{REQUEST_FILENAME}.php -f
 RewriteRule ^(.*?)/?$ $1.php [NC,L]
 
-# Handle PHP files
-AddType application/x-httpd-php .php
-AddHandler application/x-httpd-php .php
+
+
+
+Handle PHP files
+#  AddType application/x-httpd-php .php
+#  AddHandler application/x-httpd-php .php
+
+# AddType application/x-httpd-ea-php81 .php
+# AddHandler application/x-httpd-ea-php81 .php
+
+AddType application/x-httpd-php81 .php
+AddHandler application/x-httpd-php81 .php
+
+
+# AddHandler application/x-httpd-alt-php81___lsphp .php
+
+
+# <IfModule mime_module>
+#     AddHandler application/x-httpd-alt-php83___lsphp .php
+# </IfModule>
 
 # Security headers
 <IfModule mod_headers.c>
@@ -20,7 +47,31 @@ AddHandler application/x-httpd-php .php
     Header always set X-XSS-Protection "1; mode=block"
 </IfModule>
 
-# Deny access to sensitive files
+# Prevent access to sensitive files
 <FilesMatch "\.(htaccess|htpasswd|ini|log|sh|sql|conf)$">
-    Require all denied
+    Order Allow,Deny
+    Deny from all
 </FilesMatch>
+
+# Prevent access to PHP files in sensitive directories
+<Directory "php/">
+    <FilesMatch "\.(php)$">
+        Order Deny,Allow
+        Allow from all
+    </FilesMatch>
+</Directory>
+
+# Cache static assets
+<IfModule mod_expires.c>
+    ExpiresActive On
+    ExpiresByType image/jpg "access plus 1 month"
+    ExpiresByType image/jpeg "access plus 1 month"
+    ExpiresByType image/gif "access plus 1 month"
+    ExpiresByType image/png "access plus 1 month"
+    ExpiresByType text/css "access plus 1 month"
+    ExpiresByType application/pdf "access plus 1 year"
+    ExpiresByType application/javascript "access plus 1 month"
+    ExpiresByType application/x-javascript "access plus 1 month"
+    ExpiresByType application/x-shockwave-flash "access plus 1 month"
+    ExpiresByType image/x-icon "access plus 1 year"
+</IfModule>

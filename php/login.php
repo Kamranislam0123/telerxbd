@@ -1,4 +1,8 @@
 <?php
+
+ini_set('display_errors', 1);
+error_reporting(E_ALL);
+
 /**
  * Multi-User Login Handler
  * Handles login for doctors, health-workers, and patients.
@@ -6,6 +10,9 @@
  */
 
 // Start output buffering to catch any accidental output (e.g. from config or whitespace)
+file_put_contents(__DIR__ . '/debug_trace.txt', date('Y-m-d H:i:s') . " - login.php called. POST: " . print_r($_POST, true) . "\n", FILE_APPEND);
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
 ob_start();
 
 
@@ -319,11 +326,11 @@ try {
     
     $conn->close();
     
-} catch (Exception $e) {
+} catch (\Throwable $e) {
     http_response_code(500);
     // In development, show the actual error. In production, hide it.
     $error_message = 'Login failed. Please try again later.';
-    if (ini_get('display_errors')) {
+    if (true) {
         $error_message .= ' Error: ' . $e->getMessage();
     }
     error_log("Login error: " . $e->getMessage() . " | File: " . $e->getFile() . " | Line: " . $e->getLine());
