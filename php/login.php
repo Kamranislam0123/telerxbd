@@ -10,7 +10,6 @@ error_reporting(E_ALL);
  */
 
 // Start output buffering to catch any accidental output (e.g. from config or whitespace)
-file_put_contents(__DIR__ . '/debug_trace.txt', date('Y-m-d H:i:s') . " - login.php called. POST: " . print_r($_POST, true) . "\n", FILE_APPEND);
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 ob_start();
