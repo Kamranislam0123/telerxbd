@@ -41,20 +41,20 @@ include 'header.php';?>
                 <div class="form-group-flex">
                     <div class="form-check mb-0">
                         <input class="form-check-input" type="checkbox" id="remember" name="remember_me" value="1" checked>
-                        <label class="form-check-label" for="remember">
-                            Remember Me  
+                        <label class="form-check-label" style="font-size:12px;" for="remember">
+                            Remember Me
                         </label>
-                    </div>												
+                        <a href="#" class="right-text forgot forgot">Forgot Password?</a>
+                    </div>
                 </div>
             </div>
             <div class="mb-3">
                 <button class="btn btn-primary-gradient w-100" type="submit" id="login-btn">Sign in</button>
             </div>
             <div class="account-signup">
-                <p>Don't have account? <a href="registration">Register Now</a></p>
+                <p>Don't have account?</p>
+                <p><a href="registration">Register Now</a></p>
             </div>
-            <div class="center-text forgot">Forgot Password?</div>
-
         </section>
     </main>
 </div>

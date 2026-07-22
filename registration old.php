@@ -1,37 +1,57 @@
 <?php
-// Use config so session cookie path is '/' and works for dashboard after login
-require_once __DIR__ . '/php/config.php';
-// Full same-origin URL for login AJAX (avoids status 0 / CORS / mixed content issues on live)
-$login_ajax_url = (defined('APP_BASE') ? APP_BASE : '') . '/php/login.php';
+session_start();
 include 'header.php';?>
 
-<div class="registration-page-wrapper">
-    <main class="reg-card">
+<head>
+<body>
+<!-- Breadcrumb -->
+<div class="breadcrumb-bar">
+    <div class="container">
+        <div class="row align-items-center inner-banner">
+            <div class="col-md-12 col-12 text-center">
+                <nav aria-label="breadcrumb" class="page-breadcrumb">
+                    <h2 class="breadcrumb-title">Register Now</h2>
+                </nav>
+            </div>
+        </div>
+    </div>
+    <div class="breadcrumb-bg">
+        <img src="assets/img/bg/breadcrumb-bg-01.png" alt="img" class="breadcrumb-bg-01">
+        <img src="assets/img/bg/breadcrumb-bg-02.png" alt="img" class="breadcrumb-bg-02">
+        <img src="assets/img/bg/breadcrumb-icon.png" alt="img" class="breadcrumb-bg-03">
+        <img src="assets/img/bg/breadcrumb-icon.png" alt="img" class="breadcrumb-bg-04">
+    </div>
+</div>
+<!-- /Breadcrumb -->
 
-        <section class="reg-brand-panel">
-            <div class="reg-brand-logo">TeleRx Bangladesh</div>
-        </section>
-
-        <section class="reg-form-panel">
-
-            <h1 class="reg-form-title">Registration</h1>
-            <p class="reg-form-subtitle">Create a TeleRx account.</p>
-
-            <!-- Registration Tabs -->
-                            <ul class="nav nav-tabs nav-justified" id="registrationTabs" role="tablist">
+<!-- Page Content -->
+<div class="content">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-8 offset-md-2">
+                <!-- Registration Tab Content -->
+                <div class="account-content">
+                    <div class="row align-items-center justify-content-center">
+                        <div class="col-md-12 col-lg-6 login-right">
+                            <div class="login-header">
+                                <h3>Join TeleRx Bangladesh</h3>
+                                <p class="text-muted">Please make sure your registration type</p>
+                            </div>
+                            <!-- Registration Tabs -->
+                            <ul class="nav nav-tabs nav-justified mb-4" id="registrationTabs" role="tablist">
                                 <li class="nav-item" role="presentation">
                                     <button class="nav-link active" id="patient-tab" data-bs-toggle="tab" data-bs-target="#patient" type="button" role="tab" aria-controls="patient" aria-selected="true">
-                                        <i class="isax isax-user me-2"></i><h14>Patient</h14>
+                                        <i class="isax isax-user me-1"></i>Patient
                                     </button>
                                 </li>
                                 <li class="nav-item" role="presentation">
                                     <button class="nav-link" id="doctor-tab" data-bs-toggle="tab" data-bs-target="#doctor" type="button" role="tab" aria-controls="doctor" aria-selected="false">
-                                        <i class="isax isax-health me-2"></i><h14>Doctor</h14>
+                                        <i class="isax isax-health me-1"></i>Doctor
                                     </button>
                                 </li>
                                 <li class="nav-item" role="presentation">
                                     <button class="nav-link" id="health-worker-tab" data-bs-toggle="tab" data-bs-target="#health-worker" type="button" role="tab" aria-controls="health-worker" aria-selected="false">
-                                        <i class="isax isax-hospital me-2"></i><h14>Health-worker</h14>
+                                        <i class="isax isax-hospital me-1"></i>Health-worker
                                     </button>
                                 </li>
                             </ul>
@@ -50,6 +70,7 @@ include 'header.php';?>
                                         <div class="mb-3">
                                             <label class="form-label">Mobile Number</label>
                                             <input type="text" class="form-control" name="phone" id="patient-phone" placeholder="Enter your mobile number (e.g., 01712345678)" required>
+                                            <small class="form-text text-muted">Mobile number</small>
                                         </div>
                                         <div class="mb-3">
                                             <label class="form-label">Email Address</label>
@@ -80,7 +101,7 @@ include 'header.php';?>
                                         </div>
                                         <div class="mb-3">
                                             <label class="form-label">Phone Number</label>
-                                            <input class="form-control group_formcontrol form-control-phone" id="doctor-phone" name="phone" type="text" placeholder="Enter your phone number" required>
+                                            <input class="form-control form-control-lg group_formcontrol form-control-phone" id="doctor-phone" name="phone" type="text" placeholder="Enter your phone number" required>
                                         </div>
                                         <div class="mb-3">
                                             <label class="form-label">Email Address</label>
@@ -149,12 +170,16 @@ include 'header.php';?>
                             <div class="account-signup">
                                 <p>Already have account? <a href="login.php">Sign In</a></p>
                             </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- /Registration Tab Content -->
 
-        </section>
-    </main>
+            </div>
+        </div>
+    </div>
+    <?php include 'footer.php'; ?>
 </div>
-
-<?php include 'footer.php'; ?>
 
 <!-- /Page Content -->
 
@@ -467,3 +492,6 @@ include 'header.php';?>
         });
     });
     </script>
+
+</body>
+</html>

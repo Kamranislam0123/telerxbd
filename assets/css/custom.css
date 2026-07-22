@@ -2558,16 +2558,18 @@ h3,
 h4,
 h5,
 h6,
+h15,
 .h1,
 .h2,
 .h3,
 .h4,
-.h5,
+.h14,
 .h6 {
   color: #012047;
   font-family: "Inter", sans-serif;
   line-height: 1.2;
   margin-bottom: 0;
+.h14
 }
 
 h1,
@@ -2651,6 +2653,17 @@ h6,
   h6,
   .h6 {
     font-size: 16px;
+  }
+}
+
+h14,
+.h14 {
+  font-size: 14px;
+}
+@media (max-width: 767.98px) {
+  h14,
+  .h14 {
+    font-size: 12px;
   }
 }
 
@@ -3205,8 +3218,8 @@ textarea.form-control {
 }
 
 .form-check-input {
-  width: 0.9rem;
-  height: 0.9rem;
+  width: 0.8rem;
+  height: 0.8rem;
   background-color: #FFF;
   border: 1px solid #E6E8EE;
 }
@@ -48680,14 +48693,14 @@ input:checked + .tog-slider:before {
 
 .account-signup {
   text-align: center;
-  margin-top: 40px;
+  margin-top: 0px;
 }
 .account-signup p {
   margin-bottom: 0;
 }
 .account-signup p a {
   font-weight: 500;
-  color: #15558d;
+  color: #ff4877;
 }
 .account-signup p a:hover {
   color: rgb(1.7777777778, 104.8888888889, 214.2222222222);
