@@ -77,6 +77,9 @@ $current_page = basename($_SERVER['PHP_SELF']);
     <!-- Login CSS -->
     <link rel="stylesheet" href="assets/css/login.css">
 
+    <!-- Registration CSS -->
+    <link rel="stylesheet" href="assets/css/registration.css">
+
     <!-- Rangeslider CSS -->
     <link rel="stylesheet" href="assets/plugins/ion-rangeslider/css/ion.rangeSlider.css">
     <link rel="stylesheet" href="assets/plugins/ion-rangeslider/css/ion.rangeSlider.min.css">
