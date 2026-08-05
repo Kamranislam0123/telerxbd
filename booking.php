@@ -8,7 +8,9 @@ if (!$is_patient && !$is_special_tid) {
 	$booking_doctor_id = isset($_GET['doctor_id']) ? (int) $_GET['doctor_id'] : (isset($_GET['id']) ? (int) $_GET['id'] : 0);
 	$redirectUrl = 'registration.php';
 	if ($booking_doctor_id > 0) {
-		$redirectUrl .= '?redirect=' . urlencode('booking.php?doctor_id=' . $booking_doctor_id);
+		// Do NOT double-encode: pass the raw redirect value so the browser/server
+		// does not accumulate %25 encoding layers on each redirect pass (live server issue).
+		$redirectUrl .= '?redirect=booking.php%3Fdoctor_id%3D' . $booking_doctor_id;
 	}
 	header('Location: ' . $redirectUrl);
 	exit;
