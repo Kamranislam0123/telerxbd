@@ -152,206 +152,215 @@ try {
 }
 
 ?>
-	<!-- Breadcrumb -->
-	<div class="breadcrumb-bar">
-		<div class="container">
-			<div class="row align-items-center inner-banner">
-				<div class="col-md-12 col-12 text-center">
-					<nav aria-label="breadcrumb" class="page-breadcrumb">
-						<h2 class="doc-name"><?php echo htmlspecialchars($doctor['name']); ?> Profile</h2>
-					</nav>
-				</div>
-			</div>
-		</div>
-		<div class="breadcrumb-bg">
-			<img src="assets/img/bg/breadcrumb-bg-01.png" alt="img" class="breadcrumb-bg-01">
-			<img src="assets/img/bg/breadcrumb-bg-02.png" alt="img" class="breadcrumb-bg-02">
-			<img src="assets/img/bg/breadcrumb-icon.png" alt="img" class="breadcrumb-bg-03">
-			<img src="assets/img/bg/breadcrumb-icon.png" alt="img" class="breadcrumb-bg-04">
-		</div>
-	</div>
-	<!-- /Breadcrumb -->
-
 	<!-- Page Content -->
-	<div class="content">
+	<div class="content" style="background-color: #f8f9fa; padding-top: 20px;">
 		<div class="container">
+			
+			<!-- Breadcrumb -->
+			<nav aria-label="breadcrumb" class="page-breadcrumb" style="margin-bottom: 10px; display: flex; justify-content: flex-start;">
+				<ol class="breadcrumb mb-0" style="background: transparent; padding: 0; font-size: 14px; margin: 0;">
+					<li class="breadcrumb-item"><a href="index.php" style="color: #6b7280; text-decoration: none;">Home</a></li>
+					<li class="breadcrumb-item"><a href="search.php" style="color: #6b7280; text-decoration: none;">Doctors</a></li>
+					<li class="breadcrumb-item active" aria-current="page" style="color: #111827; font-weight: 500;">Dr. <?php echo htmlspecialchars(str_replace('Dr. ', '', $doctor['name'])); ?></li>
+				</ol>
+			</nav>
+			<!-- /Breadcrumb -->
 
 					<!-- Doctor Widget -->
-					<div class="card doc-profile-card">
-						<div class="card-body">
-							<div class="doctor-widget doctor-profile-two">
-								<div class="doc-info-left">
-									<div class="doctor-img">
-										<img src="<?php echo htmlspecialchars($doctor['profile_image']); ?>" class="img-fluid" alt="Doctor Image">
+					<div class="card doc-profile-card" style="border: none; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03); margin-bottom: 30px; margin-top: 20px;">
+						<div class="card-body" style="padding: 30px;">
+							<div class="row align-items-center">
+								<!-- Left Image -->
+								<div class="col-md-3 col-sm-12 text-center text-md-start mb-4 mb-md-0 position-relative">
+									<div class="doctor-img" style="width: 180px; height: 180px; margin: 0 auto; border-radius: 12px; overflow: hidden; position: relative;">
+										<img src="<?php echo htmlspecialchars($doctor['profile_image']); ?>" class="img-fluid" alt="Doctor Image" style="width: 100%; height: 100%; object-fit: cover;">
 									</div>
-									<div class="doc-info-cont">
-										<span class="badge doc-avail-badge"><i class="fa-solid fa-circle"></i><?php echo $doctor['is_available'] ? 'Available' : 'Unavailable'; ?> </span>
-										<h4 class="doc-name"><?php echo htmlspecialchars($doctor['name']); ?> <img src="assets/img/icons/badge-check.svg" alt="Img"><span class="badge doctor-role-badge"><i class="fa-solid fa-circle"></i>Doctor</span></h4>
-										<p><?php echo htmlspecialchars($doctor['specialty']); ?> - BMDC: <?php echo htmlspecialchars($doctor['bmdc_no']); ?></p>
-										<p>Speaks : <?php echo htmlspecialchars($doctor['languages_spoken']); ?></p>
-										<?php if ($doctor_location_display !== ''): ?>
-										<p class="address-detail">
-											<span class="loc-icon"><i class="feather-map-pin"></i></span>
-											<?php echo htmlspecialchars($doctor_location_display); ?>
-											<a href="<?php echo htmlspecialchars($doctor_location_maps_url); ?>" target="_blank" rel="noopener noreferrer" class="view-text">( View on map )</a>
-										</p>
-										<?php endif; ?>
+									<div style="position: absolute; bottom: -12px; left: 50%; transform: translateX(-50%);">
+										<span class="badge" style="background-color: <?php echo $doctor['is_available'] ? '#10b981' : '#9ca3af'; ?>; color: white; padding: 6px 16px; border-radius: 20px; font-weight: 500; font-size: 12px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); border: 2px solid white;">
+											<?php echo $doctor['is_available'] ? 'Online' : 'Offline'; ?>
+										</span>
 									</div>
 								</div>
-								<div class="doc-info-right">
-									<ul class="doctors-activities">
-										<li>
-											<div class="hospital-info">
-												<span class="list-icon"><img src="assets/img/icons/watch-icon.svg" alt="Img"></span>
-												<p>Full Time, Online Therapy Available</p>
-											</div>
-											<ul class="sub-links">
-												<li><a href="#"><i class="feather-heart"></i></a></li>
-												<li><a href="#"><i class="feather-share-2"></i></a></li>
-												<li><a href="#"><i class="feather-link"></i></a></li>
-											</ul>
-										</li>
-										<li>
-											<div class="hospital-info">
-												<span class="list-icon"><img src="assets/img/icons/thumb-icon.svg" alt="Img"></span>
-												<p><b>94% </b> Recommended</p>
-											</div>
-										</li>
-										<li>
-											<div class="hospital-info">
-												<span class="list-icon"><img src="assets/img/icons/building-icon.svg" alt="Img"></span>
-												<p>Royal Prince Alfred Hospital</p>
-											</div>
-											<h5 class="accept-text"><span><i class="feather-check"></i></span>Accepting New Patients</h5>
-										</li>
-										<li>
-											<div class="rating">
-												<?php for($i = 1; $i <= 5; $i++): ?>
-													<i class="fas fa-star <?php echo $i <= round($doctor['average_rating']) ? 'filled' : ''; ?>"></i>
-												<?php endfor; ?>
-												<span><?php echo number_format($doctor['average_rating'], 1); ?></span>
-												<a href="#" class="d-inline-block average-rating"><?php echo $doctor['total_reviews']; ?> Reviews</a>
-											</div>
-											<ul class="contact-doctors">
-												<li><a href="chat-doctor.html"><span><img src="assets/img/icons/device-message2.svg" alt="Img"></span>Chat</a></li>
-												<li><a href="voice-call.html"><span class="bg-violet"><i class="feather-phone-forwarded"></i></span>Audio Call</a></li>
-												<li><a href="video-call.html"><span class="bg-indigo"><i class="fa-solid fa-video"></i></span>Video Call</a></li>
-											</ul>
-										</li>
-									</ul>
-								</div>
-							</div>
-							<div class="doc-profile-card-bottom">
-								<ul>
-									<li>
-										<span class="bg-blue"><img src="assets/img/icons/calendar3.svg" alt="Img"></span>
-										<?php echo number_format($doctor['total_appointments']); ?>+ Appointments Booked
-									</li>
-									<li>
-										<span class="bg-dark-blue"><img src="assets/img/icons/bullseye.svg" alt="Img"></span>
-										In Practice for <?php echo $doctor['experience_years']; ?> Years
-									</li>
-									<li>
-										<span class="bg-green"><img src="assets/img/icons/bookmark-star.svg" alt="Img"></span>
-										<?php echo count($awards); ?>+ Awards
-									</li>
-								</ul>
-								<div class="bottom-book-btn">
-									<p><span>Consultation Fee : ৳<?php echo number_format($doctor['consultation_fee'], 0); ?> </span> for a Session</p>
-									<div class="clinic-booking">
-										<a class="apt-btn" href="booking.php?doctor_id=<?php echo $profile_doctor_id; ?>">Book Appointment</a>
+								
+								<!-- Middle Info -->
+								<div class="col-md-6 col-sm-12">
+									<h3 style="font-weight: 700; color: #111827; margin-bottom: 8px;">Dr. <?php echo htmlspecialchars(str_replace('Dr. ', '', $doctor['name'])); ?></h3>
+									<p style="color: #4b5563; font-size: 15px; margin-bottom: 8px;">MBBS</p>
+									<p style="color: #3b82f6; font-size: 15px; font-weight: 500; margin-bottom: 20px;"><?php echo htmlspecialchars($doctor['specialty']); ?></p>
+									
+									<div class="row" style="margin-bottom: 15px;">
+										<div class="col-4" style="border-right: 1px solid #e5e7eb;">
+											<p style="color: #6b7280; font-size: 13px; margin-bottom: 4px;">Total Experience</p>
+											<p style="color: #111827; font-weight: 600; font-size: 14px; margin-bottom: 0;"><?php echo $doctor['experience_years']; ?>+ Years</p>
+										</div>
+										<div class="col-4" style="border-right: 1px solid #e5e7eb;">
+											<p style="color: #6b7280; font-size: 13px; margin-bottom: 4px;">BMDC Number</p>
+											<p style="color: #111827; font-weight: 600; font-size: 14px; margin-bottom: 0;"><?php echo htmlspecialchars($doctor['bmdc_no'] ?: 'N/A'); ?></p>
+										</div>
+										<div class="col-4">
+											<p style="color: #6b7280; font-size: 13px; margin-bottom: 4px;">Total Rating</p>
+											<p style="color: #111827; font-weight: 600; font-size: 14px; margin-bottom: 0;">
+												<i class="fas fa-star" style="color: #f59e0b;"></i> <?php echo number_format($doctor['average_rating'], 1); ?> <span style="color: #6b7280; font-weight: 400;">(<?php echo $doctor['total_reviews']; ?>)</span>
+											</p>
+										</div>
 									</div>
+									
+									<p style="color: #4b5563; font-size: 14px; margin-bottom: 0;">Working in <span style="font-weight: 500; color: #111827;"><?php echo !empty($experiences) ? htmlspecialchars($experiences[0]['hospital_name']) : 'N/A'; ?></span></p>
+								</div>
+								
+								<!-- Right Info -->
+								<div class="col-md-3 col-sm-12 text-md-end mt-4 mt-md-0 position-relative" style="height: 100%; display: flex; flex-direction: column; justify-content: space-between;">
+									<div style="margin-top: auto; margin-bottom: 15px;">
+										<h5 style="font-weight: 700; color: #111827; margin-bottom: 10px; font-size: 18px;">Consultation Fee</h5>
+										<div class="d-flex align-items-baseline justify-content-md-end mb-3">
+											<span style="color: #3b82f6; font-size: 36px; font-weight: 700;">৳<?php echo number_format($doctor['consultation_fee'], 0); ?></span>
+											<span style="color: #6b7280; font-size: 14px; margin-left: 8px;">(Inc. VAT)</span>
+										</div>
+									</div>
+									<a href="booking.php?doctor_id=<?php echo $profile_doctor_id; ?>" class="btn btn-primary w-100" style="background-color: #3b82f6; border-color: #3b82f6; color: #fff; font-weight: 500; padding: 12px; border-radius: 8px;">
+										Book Doctor Now
+									</a>
 								</div>
 							</div>
 						</div>
 					</div>
 					<!-- /Doctor Widget -->
 					
-					<div class="doctors-detailed-info">
-						<ul class="information-title-list">
-							<li class="active">
-								<a href="#doc_bio">Doctor Bio</a>
+					<div class="doctors-detailed-info custom-tabs-section" style="margin-top: 40px; margin-bottom: 60px;">
+						<ul class="nav nav-tabs border-bottom-0" id="doctorProfileTab" role="tablist" style="border-bottom: 1px solid #e5e7eb !important; gap: 30px;">
+							<li class="nav-item" role="presentation">
+								<button class="nav-link active custom-tab-btn" id="info-tab" data-bs-toggle="tab" data-bs-target="#info-tab-pane" type="button" role="tab" aria-controls="info-tab-pane" aria-selected="true" style="border: none; background: transparent; padding: 10px 0; color: #3b82f6; font-weight: 600; border-bottom: 2px solid #3b82f6; border-radius: 0;">
+									<i class="fas fa-info-circle me-2"></i>Info
+								</button>
 							</li>
-							<li>
-								<a href="#experience">Experience</a>
+							<li class="nav-item" role="presentation">
+								<button class="nav-link custom-tab-btn" id="experience-tab" data-bs-toggle="tab" data-bs-target="#experience-tab-pane" type="button" role="tab" aria-controls="experience-tab-pane" aria-selected="false" style="border: none; background: transparent; padding: 10px 0; color: #6b7280; font-weight: 500; border-bottom: 2px solid transparent; border-radius: 0;">
+									<i class="fas fa-briefcase me-2"></i>Experience
+								</button>
 							</li>
-							<li>
-								<a href="#insurence">Insurances</a>
-							</li>
-							<li>
-								<a href="#services">Treatments</a>
-							</li>
-							<li>
-								<a href="#speciality">Speciality</a>
-							</li>
-							<li>
-								<a href="#availability">Availability</a>
-							</li>
-							<li>
-								<a href="#clinic">Clinics</a>
-							</li>
-							<li>
-								<a href="#membership">Memberships</a>
-							</li>
-							<li>
-								<a href="#awards">Awards</a>
-							</li>
-							<li>
-								<a href="#bussiness_hour">Business Hours</a>
-							</li>
-							<li>
-								<a href="#review">Review</a>
+							<li class="nav-item" role="presentation">
+								<button class="nav-link custom-tab-btn" id="reviews-tab" data-bs-toggle="tab" data-bs-target="#reviews-tab-pane" type="button" role="tab" aria-controls="reviews-tab-pane" aria-selected="false" style="border: none; background: transparent; padding: 10px 0; color: #6b7280; font-weight: 500; border-bottom: 2px solid transparent; border-radius: 0;">
+									<i class="fas fa-comments me-2"></i>Reviews
+								</button>
 							</li>
 						</ul>
-						<div class="doc-information-main">
-							<div class="doc-information-details bio-detail" id="doc_bio">
-								<div class="detail-title">
-									<h4>Doctor Bio</h4>
-								</div>
-								<p><?php echo htmlspecialchars($doctor['bio']); ?></p>
-								<a href="#" class="show-more d-flex align-items-center">See More<i class="fa-solid fa-chevron-down ms-2"></i></a>
-							</div>
-							<div class="doc-information-details" id="experience">
-								<div class="detail-title">
-									<h4>Practice Experience</h4>
-								</div>
-								<?php if (!empty($experiences)): ?>
-									<?php foreach ($experiences as $index => $exp): ?>
-										<div class="experience-info <?php echo ($index === count($experiences) - 1) ? 'mb-0' : ''; ?>">
-											<div class="experience-logo">
-												<span><img src="assets/img/icons/experience-logo-0<?php echo ($index % 2) + 1; ?>.svg" alt="Img"></span>
-											</div>
-											<div class="experience-content <?php echo ($index === count($experiences) - 1) ? 'mb-0' : ''; ?>">
-												<h5><?php echo htmlspecialchars($exp['hospital_name']); ?></h5>
-												<ul class="ent-list">
-													<li><?php echo htmlspecialchars($exp['title']); ?> </li>
-													<li><?php echo htmlspecialchars($exp['location']); ?></li>
-												</ul>
-												<ul class="date-list">
-													<li>
-														<?php
-														$start_date = date('M Y', strtotime($exp['start_date']));
-														$end_date = $exp['currently_working'] ? 'Present' : ($exp['end_date'] ? date('M Y', strtotime($exp['end_date'])) : 'Present');
-														echo $start_date . ' - ' . $end_date;
-														?>
-													</li>
-													<li><?php echo htmlspecialchars($exp['years_of_experience']); ?></li>
-												</ul>
-												<p><?php echo htmlspecialchars($exp['job_description'] ?: 'Experienced healthcare professional providing quality medical care.'); ?></p>
-											</div>
-										</div>
-									<?php endforeach; ?>
-								<?php else: ?>
-									<div class="experience-info">
-										<div class="experience-logo">
-											<span><img src="assets/img/icons/experience-logo-01.svg" alt="Img"></span>
-										</div>
-										<div class="experience-content mb-0">
-											<p class="text-muted">No experience information available.</p>
+
+						<div class="tab-content mt-5" id="doctorProfileTabContent">
+							<!-- Info Tab -->
+							<div class="tab-pane fade show active" id="info-tab-pane" role="tabpanel" aria-labelledby="info-tab" tabindex="0">
+								<div class="row">
+									<div class="col-lg-7 mb-4 mb-lg-0">
+										<h4 style="color: #3b82f6; font-weight: 700; margin-bottom: 20px;">About Doctor</h4>
+										<div style="color: #4b5563; font-size: 15px; line-height: 1.7;">
+											<?php echo nl2br(htmlspecialchars($doctor['bio'])); ?>
 										</div>
 									</div>
-								<?php endif; ?>
+									<div class="col-lg-5">
+										<h4 style="color: #3b82f6; font-weight: 700; margin-bottom: 20px;">At a Glance</h4>
+										
+										<!-- Consultation Time Box -->
+										<div class="p-3 mb-3" style="background-color: #f8f9fa; border-radius: 10px;">
+											<div class="d-flex align-items-center mb-2">
+												<i class="fas fa-video text-secondary me-2"></i>
+												<span style="font-weight: 500; color: #4b5563;">Instant Consultation Time</span>
+											</div>
+											<div class="d-flex align-items-center">
+												<span style="width: 8px; height: 8px; background-color: #9ca3af; border-radius: 50%; display: inline-block; margin-right: 10px;"></span>
+												<span style="font-weight: 600; color: #111827;">Sat - Fri</span>
+												<span style="color: #6b7280; margin-left: 8px;">(5:00 PM - 10:00 PM)</span>
+											</div>
+										</div>
+										
+										<!-- Stats Grid Box -->
+										<div class="p-4" style="background-color: #f8f9fa; border-radius: 10px;">
+											<div class="row g-4">
+												<div class="col-6">
+													<p style="color: #6b7280; font-size: 14px; margin-bottom: 4px;">Consultation Fee</p>
+													<p style="color: #111827; font-weight: 700; font-size: 16px; margin-bottom: 0;">৳<?php echo number_format($doctor['consultation_fee'], 0); ?> <span style="font-weight: 400; font-size: 13px; color: #9ca3af;">(inc. VAT)</span></p>
+												</div>
+												<div class="col-6">
+													<p style="color: #6b7280; font-size: 14px; margin-bottom: 4px;">Follow-Up Fee</p>
+													<p style="color: #111827; font-weight: 700; font-size: 16px; margin-bottom: 0;">৳<?php echo number_format($doctor['consultation_fee'] * 0.7, 0); ?> <span style="font-weight: 400; font-size: 13px; color: #9ca3af;">(inc. VAT)</span></p>
+													<p style="font-size: 12px; color: #6b7280; margin-top: 2px; margin-bottom: 0;">(Within 30 days)</p>
+												</div>
+												<div class="col-6">
+													<p style="color: #6b7280; font-size: 14px; margin-bottom: 4px;">Patient Attended</p>
+													<p style="color: #111827; font-weight: 700; font-size: 16px; margin-bottom: 0;"><?php echo number_format($doctor['total_appointments']); ?></p>
+												</div>
+												<div class="col-6">
+													<p style="color: #6b7280; font-size: 14px; margin-bottom: 4px;">Joined DocTime</p>
+													<p style="color: #111827; font-weight: 700; font-size: 16px; margin-bottom: 0;"><?php echo date('F d, Y', strtotime($doctor['created_at'] ?? 'now')); ?></p>
+												</div>
+												<div class="col-6">
+													<p style="color: #6b7280; font-size: 14px; margin-bottom: 4px;">Doctor Code</p>
+													<p style="color: #111827; font-weight: 700; font-size: 16px; margin-bottom: 0;">DT<?php echo str_pad($doctor['id'], 4, '0', STR_PAD_LEFT); ?></p>
+												</div>
+												<div class="col-6">
+													<p style="color: #6b7280; font-size: 14px; margin-bottom: 4px;">Avg. Consultation Time</p>
+													<p style="color: #111827; font-weight: 700; font-size: 16px; margin-bottom: 0;">15 minutes</p>
+												</div>
+											</div>
+										</div>
+									</div>
+								</div>
 							</div>
+
+							<!-- Experience Tab -->
+							<div class="tab-pane fade" id="experience-tab-pane" role="tabpanel" aria-labelledby="experience-tab" tabindex="0">
+								<div class="row g-4">
+									<?php if (!empty($experiences)): ?>
+										<?php foreach ($experiences as $index => $exp): ?>
+											<div class="col-md-6">
+												<div class="p-4 h-100" style="border: 1px solid #e5e7eb; border-radius: 10px; background-color: #fff;">
+													<h5 style="font-weight: 700; color: #111827; margin-bottom: 20px;"><?php echo htmlspecialchars($exp['hospital_name']); ?></h5>
+													
+													<div class="row mb-3">
+														<div class="col-6">
+															<p style="color: #6b7280; font-size: 14px; margin-bottom: 4px;">Designation</p>
+															<p style="color: #111827; font-weight: 500; font-size: 15px; margin-bottom: 0;"><?php echo htmlspecialchars($exp['title']); ?></p>
+														</div>
+														<div class="col-6">
+															<p style="color: #6b7280; font-size: 14px; margin-bottom: 4px;">Department</p>
+															<p style="color: #111827; font-weight: 500; font-size: 15px; margin-bottom: 0;"><?php echo htmlspecialchars($doctor['specialty']); ?></p>
+														</div>
+													</div>
+													
+													<div class="row">
+														<div class="col-6">
+															<p style="color: #6b7280; font-size: 14px; margin-bottom: 4px;">Employment Status</p>
+															<p style="color: #111827; font-weight: 500; font-size: 15px; margin-bottom: 0;">
+																<?php 
+																$start_date = date('M j, Y', strtotime($exp['start_date']));
+																$end_date = $exp['currently_working'] ? 'current' : ($exp['end_date'] ? date('M j, Y', strtotime($exp['end_date'])) : 'current');
+																echo $start_date . ' - ' . $end_date;
+																?>
+															</p>
+														</div>
+														<div class="col-6">
+															<p style="color: #6b7280; font-size: 14px; margin-bottom: 4px;">Period</p>
+															<p style="color: #111827; font-weight: 500; font-size: 15px; margin-bottom: 0;">
+																<?php echo htmlspecialchars($exp['years_of_experience']); ?>
+															</p>
+														</div>
+													</div>
+												</div>
+											</div>
+										<?php endforeach; ?>
+									<?php else: ?>
+										<div class="col-12 text-center text-muted py-5">
+											<p>No experience information available.</p>
+										</div>
+									<?php endif; ?>
+								</div>
+							</div>
+
+							<!-- Reviews Tab -->
+							<div class="tab-pane fade" id="reviews-tab-pane" role="tabpanel" aria-labelledby="reviews-tab" tabindex="0">
+								<div class="text-center text-muted py-5">
+									<p>Reviews will be available soon.</p>
+								</div>
+							</div>
+						</div>
 							<!-- <div class="doc-information-details" id="insurence">
 								<div class="detail-title slider-nav d-flex justify-content-between align-items-center">
 									<h4>Insurance  Accepted (6)</h4>
@@ -733,7 +742,7 @@ try {
 										</p>
 										<a href="#" class="reply d-flex align-items-center"><i class="fa-solid fa-reply me-2"></i>Reply</a>
 									</div>
-									<!-- Pagination -->
+									<!-- Pagination 
 									<div class="pagination dashboard-pagination">
 										<ul>
 											<li>
@@ -762,7 +771,7 @@ try {
 											</li>
 										</ul>
 									</div>
-									<!-- /Pagination -->
+									/Pagination -->
 								</div>
 							</div> -->
 						</div>

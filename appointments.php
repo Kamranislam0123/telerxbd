@@ -488,13 +488,15 @@ include 'header.php';
 												</ul>
 											</li>
 											<li class="appointment-detail-btn">
-												<a href="appointment-detail.php?id=<?php echo (int)$a['id']; ?>" class="start-link">View Details</a>
+												<a href="appointment-detail.php?id=<?php echo (int)$a['id']; ?>" class="start-link mb-2">View Details</a>
 												<?php if (!empty($a['prescription_path'])): ?>
-													<a href="<?php echo htmlspecialchars($a['prescription_path']); ?>" target="_blank" class="btn btn-sm btn-outline-success btn-prescription" title="View Prescription"><i class="isax isax-document-text"></i></a>
+													<div class="d-flex gap-1">
+														<a href="<?php echo htmlspecialchars($a['prescription_path']); ?>" target="_blank" class="btn btn-sm btn-outline-success flex-fill" title="View Prescription"><i class="isax isax-document-text"></i></a>
+													</div>
 												<?php else: ?>
-													<div class="d-inline-flex gap-1">
-														<a href="javascript:void(0);" class="btn btn-sm btn-outline-primary btn-generate-prescription" data-id="<?php echo (int)$a['id']; ?>" data-patient="<?php echo htmlspecialchars($a['patient_name'] ?? 'Patient'); ?>" title="Generate Prescription"><i class="isax isax-edit-2"></i></a>
-														<a href="javascript:void(0);" class="btn btn-sm btn-outline-secondary upload-prescription" data-id="<?php echo (int)$a['id']; ?>" title="Upload Prescription"><i class="isax isax-import"></i></a>
+													<div class="d-flex gap-1">
+														<a href="javascript:void(0);" class="btn btn-sm btn-outline-primary btn-generate-prescription flex-fill" data-id="<?php echo (int)$a['id']; ?>" data-patient="<?php echo htmlspecialchars($a['patient_name'] ?? 'Patient'); ?>" title="Generate Prescription"><i class="isax isax-edit-2"></i></a>
+														<a href="javascript:void(0);" class="btn btn-sm btn-outline-secondary upload-prescription flex-fill" data-id="<?php echo (int)$a['id']; ?>" title="Upload Prescription"><i class="isax isax-import"></i></a>
 													</div>
 												<?php endif; ?>
 											</li>
@@ -535,13 +537,16 @@ include 'header.php';
 												</ul>
 											</li>
 											<li class="appointment-detail-btn">
-												<a href="appointment-detail.php?id=<?php echo (int)$a['id']; ?>" class="start-link">View Details</a>
+												<a href="appointment-detail.php?id=<?php echo (int)$a['id']; ?>" class="start-link mb-2">View Details</a>
 												<?php if (!empty($a['prescription_path'])): ?>
-													<a href="<?php echo htmlspecialchars($a['prescription_path']); ?>" target="_blank" class="btn btn-sm btn-outline-success btn-prescription" title="View Prescription"><i class="isax isax-document-text"></i></a>
+													<div class="d-flex gap-1">
+														<a href="<?php echo htmlspecialchars($a['prescription_path']); ?>" target="_blank" class="btn btn-sm btn-outline-success flex-fill" title="View Prescription"><i class="isax isax-document-text"></i></a>
+														<a href="video-call.php?appointment_id=<?php echo (int)$a['id']; ?>" class="btn btn-sm btn-outline-primary flex-fill" title="Edit Prescription"><i class="isax isax-edit-2"></i></a>
+													</div>
 												<?php else: ?>
-													<div class="d-inline-flex gap-1">
-														<a href="javascript:void(0);" class="btn btn-sm btn-outline-primary btn-generate-prescription" data-id="<?php echo (int)$a['id']; ?>" data-patient="<?php echo htmlspecialchars($a['patient_name'] ?? 'Patient'); ?>" title="Generate Prescription"><i class="isax isax-edit-2"></i></a>
-														<a href="javascript:void(0);" class="btn btn-sm btn-outline-secondary upload-prescription" data-id="<?php echo (int)$a['id']; ?>" title="Upload Prescription"><i class="isax isax-import"></i></a>
+													<div class="d-flex gap-1">
+														<a href="javascript:void(0);" class="btn btn-sm btn-outline-primary btn-generate-prescription flex-fill" data-id="<?php echo (int)$a['id']; ?>" data-patient="<?php echo htmlspecialchars($a['patient_name'] ?? 'Patient'); ?>" title="Generate Prescription"><i class="isax isax-edit-2"></i></a>
+														<a href="javascript:void(0);" class="btn btn-sm btn-outline-secondary upload-prescription flex-fill" data-id="<?php echo (int)$a['id']; ?>" title="Upload Prescription"><i class="isax isax-import"></i></a>
 													</div>
 												<?php endif; ?>
 											</li>
@@ -668,14 +673,33 @@ include 'header.php';
 
 							<hr class="mt-4">
 							<div class="form-group mb-3">
-								<label class="form-label d-block">Follow-up</label>
-								<div class="form-check">
-									<input class="form-check-input" type="radio" name="follow_up_type" id="modal_follow_up_with_report" value="with_report">
-									<label class="form-check-label" for="modal_follow_up_with_report">Follow-up with Report</label>
+								<label class="form-label d-block">Follow-up?</label>
+								<div class="form-check form-check-inline">
+									<input class="form-check-input" type="radio" name="has_follow_up" id="modal_follow_up_yes" value="yes">
+									<label class="form-check-label" for="modal_follow_up_yes">Yes</label>
 								</div>
-								<div class="form-check">
-									<input class="form-check-input" type="radio" name="follow_up_type" id="modal_follow_up_without_report" value="without_report">
-									<label class="form-check-label" for="modal_follow_up_without_report">Follow-up without Report</label>
+								<div class="form-check form-check-inline">
+									<input class="form-check-input" type="radio" name="has_follow_up" id="modal_follow_up_no" value="no" checked>
+									<label class="form-check-label" for="modal_follow_up_no">No</label>
+								</div>
+							</div>
+
+							<div id="modal_follow_up_details_container" style="display: none;">
+								<div class="form-group mb-3">
+									<label class="form-label d-block">Follow-up Type</label>
+									<div class="form-check">
+										<input class="form-check-input" type="radio" name="follow_up_type" id="modal_follow_up_with_report" value="with_report">
+										<label class="form-check-label" for="modal_follow_up_with_report">Follow-up with Report</label>
+									</div>
+									<div class="form-check">
+										<input class="form-check-input" type="radio" name="follow_up_type" id="modal_follow_up_without_report" value="without_report">
+										<label class="form-check-label" for="modal_follow_up_without_report">Follow-up without Report</label>
+									</div>
+								</div>
+								
+								<div class="form-group mb-3">
+									<label class="form-label">Follow-up After (Days)</label>
+									<input type="number" class="form-control" name="follow_up_date" id="modal_follow_up_date" placeholder="e.g. 20" value="">
 								</div>
 							</div>
 							<div class="form-group mb-3">
@@ -855,7 +879,14 @@ include 'header.php';
 					}
 				});
 			}
-
+			// Toggle follow-up details visibility in modal
+			$('input[name="has_follow_up"]').change(function() {
+				if ($(this).val() === 'yes') {
+					$('#modal_follow_up_details_container').slideDown();
+				} else {
+					$('#modal_follow_up_details_container').slideUp();
+				}
+			});
 		});
 		</script>
 

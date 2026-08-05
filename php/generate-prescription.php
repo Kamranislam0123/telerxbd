@@ -407,12 +407,29 @@ try {
                 }
 
                 $selected_follow_up = $appointment['follow_up_type'] ?? '';
-                if ($selected_follow_up === 'with_report') {
-                    $html .= '
-                <div class="follow-up-text"><strong>Follow-up:</strong> Follow-up with Report</div>';
-                } else if ($selected_follow_up === 'without_report') {
-                    $html .= '
-                <div class="follow-up-text"><strong>Follow-up:</strong> Follow-up without Report</div>';
+                $follow_up_date = $appointment['follow_up_date'] ?? '';
+                
+                if (!empty($selected_follow_up) && !empty($follow_up_date) && $follow_up_date !== '0000-00-00') {
+                    if (is_numeric($follow_up_date)) {
+                        $days_text = $follow_up_date . ' days';
+                    } else {
+                        $diff_days = round((strtotime($follow_up_date) - strtotime($appointment['appointment_date'])) / (60 * 60 * 24));
+                        $days_text = ($diff_days > 0) ? $diff_days . ' days' : date('d M Y', strtotime($follow_up_date));
+                    }
+                    
+                    if ($selected_follow_up === 'with_report') {
+                        $html .= '
+                <br><br>
+                <div class="follow-up-text" style="font-size: 10pt; font-family: hindsiliguri; line-height: 1.5;">
+                    Follow up after ' . $days_text . ' with report.
+                </div>';
+                    } else if ($selected_follow_up === 'without_report') {
+                        $html .= '
+                <br><br>
+                <div class="follow-up-text" style="font-size: 10pt; font-family: hindsiliguri; line-height: 1.5;">
+                    Follow up after ' . $days_text . '.
+                </div>';
+                    }
                 }
 
     // Pin Note/Reference + Prescription Footer to the page bottom

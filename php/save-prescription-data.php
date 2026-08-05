@@ -28,10 +28,21 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $advice = $_POST['advice'] ?? '';
     $note_reference = $_POST['note_reference'] ?? '';
     $prescription_footer = $_POST['prescription_footer'] ?? '';
+    $has_follow_up = $_POST['has_follow_up'] ?? 'no';
     $follow_up_type = $_POST['follow_up_type'] ?? '';
-    $allowed_follow_up = ['with_report', 'without_report'];
-    if (!in_array($follow_up_type, $allowed_follow_up, true)) {
-        $follow_up_type = '';
+    $follow_up_date = $_POST['follow_up_date'] ?? '';
+
+    if ($has_follow_up === 'yes') {
+        $allowed_follow_up = ['with_report', 'without_report'];
+        if (!in_array($follow_up_type, $allowed_follow_up, true)) {
+            $follow_up_type = null;
+        }
+        if (empty($follow_up_date)) {
+            $follow_up_date = null;
+        }
+    } else {
+        $follow_up_type = null;
+        $follow_up_date = null;
     }
     
     // Process medications into JSON
@@ -48,13 +59,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         }
     }
     $meds_json = json_encode($medications);
-
+ 
     if ($appointment_id <= 0) {
         ob_clean();
         echo json_encode(['success' => false, 'message' => 'Invalid Appointment ID']);
         exit;
     }
-
+ 
     try {
         $conn = getDBConnection();
         
@@ -70,25 +81,36 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             exit;
         }
         $stmt->close();
-
+ 
         // Ensure prescription_footer column exists
         $col_check = $conn->query("SHOW COLUMNS FROM appointments LIKE 'prescription_footer'");
         if ($col_check->num_rows === 0) {
             $conn->query("ALTER TABLE appointments ADD COLUMN prescription_footer TEXT NULL");
         }
-
+ 
         // Ensure note_reference column exists
         $note_col_check = $conn->query("SHOW COLUMNS FROM appointments LIKE 'note_reference'");
         if ($note_col_check->num_rows === 0) {
             $conn->query("ALTER TABLE appointments ADD COLUMN note_reference TEXT NULL");
         }
-
+ 
         // Ensure follow_up_type column exists
         $follow_up_col_check = $conn->query("SHOW COLUMNS FROM appointments LIKE 'follow_up_type'");
         if ($follow_up_col_check->num_rows === 0) {
             $conn->query("ALTER TABLE appointments ADD COLUMN follow_up_type VARCHAR(32) NULL");
         }
 
+        // Ensure follow_up_date column exists and can hold strings
+        $follow_up_date_col_check = $conn->query("SHOW COLUMNS FROM appointments LIKE 'follow_up_date'");
+        if ($follow_up_date_col_check->num_rows === 0) {
+            $conn->query("ALTER TABLE appointments ADD COLUMN follow_up_date VARCHAR(50) NULL");
+        } else {
+            $col_info = $follow_up_date_col_check->fetch_assoc();
+            if (stripos($col_info['Type'], 'date') !== false) {
+                $conn->query("ALTER TABLE appointments MODIFY COLUMN follow_up_date VARCHAR(50) NULL");
+            }
+        }
+ 
         // Update appointment with prescription details
         $update_sql = "UPDATE appointments SET 
                         chief_complaints = ?, 
@@ -98,11 +120,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                         advice = ?,
                         note_reference = ?,
                         prescription_footer = ?,
-                        follow_up_type = ?
+                        follow_up_type = ?,
+                        follow_up_date = ?
                        WHERE id = ?";
         
         $update_stmt = $conn->prepare($update_sql);
-        $update_stmt->bind_param("ssssssssi", $chief_complaints, $on_examination, $diagnosis, $meds_json, $advice, $note_reference, $prescription_footer, $follow_up_type, $appointment_id);
+        $update_stmt->bind_param("sssssssssi", $chief_complaints, $on_examination, $diagnosis, $meds_json, $advice, $note_reference, $prescription_footer, $follow_up_type, $follow_up_date, $appointment_id);
         
         if ($update_stmt->execute()) {
             ob_clean();

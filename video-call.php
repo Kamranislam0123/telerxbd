@@ -680,15 +680,38 @@ if ($appointment_id) {
 							</div>
 
 							<div class="form-group mb-3">
-								<label class="form-label d-block">Follow-up</label>
-								<?php $saved_follow_up = $appointment['follow_up_type'] ?? ''; ?>
-								<div class="form-check">
-									<input class="form-check-input" type="radio" name="follow_up_type" id="follow_up_with_report" value="with_report" <?php echo $saved_follow_up === 'with_report' ? 'checked' : ''; ?>>
-									<label class="form-check-label" for="follow_up_with_report">Follow-up with Report</label>
+								<label class="form-label d-block">Follow-up?</label>
+								<?php 
+								$saved_follow_up = $appointment['follow_up_type'] ?? ''; 
+								$saved_follow_up_date = $appointment['follow_up_date'] ?? ''; 
+								$has_follow_up = !empty($saved_follow_up) ? 'yes' : 'no';
+								?>
+								<div class="form-check form-check-inline">
+									<input class="form-check-input" type="radio" name="has_follow_up" id="follow_up_yes" value="yes" <?php echo $has_follow_up === 'yes' ? 'checked' : ''; ?>>
+									<label class="form-check-label" for="follow_up_yes">Yes</label>
 								</div>
-								<div class="form-check">
-									<input class="form-check-input" type="radio" name="follow_up_type" id="follow_up_without_report" value="without_report" <?php echo $saved_follow_up === 'without_report' ? 'checked' : ''; ?>>
-									<label class="form-check-label" for="follow_up_without_report">Follow-up without Report</label>
+								<div class="form-check form-check-inline">
+									<input class="form-check-input" type="radio" name="has_follow_up" id="follow_up_no" value="no" <?php echo $has_follow_up === 'no' ? 'checked' : ''; ?>>
+									<label class="form-check-label" for="follow_up_no">No</label>
+								</div>
+							</div>
+
+							<div id="follow_up_details_container" style="<?php echo $has_follow_up === 'yes' ? '' : 'display: none;'; ?>">
+								<div class="form-group mb-3">
+									<label class="form-label d-block">Follow-up Type</label>
+									<div class="form-check">
+										<input class="form-check-input" type="radio" name="follow_up_type" id="follow_up_with_report" value="with_report" <?php echo $saved_follow_up === 'with_report' ? 'checked' : ''; ?>>
+										<label class="form-check-label" for="follow_up_with_report">Follow-up with Report</label>
+									</div>
+									<div class="form-check">
+										<input class="form-check-input" type="radio" name="follow_up_type" id="follow_up_without_report" value="without_report" <?php echo $saved_follow_up === 'without_report' ? 'checked' : ''; ?>>
+										<label class="form-check-label" for="follow_up_without_report">Follow-up without Report</label>
+									</div>
+								</div>
+								
+								<div class="form-group mb-3">
+									<label class="form-label">Follow-up After (Days)</label>
+									<input type="number" class="form-control" name="follow_up_date" id="follow_up_date" placeholder="e.g. 20" value="<?php echo htmlspecialchars($saved_follow_up_date); ?>">
 								</div>
 							</div>
 
@@ -705,7 +728,6 @@ if ($appointment_id) {
 
 							
 							<div class="text-end">
-								<button type="button" class="btn btn-outline-primary btn-lg px-4 me-2" id="btn_preview_prescription">Preview Design</button>
 								<button type="submit" class="btn btn-primary btn-lg px-5" id="btn_submit_prescription">Generate & Save Prescription PDF</button>
 							</div>
 						</form>
@@ -1138,6 +1160,15 @@ if ($appointment_id) {
 			// Remove Medicine Row
 			$(document).on('click', '.btn-remove-medicine', function () {
 				$(this).closest('.medicine-row').remove();
+			});
+
+			// Toggle follow-up details visibility
+			$('input[name="has_follow_up"]').change(function() {
+				if ($(this).val() === 'yes') {
+					$('#follow_up_details_container').slideDown();
+				} else {
+					$('#follow_up_details_container').slideUp();
+				}
 			});
 
 			// If the provider closes the window/tab or navigates away, clear the call status
