@@ -175,6 +175,17 @@ include 'header.php';?>
         }
 
         var registrationRedirect = (new URLSearchParams(window.location.search)).get('redirect') || '';
+        if (registrationRedirect) {
+            try {
+                var previousValue;
+                do {
+                    previousValue = registrationRedirect;
+                    registrationRedirect = decodeURIComponent(registrationRedirect);
+                } while (registrationRedirect !== previousValue);
+            } catch (e) {
+                // Leave the value as-is if it can't be decoded further.
+            }
+        }
 
         // Patient Registration Form Handler
         $('#patient-register-btn').on('click', function(e) {

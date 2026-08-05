@@ -44,8 +44,23 @@ $password = isset($_POST['password']) ? trim($_POST['password']) : '';
 $redirect = isset($_POST['redirect']) ? trim($_POST['redirect']) : '';
 
 // Normalize redirect to allow only local paths
+function normalize_local_redirect($redirect)
+{
+    $current = $redirect;
+    $maxIterations = 5;
+    for ($i = 0; $i < $maxIterations; $i++) {
+        $decoded = urldecode($current);
+        if ($decoded === $current) {
+            break;
+        }
+        $current = $decoded;
+    }
+    return $current;
+}
+
 $sanitized_redirect = '';
 if ($redirect !== '') {
+    $redirect = normalize_local_redirect($redirect);
     $parsed = parse_url($redirect);
     if (!isset($parsed['scheme']) && !isset($parsed['host']) && isset($parsed['path'])) {
         $sanitized_redirect = ltrim($parsed['path'], '/');
@@ -273,6 +288,7 @@ try {
     // Insert based on user type
     $user_id = null;
     $redirect_url = 'login.php';
+    $stmt = null;
 
     switch ($user_type) {
         case 'patient':
