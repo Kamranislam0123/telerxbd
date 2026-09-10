@@ -11,6 +11,7 @@ if (!file_exists($config_path)) {
     exit;
 }
 require_once $config_path;
+require_once __DIR__ . '/php/subscription-helper.php';
 
 // Check if patient is logged in
 if (!isset($_SESSION['patient_id']) || !isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true || $_SESSION['user_type'] !== 'patient') {
@@ -20,9 +21,11 @@ if (!isset($_SESSION['patient_id']) || !isset($_SESSION['logged_in']) || $_SESSI
 
 // Get patient information from session
 $patient_id = $_SESSION['patient_id'];
+$patient_sub = null;
 
 try {
     $conn = getDBConnection();
+    $patient_sub = getActiveSubscription($patient_id, $conn);
 
     // Fetch patient's basic information
     $stmt = $conn->prepare("SELECT * FROM patients WHERE id = ?");
@@ -139,6 +142,53 @@ include 'header.php';
 							<div class="dashboard-header">
 								<h3>Dashboard</h3>
 							</div>
+
+                            <!-- TeleRx Subscription Quick Widget -->
+                            <?php if ($patient_sub): 
+                                $rem_calls = max(0, (int)$patient_sub['emergency_calls_total'] - (int)$patient_sub['emergency_calls_used']);
+                            ?>
+                                <div class="card mb-4 border-0 shadow-sm" style="background: linear-gradient(135deg, #0e82fd 0%, #0352bd 100%); border-radius: 12px; color: #fff;">
+                                    <div class="card-body p-4">
+                                        <div class="row align-items-center">
+                                            <div class="col-md-8">
+                                                <div class="d-flex align-items-center gap-2 mb-1">
+                                                    <span class="badge bg-success"><i class="fa-solid fa-circle-check me-1"></i> Active Plan</span>
+                                                    <span class="badge bg-white text-dark"><?php echo htmlspecialchars($patient_sub['plan_name']); ?> (<?php echo htmlspecialchars($patient_sub['duration_label']); ?>)</span>
+                                                </div>
+                                                <h4 class="text-white fw-bold mb-1">TeleRx Health Membership</h4>
+                                                <p class="mb-0 text-white-50 small">
+                                                    <strong><?php echo $rem_calls; ?></strong> Free Emergency Calls Left &bull; 
+                                                    <strong><?php echo (int)$patient_sub['gp_discount_percent']; ?>%</strong> Consultation Discount &bull; 
+                                                    Valid until <?php echo date('d M, Y', strtotime($patient_sub['end_date'])); ?>
+                                                </p>
+                                            </div>
+                                            <div class="col-md-4 text-md-end mt-3 mt-md-0">
+                                                <a href="patient-subscription.php" class="btn btn-sm btn-light fw-bold text-primary px-3">
+                                                    <i class="fa-solid fa-sliders me-1"></i> Manage Plan
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            <?php else: ?>
+                                <div class="card mb-4 border-0 shadow-sm" style="background: linear-gradient(135deg, #2c3e50 0%, #3498db 100%); border-radius: 12px; color: #fff;">
+                                    <div class="card-body p-3 p-md-4">
+                                        <div class="row align-items-center">
+                                            <div class="col-md-8">
+                                                <h5 class="text-white fw-bold mb-1"><i class="fa-solid fa-shield-heart me-2"></i>TeleRx Subscription Packages</h5>
+                                                <p class="mb-0 text-white-50 small">
+                                                    Get 24/7 free emergency doctor consultations, doctor booking discounts, and family member coverage.
+                                                </p>
+                                            </div>
+                                            <div class="col-md-4 text-md-end mt-3 mt-md-0">
+                                                <a href="subscription.php" class="btn btn-sm btn-warning fw-bold text-dark px-3">
+                                                    <i class="fa-solid fa-arrow-right me-1"></i> View Packages
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            <?php endif; ?>
 							
 							<!-- Health Records Section (Top) -->
 							<div class="row">

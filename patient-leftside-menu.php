@@ -47,6 +47,12 @@ if (!empty($patient['gender']) || !empty($patient['date_of_birth'])) {
                                 <span>My Appointments</span>
                             </a>
                         </li>
+                        <li <?php echo (in_array(basename($_SERVER['PHP_SELF']), ['patient-subscription.php', 'subscription-checkout.php'])) ? 'class="active"' : ''; ?>>
+                            <a href="<?php echo (defined('APP_BASE') && APP_BASE) ? APP_BASE . '/patient-subscription' : 'patient-subscription.php'; ?>">
+                                <i class="isax isax-medal-star"></i>
+                                <span>My Subscription</span>
+                            </a>
+                        </li>
                         <li <?php echo (basename($_SERVER['PHP_SELF']) == 'patient-profile-settings.php') ? 'class="active"' : ''; ?>>
                             <a href="<?php echo (defined('APP_BASE') && APP_BASE) ? APP_BASE . '/patient-profile-settings' : 'patient-profile-settings'; ?>">
                                 <i class="isax isax-setting-2"></i>

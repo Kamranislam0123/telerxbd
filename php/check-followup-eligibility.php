@@ -13,13 +13,33 @@ $doctor_id = isset($_GET['doctor_id']) ? (int) $_GET['doctor_id'] : 0;
 $mobile = isset($_GET['mobile']) ? trim($_GET['mobile']) : '';
 $target_date_str = isset($_GET['appointment_date']) ? trim($_GET['appointment_date']) : '';
 
+require_once __DIR__ . '/subscription-helper.php';
+
+if (session_status() === PHP_SESSION_NONE) session_start();
+$session_patient_id = isset($_SESSION['patient_id']) ? (int)$_SESSION['patient_id'] : 0;
+$sub_discount_pct = 0;
+$sub_plan_name = '';
+
+if ($session_patient_id > 0) {
+    $session_sub = getActiveSubscription($session_patient_id);
+    if ($session_sub) {
+        $sub_discount_pct = (float)($session_sub['gp_discount_percent'] ?? 0);
+        if ($sub_discount_pct <= 0 && isset($session_sub['specialist_discount_percent'])) {
+            $sub_discount_pct = (float)$session_sub['specialist_discount_percent'];
+        }
+        $sub_plan_name = $session_sub['plan_name'] ?? '';
+    }
+}
+
 if ($doctor_id <= 0 || $mobile === '') {
     ob_clean();
     echo json_encode([
         'success' => false,
         'message' => 'Missing doctor_id or mobile number',
         'eligible_with_report' => false,
-        'eligible_without_report' => false
+        'eligible_without_report' => false,
+        'subscription_discount_percent' => $sub_discount_pct,
+        'subscription_discount_name' => $sub_plan_name
     ]);
     exit;
 }
@@ -32,7 +52,9 @@ if (strlen($mobile_clean) < 10) {
         'success' => false,
         'message' => 'Invalid mobile number',
         'eligible_with_report' => false,
-        'eligible_without_report' => false
+        'eligible_without_report' => false,
+        'subscription_discount_percent' => $sub_discount_pct,
+        'subscription_discount_name' => $sub_plan_name
     ]);
     exit;
 }
@@ -41,7 +63,7 @@ try {
     $conn = getDBConnection();
     
     // Resolve patient ID or use mobile directly
-    $patient_id = 0;
+    $patient_id = $session_patient_id;
     $patient_lookup = $conn->prepare("SELECT id FROM patients WHERE phone = ? LIMIT 1");
     if ($patient_lookup) {
         $patient_lookup->bind_param("s", $mobile_clean);
@@ -51,6 +73,17 @@ try {
             $patient_id = (int)$res->fetch_assoc()['id'];
         }
         $patient_lookup->close();
+    }
+
+    if ($sub_discount_pct <= 0 && $patient_id > 0) {
+        $active_sub = getActiveSubscription($patient_id, $conn);
+        if ($active_sub) {
+            $sub_discount_pct = (float)($active_sub['gp_discount_percent'] ?? 0);
+            if ($sub_discount_pct <= 0 && isset($active_sub['specialist_discount_percent'])) {
+                $sub_discount_pct = (float)$active_sub['specialist_discount_percent'];
+            }
+            $sub_plan_name = $active_sub['plan_name'] ?? '';
+        }
     }
     
     // Find the latest completed appointment for this patient/mobile with the selected doctor
@@ -94,6 +127,8 @@ try {
             'success' => true,
             'eligible_with_report' => false,
             'eligible_without_report' => false,
+            'subscription_discount_percent' => $sub_discount_pct,
+            'subscription_discount_name' => $sub_plan_name,
             'message' => 'No previous completed appointment found with this doctor.'
         ]);
         exit;
@@ -138,6 +173,8 @@ try {
         'success' => true,
         'eligible_with_report' => $eligible_with_report,
         'eligible_without_report' => $eligible_without_report,
+        'subscription_discount_percent' => $sub_discount_pct,
+        'subscription_discount_name' => $sub_plan_name,
         'previous_appointment_date' => $prev_date_str,
         'days_since_previous' => $days_diff,
         'prescribed_follow_up_type' => $follow_up_type,

@@ -1187,3 +1187,4 @@ if ($appointment_id) {
 </body>
 
 </html>
+</html>

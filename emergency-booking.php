@@ -29,6 +29,9 @@ if (empty($prefill_mobile)) {
     }
 }
 
+require_once __DIR__ . '/php/subscription-helper.php';
+$active_sub = getActiveSubscription($_SESSION['patient_id']);
+
 include 'header.php';
 ?>
 
@@ -60,26 +63,44 @@ include 'header.php';
                     <p class="text-muted">Enter your mobile number to get immediate access to an available emergency doctor.</p>
                 </div>
                 
-                <div id="emergency-message" class="alert" style="display: none;"></div>
+                    <div id="emergency-message" class="alert" style="display: none;"></div>
 
-                <form id="emergency-booking-form">
-                    <div class="mb-4">
-                        <label class="form-label">Mobile Number <span class="text-danger">*</span></label>
-                        <input type="text" class="form-control form-control-lg" name="mobile" id="emergency-mobile" placeholder="e.g. 01XXXXXXXXX" value="<?php echo htmlspecialchars($prefill_mobile); ?>" required>
-                    </div>
+                    <?php if ($active_sub && $active_sub['remaining_calls'] > 0): ?>
+                        <div class="alert alert-success border-0 mb-4 shadow-sm" style="border-radius: 10px; background: #ecfdf5; border-left: 5px solid #10b981 !important;">
+                            <div class="d-flex align-items-center">
+                                <i class="fa-solid fa-shield-heart fs-3 text-success me-3"></i>
+                                <div>
+                                    <h6 class="mb-0 fw-bold text-success">Covered by <?php echo htmlspecialchars($active_sub['plan_name']); ?> Subscription</h6>
+                                    <p class="mb-0 small text-secondary">
+                                        You have <strong><?php echo $active_sub['remaining_calls']; ?></strong> free emergency calls remaining. No payment is required for this consultation.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    <?php endif; ?>
 
-                    <div class="mb-4">
-                        <label class="form-label">Payment Method</label>
-                        <select class="form-select" name="payment_method" id="emergency-payment-method">
-                            <option value="bkash" selected>bKash (no payment required)</option>
-                        </select>
-                    </div>
-                    
-                    <div class="mb-4">
-                        <button class="btn btn-danger w-100 btn-lg" type="submit" id="emergency-btn">
-                            <i class="fa-solid fa-truck-medical me-2"></i> Confirm Emergency Booking
-                        </button>
-                    </div>
+                    <form id="emergency-booking-form">
+                        <div class="mb-4">
+                            <label class="form-label">Mobile Number <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control form-control-lg" name="mobile" id="emergency-mobile" placeholder="e.g. 01XXXXXXXXX" value="<?php echo htmlspecialchars($prefill_mobile); ?>" required>
+                        </div>
+
+                        <div class="mb-4">
+                            <label class="form-label">Payment Method</label>
+                            <select class="form-select" name="payment_method" id="emergency-payment-method">
+                                <?php if ($active_sub && $active_sub['remaining_calls'] > 0): ?>
+                                    <option value="subscription" selected>TeleRx Subscription (Free Quota)</option>
+                                <?php else: ?>
+                                    <option value="bkash" selected>bKash (Send Money)</option>
+                                <?php endif; ?>
+                            </select>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <button class="btn btn-danger w-100 btn-lg" type="submit" id="emergency-btn">
+                                <i class="fa-solid fa-truck-medical me-2"></i> Confirm Emergency Booking
+                            </button>
+                        </div>
                     
                     <div class="text-center text-muted small">
                         <p>By proceeding, you agree to our Terms and Conditions.</p>
@@ -127,10 +148,17 @@ $(document).ready(function() {
             dataType: 'json',
             success: function(response) {
                 if (response.success) {
-                    messageDiv.removeClass('alert-danger').addClass('alert-success').html('<strong>Booking Saved!</strong> Redirecting to payment page...').fadeIn();
-                    setTimeout(function() {
-                        window.location.href = 'payment.php?appointment_id=' + response.appointment_id;
-                    }, 1000);
+                    if (response.covered_by_subscription) {
+                        messageDiv.removeClass('alert-danger').addClass('alert-success').html('<strong>Covered by Subscription!</strong> Connecting you directly to the emergency doctor...').fadeIn();
+                        setTimeout(function() {
+                            window.location.href = 'emergency-live-dashboard.php?appointment_id=' + response.appointment_id;
+                        }, 1000);
+                    } else {
+                        messageDiv.removeClass('alert-danger').addClass('alert-success').html('<strong>Booking Saved!</strong> Redirecting to payment page...').fadeIn();
+                        setTimeout(function() {
+                            window.location.href = 'payment.php?appointment_id=' + response.appointment_id;
+                        }, 1000);
+                    }
                 } else {
                     messageDiv.removeClass('alert-success').addClass('alert-danger').html('<strong>Error!</strong> ' + response.message).fadeIn();
                     submitBtn.prop('disabled', false).html('<i class="fa-solid fa-truck-medical me-2"></i> Confirm Emergency Booking');

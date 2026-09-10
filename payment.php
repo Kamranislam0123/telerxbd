@@ -1,6 +1,7 @@
 <?php
 session_start();
 require_once __DIR__ . '/php/config.php';
+require_once __DIR__ . '/php/subscription-helper.php';
 
 // Force patient log in
 if (!isset($_SESSION['patient_id']) || !isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true || $_SESSION['user_type'] !== 'patient') {
@@ -33,7 +34,29 @@ try {
         die("Appointment not found or unauthorized access.");
     }
     
-    $fee = (float)($appointment['consultation_fee'] ?? 500); // Default to 500 if not set
+    $booking_type = $appointment['booking_type'] ?? 'regular';
+    $base_fee = (float)($appointment['consultation_fee'] ?? 500);
+    
+    if ($booking_type === 'follow_up_with_report') {
+        $original_fee = 0;
+    } else if ($booking_type === 'follow_up_without_report') {
+        $original_fee = $base_fee * 0.5;
+    } else {
+        $original_fee = $base_fee;
+    }
+    
+    $active_sub = getActiveSubscription($_SESSION['patient_id'], $conn);
+    
+    $discount_percent = 0;
+    if ($active_sub) {
+        $discount_percent = (float)($active_sub['gp_discount_percent'] ?? 0);
+        if ($discount_percent <= 0 && isset($active_sub['specialist_discount_percent'])) {
+            $discount_percent = (float)$active_sub['specialist_discount_percent'];
+        }
+    }
+    
+    $discount_amount = ($original_fee * $discount_percent) / 100;
+    $fee = max(0, $original_fee - $discount_amount);
     
     if (isset($_POST['transaction_id'])) {
         $trx_id = trim($_POST['transaction_id']);
@@ -143,6 +166,10 @@ include 'header.php';
             
             <div class="amount-box">
                 <p class="text-muted mb-1">Consultation Fee</p>
+                <?php if ($discount_percent > 0): ?>
+                    <div class="mb-1 text-muted small text-decoration-line-through">Original: ৳<?php echo number_format($original_fee, 2); ?> BDT</div>
+                    <div class="badge bg-success mb-2">TeleRx <?php echo htmlspecialchars($active_sub['plan_name']); ?> Discount (-<?php echo (int)$discount_percent; ?>%)</div>
+                <?php endif; ?>
                 <div class="amount-value">৳ <?php echo number_format($fee, 2); ?> BDT</div>
                 <p class="small text-muted mb-0">Doctor: <?php echo htmlspecialchars($appointment['doctor_name']); ?> (<?php echo htmlspecialchars($appointment['specialty'] ?? 'Specialist'); ?>)</p>
             </div>

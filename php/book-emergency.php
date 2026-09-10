@@ -3,6 +3,7 @@ header('Content-Type: application/json');
 if (session_status() === PHP_SESSION_NONE) session_start();
 
 require_once __DIR__ . '/config.php';
+require_once __DIR__ . '/subscription-helper.php';
 
 $mobile = isset($_POST['mobile']) ? trim($_POST['mobile']) : '';
 $mobile_clean = preg_replace('/[^0-9]/', '', $mobile);
@@ -26,6 +27,10 @@ try {
     $conn = getDBConnection();
     $conn->begin_transaction();
 
+    // Check if covered by subscription
+    $active_sub = getActiveSubscription($patient_id, $conn);
+    $is_covered_by_sub = ($active_sub && $active_sub['remaining_calls'] > 0);
+
     // 3. Find Emergency Doctor ID
     $doctor_email = 'emergency@telerx.com';
     $doc_check = $conn->prepare("SELECT id FROM doctors WHERE email = ? LIMIT 1");
@@ -42,20 +47,21 @@ try {
     $appointment_date = date('Y-m-d');
     $slot_time = date('H:i'); // Adjusted format to avoid overflow
     $appointment_time = $slot_time;
-    $status = 'pending'; // Change from confirmed to pending until paid
+    $status = $is_covered_by_sub ? 'confirmed' : 'pending'; // Auto-confirm if covered by subscription
     $appointment_number = 'EMG00000';
     $is_emergency = 1;
+    $pay_method = $is_covered_by_sub ? 'subscription' : 'bkash';
+    $sub_id_to_store = $is_covered_by_sub ? (int)$active_sub['id'] : null;
 
     // Ensure we insert into existing columns
-    // the generic book-appointment.php does some conditional column checks, we will just use basic columns
     $ins = $conn->prepare("
         INSERT INTO appointments (
             patient_id, doctor_id, appointment_date, slot_time, appointment_time,
-            status, appointment_number, patient_name, mobile, patient_phone, is_emergency
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            status, appointment_number, patient_name, mobile, patient_phone, is_emergency, payment_method, subscription_id
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     ");
     $ins->bind_param(
-        "iissssssssi",
+        "iissssssssssi",
         $patient_id,
         $doctor_id,
         $appointment_date,
@@ -66,7 +72,9 @@ try {
         $patient_name,
         $mobile,
         $mobile,
-        $is_emergency
+        $is_emergency,
+        $pay_method,
+        $sub_id_to_store
     );
 
     if (!$ins->execute()) {
@@ -81,13 +89,19 @@ try {
     $upd->execute();
     $upd->close();
 
+    // If covered by subscription, deduct 1 emergency call from quota
+    if ($is_covered_by_sub) {
+        useEmergencyCallQuota($patient_id, $appointment_id, $conn);
+    }
+
     $conn->commit();
     $conn->close();
 
     echo json_encode([
         'success' => true,
         'message' => 'Emergency booking successful.',
-        'appointment_id' => $appointment_id
+        'appointment_id' => $appointment_id,
+        'covered_by_subscription' => $is_covered_by_sub
     ]);
 
 } catch (Exception $e) {

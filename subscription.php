@@ -1,4 +1,12 @@
 <?php
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+require_once __DIR__ . '/php/config.php';
+require_once __DIR__ . '/php/subscription-helper.php';
+
+$active_sub = (isset($_SESSION['patient_id'])) ? getActiveSubscription($_SESSION['patient_id']) : null;
+
 $page_title = 'TeleRx Subscription Packages';
 $has_site_header = file_exists(__DIR__ . '/header.php');
 $has_site_footer = file_exists(__DIR__ . '/footer.php');
@@ -26,6 +34,7 @@ $plan_groups = [
         'subtitle' => 'Flexible telemedicine support for short-term and occasional healthcare needs.',
         'plans' => [
             [
+                'code' => 'monthly_basic',
                 'name' => 'Basic',
                 'badge' => 'Occasional Users',
                 'price' => '৳499',
@@ -34,7 +43,7 @@ $plan_groups = [
                 'featured' => false,
                 'cta' => 'Choose Basic',
                 'features' => [
-                    'GP consultation discount up to 5%',
+                    'Doctor consultation discount up to 5% (All Doctors)',
                     '10 free 24/7 emergency doctor calls',
                     'Digital prescription included',
                     'Home service from TeleRx up to 10%',
@@ -44,6 +53,7 @@ $plan_groups = [
                 ],
             ],
             [
+                'code' => 'monthly_standard',
                 'name' => 'Standard',
                 'badge' => 'Best Value',
                 'price' => '৳999',
@@ -52,7 +62,7 @@ $plan_groups = [
                 'featured' => true,
                 'cta' => 'Choose Standard',
                 'features' => [
-                    'GP consultation discount up to 7%',
+                    'Doctor consultation discount up to 7% (All Doctors)',
                     '25 free 24/7 emergency doctor calls',
                     'Digital prescription included',
                     'Home service from TeleRx up to 15%',
@@ -63,6 +73,7 @@ $plan_groups = [
                 ],
             ],
             [
+                'code' => 'monthly_premium',
                 'name' => 'Premium',
                 'badge' => 'Recommended',
                 'price' => '৳1,499',
@@ -71,8 +82,7 @@ $plan_groups = [
                 'featured' => false,
                 'cta' => 'Choose Premium',
                 'features' => [
-                    'GP consultation discount up to 12%',
-                    'Specialist consultation discount up to 10%',
+                    'Doctor consultation discount up to 12% (All Doctors)',
                     '40 free 24/7 emergency doctor calls',
                     'Digital prescription included',
                     'Lab test discount up to 15%',
@@ -91,6 +101,7 @@ $plan_groups = [
         'subtitle' => 'Better value for users and families who need regular online doctor support.',
         'plans' => [
             [
+                'code' => 'sixmonths_basic',
                 'name' => 'Basic 6 Months',
                 'badge' => 'Basic',
                 'price' => '৳2,499',
@@ -99,7 +110,7 @@ $plan_groups = [
                 'featured' => false,
                 'cta' => 'Choose Basic',
                 'features' => [
-                    'GP consultation discount up to 5%',
+                    'Doctor consultation discount up to 5% (All Doctors)',
                     '70 free 24/7 emergency doctor calls',
                     'Digital prescription included',
                     'Home service from TeleRx up to 10%',
@@ -110,6 +121,7 @@ $plan_groups = [
                 ],
             ],
             [
+                'code' => 'sixmonths_standard',
                 'name' => 'Standard 6 Months',
                 'badge' => 'Best Value',
                 'price' => '৳5,499',
@@ -118,7 +130,7 @@ $plan_groups = [
                 'featured' => true,
                 'cta' => 'Choose Standard',
                 'features' => [
-                    'GP consultation discount up to 7%',
+                    'Doctor consultation discount up to 7% (All Doctors)',
                     '150 free 24/7 emergency doctor calls',
                     'Digital prescription included',
                     'Home service from TeleRx up to 15%',
@@ -130,6 +142,7 @@ $plan_groups = [
                 ],
             ],
             [
+                'code' => 'sixmonths_premium',
                 'name' => 'Premium 6 Months',
                 'badge' => 'Maximum Support',
                 'price' => '৳7,999',
@@ -138,8 +151,7 @@ $plan_groups = [
                 'featured' => false,
                 'cta' => 'Choose Premium',
                 'features' => [
-                    'GP consultation discount up to 12%',
-                    'Specialist consultation discount up to 10%',
+                    'Doctor consultation discount up to 12% (All Doctors)',
                     '225 free 24/7 emergency doctor calls',
                     'Digital prescription included',
                     'Lab test discount up to 15%',
@@ -159,6 +171,7 @@ $plan_groups = [
         'subtitle' => 'Best yearly value for family healthcare, elderly care and long-term support.',
         'plans' => [
             [
+                'code' => 'yearly_basic',
                 'name' => 'Basic 12 Months',
                 'badge' => 'Basic',
                 'price' => '৳4,499',
@@ -167,7 +180,7 @@ $plan_groups = [
                 'featured' => false,
                 'cta' => 'Choose Basic',
                 'features' => [
-                    'GP consultation discount up to 5%',
+                    'Doctor consultation discount up to 5% (All Doctors)',
                     '120 free 24/7 emergency doctor calls',
                     'Digital prescription included',
                     'Home service from TeleRx up to 10%',
@@ -178,6 +191,7 @@ $plan_groups = [
                 ],
             ],
             [
+                'code' => 'yearly_standard',
                 'name' => 'Standard 12 Months',
                 'badge' => 'Best Value',
                 'price' => '৳9,999',
@@ -186,7 +200,7 @@ $plan_groups = [
                 'featured' => true,
                 'cta' => 'Choose Standard',
                 'features' => [
-                    'GP consultation discount up to 7%',
+                    'Doctor consultation discount up to 7% (All Doctors)',
                     '250 free 24/7 emergency doctor calls',
                     'Digital prescription included',
                     'Home service from TeleRx up to 15%',
@@ -198,6 +212,7 @@ $plan_groups = [
                 ],
             ],
             [
+                'code' => 'yearly_premium',
                 'name' => 'Premium 12 Months',
                 'badge' => 'Recommended',
                 'price' => '৳14,499',
@@ -206,8 +221,7 @@ $plan_groups = [
                 'featured' => false,
                 'cta' => 'Choose Premium',
                 'features' => [
-                    'GP consultation discount up to 12%',
-                    'Specialist consultation discount up to 10%',
+                    'Doctor consultation discount up to 12% (All Doctors)',
                     '400 free 24/7 emergency doctor calls',
                     'Digital prescription included',
                     'Lab test discount up to 15%',
@@ -227,8 +241,7 @@ $comparison_rows = [
     'monthly' => [
         ['Price', '৳499', '৳999', '৳1,499'],
         ['Validity', '1 Month', '1 Month', '1 Month'],
-        ['GP Consultation Discount', 'Up to 5%', 'Up to 7%', 'Up to 12%'],
-        ['Specialist Consultation Discount', 'Not included', 'Not included', 'Up to 10%'],
+        ['Doctor Consultation Discount (All Doctors)', 'Up to 5%', 'Up to 7%', 'Up to 12%'],
         ['Free 24/7 Emergency Doctor Calls', '10 Calls', '25 Calls', '40 Calls'],
         ['Digital Prescription', 'Included', 'Included', 'Included'],
         ['Lab Test Discount', 'Not included', 'Not included', 'Up to 15%'],
@@ -245,8 +258,7 @@ $comparison_rows = [
     'sixmonths' => [
         ['Price', '৳2,499', '৳5,499', '৳7,999'],
         ['Validity', '6 Months', '6 Months', '6 Months'],
-        ['GP Consultation Discount', 'Up to 5%', 'Up to 7%', 'Up to 12%'],
-        ['Specialist Consultation Discount', 'Not included', 'Not included', 'Up to 10%'],
+        ['Doctor Consultation Discount (All Doctors)', 'Up to 5%', 'Up to 7%', 'Up to 12%'],
         ['Free 24/7 Emergency Doctor Calls', '70 Calls', '150 Calls', '225 Calls'],
         ['Digital Prescription', 'Included', 'Included', 'Included'],
         ['Lab Test Discount', 'Not included', 'Not included', 'Up to 15%'],
@@ -263,8 +275,7 @@ $comparison_rows = [
     'yearly' => [
         ['Price', '৳4,499', '৳9,999', '৳14,499'],
         ['Validity', '12 Months', '12 Months', '12 Months'],
-        ['GP Consultation Discount', 'Up to 5%', 'Up to 7%', 'Up to 12%'],
-        ['Specialist Consultation Discount', 'Not included', 'Not included', 'Up to 10%'],
+        ['Doctor Consultation Discount (All Doctors)', 'Up to 5%', 'Up to 7%', 'Up to 12%'],
         ['Free 24/7 Emergency Doctor Calls', '120 Calls', '250 Calls', '400 Calls'],
         ['Digital Prescription', 'Included', 'Included', 'Included'],
         ['Lab Test Discount', 'Not included', 'Not included', 'Up to 15%'],
@@ -364,9 +375,15 @@ $comparison_rows = [
                                         <li><span class="trx-check">✓</span><span><?php echo htmlspecialchars($feature); ?></span></li>
                                     <?php endforeach; ?>
                                 </ul>
-                                <a class="trx-btn <?php echo $plan['featured'] ? 'trx-btn-primary' : 'trx-btn-outline'; ?>" href="contact.php?package=<?php echo urlencode($plan['name']); ?>">
-                                    <?php echo htmlspecialchars($plan['cta']); ?>
-                                </a>
+                                <?php if ($active_sub && ($active_sub['plan_code'] ?? '') === ($plan['code'] ?? '')): ?>
+                                    <a class="trx-btn trx-btn-primary w-100" href="patient-subscription.php">
+                                        <i class="fa-solid fa-circle-check me-1"></i> Current Active Plan
+                                    </a>
+                                <?php else: ?>
+                                    <a class="trx-btn <?php echo $plan['featured'] ? 'trx-btn-primary' : 'trx-btn-outline'; ?>" href="subscription-checkout.php?plan=<?php echo urlencode($plan['code'] ?? ''); ?>">
+                                        <?php echo htmlspecialchars($plan['cta']); ?>
+                                    </a>
+                                <?php endif; ?>
                             </article>
                         <?php endforeach; ?>
                     </div>

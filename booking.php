@@ -498,18 +498,40 @@ function format_slot_time_12($t)
 											<div class="card flex-fill mb-0">
 												<div class="card-body">
 													<?php
+													require_once __DIR__ . '/php/subscription-helper.php';
 													$consultation_fee = $doctor ? (float) ($doctor['consultation_fee'] ?? 0) : 0;
 													$tax = 0;
 													$discount = 0;
-													$total_fee = $consultation_fee + $tax - $discount;
+													$discount_label = '';
+													$disc_pct = 0;
+													
+													$patient_id_for_sub = (isset($_SESSION['patient_id'])) ? (int)$_SESSION['patient_id'] : 0;
+													$active_sub = null;
+													if ($patient_id_for_sub > 0) {
+														$active_sub = getActiveSubscription($patient_id_for_sub);
+													}
+													if ($active_sub && $doctor) {
+														$disc_pct = (float)($active_sub['gp_discount_percent'] ?? 0);
+														if ($disc_pct <= 0 && isset($active_sub['specialist_discount_percent'])) {
+															$disc_pct = (float)$active_sub['specialist_discount_percent'];
+														}
+														if ($disc_pct > 0) {
+															$discount = ($consultation_fee * $disc_pct) / 100;
+															$discount_label = "({$active_sub['plan_name']} -{$disc_pct}%)";
+														}
+													}
+													$total_fee = max(0, $consultation_fee + $tax - $discount);
 													?>
+													<input type="hidden" id="raw_doctor_fee" value="<?php echo (float)$consultation_fee; ?>">
+													<input type="hidden" id="subscription_discount_percent" data-session-pct="<?php echo (float)$disc_pct; ?>" value="<?php echo (float)$disc_pct; ?>">
+													<input type="hidden" id="subscription_discount_name" value="<?php echo htmlspecialchars($active_sub['plan_name'] ?? ''); ?>">
 													<div>
 														<h6 class="mb-3">Payment Info</h6>
 														<div
 															class="d-flex align-items-center flex-wrap rpw-gap-2 justify-content-between mb-2">
 															<p class="mb-0">Doctor Fee</p>
 															<span
-																class="fw-medium d-block" id="booking_display_doctor_fee"><?php echo number_format($consultation_fee, 0); ?>/-</span>
+																class="fw-medium d-block" id="booking_display_doctor_fee"><?php echo ($consultation_fee == (int)$consultation_fee) ? number_format($consultation_fee, 0) : number_format($consultation_fee, 2); ?>/-</span>
 														</div>
 														<div
 															class="d-flex align-items-center flex-wrap rpw-gap-2 justify-content-between mb-2">
@@ -519,16 +541,16 @@ function format_slot_time_12($t)
 														</div>
 														<div
 															class="d-flex align-items-center flex-wrap rpw-gap-2 justify-content-between mb-2">
-															<p class="mb-0">Discount</p>
+															<p class="mb-0">Discount <small class="text-success" id="booking_discount_badge"><?php echo $discount_label; ?></small></p>
 															<span
-																class="fw-medium text-danger d-block" id="booking_display_discount"><?php echo $discount > 0 ? '-' : ''; ?><?php echo number_format($discount, 0); ?>/-</span>
+																class="fw-medium text-success d-block" id="booking_display_discount"><?php echo $discount > 0 ? '-' : ''; ?><?php echo ($discount == (int)$discount) ? number_format($discount, 0) : number_format($discount, 2); ?>/-</span>
 														</div>
 													</div>
 													<div
 														class="bg-primary d-flex align-items-center flex-wrap rpw-gap-2 justify-content-between p-3 rounded">
 														<h6 class="text-white">Total</h6>
 														<h6 class="text-white" id="booking_display_total">
-															<?php echo number_format($total_fee, 0); ?>/-</h6>
+															<?php echo ($total_fee == (int)$total_fee) ? number_format($total_fee, 0) : number_format($total_fee, 2); ?>/-</h6>
 													</div>
 													<div id="optional_tid_wrapper">
 														<h6 class="mb-3 mt-3">TeleRx ID (TID)</h6>

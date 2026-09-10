@@ -4012,6 +4012,14 @@ $(document).ready(function () {
 			},
 			dataType: 'json',
 			success: function(r) {
+				var sessionPct = parseFloat($('#subscription_discount_percent').data('session-pct')) || 0;
+				if (r && r.subscription_discount_percent !== undefined) {
+					var respPct = parseFloat(r.subscription_discount_percent) || 0;
+					if (respPct > 0 || sessionPct === 0) {
+						$('#subscription_discount_percent').val(respPct);
+						$('#subscription_discount_name').val(r.subscription_discount_name || '');
+					}
+				}
 				if (r && r.success) {
 					var hasEligibility = false;
 					if (r.eligible_with_report) {
@@ -4064,25 +4072,52 @@ $(document).ready(function () {
 	}
 
 	function updateBookingFees() {
-		if (originalDoctorFee === null) {
+		var rawFeeVal = parseFloat($('#raw_doctor_fee').val());
+		if (!isNaN(rawFeeVal) && rawFeeVal > 0) {
+			originalDoctorFee = rawFeeVal;
+		} else if (originalDoctorFee === null || originalDoctorFee === 0) {
 			originalDoctorFee = parseFloat($('#booking_display_doctor_fee').text().replace(/[^\d.]/g, '')) || 0;
 		}
 		var selectedType = $('input[name="booking_type"]:checked').val() || 'regular';
 		var doctorFee = originalDoctorFee;
 		var discount = 0;
+		var subPct = parseFloat($('#subscription_discount_percent').val()) || 0;
+		var subName = $('#subscription_discount_name').val() || '';
 		
 		if (selectedType === 'follow_up_with_report') {
 			discount = doctorFee;
+			$('#booking_discount_badge').text('(Follow-up Free)');
 		} else if (selectedType === 'follow_up_without_report') {
-			discount = doctorFee * 0.5;
+			var followupDisc = doctorFee * 0.5;
+			var followupFee = doctorFee * 0.5;
+			var subDisc = 0;
+			if (subPct > 0) {
+				subDisc = (followupFee * subPct) / 100;
+				$('#booking_discount_badge').text('(Follow-up 50% + ' + subName + ' -' + subPct + '%)');
+			} else {
+				$('#booking_discount_badge').text('(Follow-up 50%)');
+			}
+			discount = followupDisc + subDisc;
+		} else {
+			// Regular booking with subscription discount
+			if (subPct > 0) {
+				discount = (doctorFee * subPct) / 100;
+				$('#booking_discount_badge').text('(' + subName + ' -' + subPct + '%)');
+			} else {
+				$('#booking_discount_badge').text('');
+			}
 		}
 		
 		var total = doctorFee - discount;
 		if (total < 0) total = 0;
 
-		$('#booking_display_doctor_fee').text(doctorFee.toFixed(0) + '/-');
-		$('#booking_display_discount').text((discount > 0 ? '-' : '') + discount.toFixed(0) + '/-');
-		$('#booking_display_total').text(total.toFixed(0) + '/-');
+		function formatFeeStr(v) {
+			return (v % 1 === 0) ? v.toFixed(0) : v.toFixed(2);
+		}
+
+		$('#booking_display_doctor_fee').text(formatFeeStr(doctorFee) + '/-');
+		$('#booking_display_discount').text((discount > 0 ? '-' : '') + formatFeeStr(discount) + '/-');
+		$('#booking_display_total').text(formatFeeStr(total) + '/-');
 	}
 
 	$('#booking_mobile').on('input change blur', function() {
@@ -4096,6 +4131,10 @@ $(document).ready(function () {
 	$(document).on('change', 'input[name="booking_type"]', function() {
 		updateBookingFees();
 	});
+
+	if ($('#booking_display_doctor_fee').length) {
+		updateBookingFees();
+	}
 
 	if ($('#booking_mobile').val()) {
 		setTimeout(recalculateFollowUpEligibility, 1000);
