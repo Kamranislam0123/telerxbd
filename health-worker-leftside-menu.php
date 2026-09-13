@@ -48,6 +48,12 @@ $healthcare = $healthcare ?? [];
                             <span>Change Password</span>
                         </a>
                     </li>
+                    <li class="<?php echo ($current_page === 'emergency-booking.php') ? 'active' : ''; ?>">
+                        <a href="emergency-booking">
+                            <i class="fa-solid fa-truck-medical"></i>
+                            <span>Emergency Call</span>
+                        </a>
+                    </li>
                     <li>
                         <a href="php/logout.php">
                             <i class="isax isax-logout"></i>

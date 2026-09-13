@@ -950,6 +950,17 @@ if ($appointment_id) {
 						console.error("Failed to notify call start to server:", err);
 					}
 					<?php endif; ?>
+					<?php if ($_SESSION['user_type'] === 'patient' && !empty($appointment['is_emergency']) && (int)$appointment['is_emergency'] === 1): ?>
+					// Patient joining an emergency call — notify server so emergency doctor sees active case
+					try {
+						await $.post('php/handle-call-status.php', {
+							appointment_id: "<?php echo (int) $appointment_id; ?>",
+							action: 'start_call'
+						});
+					} catch (err) {
+						console.error("Failed to notify emergency call start to server:", err);
+					}
+					<?php endif; ?>
 				} catch (err) {
 					console.error("Join call failed:", err);
 					alert("Failed to join call. Please check your camera/microphone permissions.");
@@ -1173,6 +1184,15 @@ if ($appointment_id) {
 
 			// If the provider closes the window/tab or navigates away, clear the call status
 			<?php if (in_array($_SESSION['user_type'], ['doctor', 'healthcare', 'special_tid'])): ?>
+			$(window).on('beforeunload', function() {
+				const formData = new FormData();
+				formData.append('appointment_id', '<?php echo (int)$appointment_id; ?>');
+				formData.append('action', 'end_call');
+				navigator.sendBeacon('php/handle-call-status.php', formData);
+			});
+			<?php endif; ?>
+			<?php if ($_SESSION['user_type'] === 'patient' && !empty($appointment['is_emergency']) && (int)$appointment['is_emergency'] === 1): ?>
+			// Patient navigating away from emergency call clears the call status
 			$(window).on('beforeunload', function() {
 				const formData = new FormData();
 				formData.append('appointment_id', '<?php echo (int)$appointment_id; ?>');

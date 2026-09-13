@@ -33,10 +33,25 @@ try {
     $conn = getDBConnection();
 
     if ($action === 'start_call') {
-        // Only allow doctor, healthcare, or special_tid to start the call
-        if (!in_array($user_type, ['doctor', 'healthcare', 'special_tid'])) {
+        // Doctors, healthcare workers, and special TID users can always start a call.
+        // Patients can start a call ONLY for emergency appointments (is_emergency = 1),
+        // so the emergency doctor dashboard shows them as active.
+        $allowed = in_array($user_type, ['doctor', 'healthcare', 'special_tid']);
+
+        if (!$allowed && $user_type === 'patient') {
+            // Check if this is an emergency appointment for this patient
+            $chk = $conn->prepare("SELECT id FROM appointments WHERE id = ? AND is_emergency = 1 AND patient_id = ? LIMIT 1");
+            $patient_id_chk = $_SESSION['patient_id'] ?? 0;
+            $chk->bind_param("ii", $appointment_id, $patient_id_chk);
+            $chk->execute();
+            $chk_res = $chk->get_result();
+            $allowed = ($chk_res->num_rows > 0);
+            $chk->close();
+        }
+
+        if (!$allowed) {
             http_response_code(403);
-            echo json_encode(['success' => false, 'message' => 'Forbidden: Only providers can start a call']);
+            echo json_encode(['success' => false, 'message' => 'Forbidden: Only providers or emergency patients can start a call']);
             $conn->close();
             exit;
         }

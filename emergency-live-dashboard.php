@@ -1,6 +1,8 @@
 <?php
 session_start();
-if (!isset($_SESSION['logged_in']) || $_SESSION['user_type'] !== 'patient') {
+// Allow both patients and Special TID users
+$_allowed_types = ['patient', 'special_tid'];
+if (!isset($_SESSION['logged_in']) || !in_array($_SESSION['user_type'] ?? '', $_allowed_types)) {
     header('Location: login.php');
     exit;
 }
@@ -75,12 +77,18 @@ include 'header.php';
                             <div class="emergency-icon-wrap mx-auto mb-3" style="width:80px;height:80px;background:#dc3545;color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:36px;">
                                 <i class="fa-solid fa-video pulse-animation"></i>
                             </div>
-                            <h3 class="mb-2">Doctor is Available</h3>
-                            <p class="text-muted">Start the live video consultation immediately. The doctor is on standby.</p>
+                            <h3 class="mb-2" id="call-status-text">Connecting to Emergency Doctor...</h3>
+                            <p class="text-muted" id="call-status-sub">Please wait. The emergency doctor will join you shortly.</p>
+                            <div class="mb-3" id="waiting-badge">
+                                <span class="badge bg-warning text-dark"><i class="fa-solid fa-circle-notch fa-spin me-1"></i> Waiting for doctor...</span>
+                            </div>
                         </div>
-                        
-                        <a href="video-call.php?appointment_id=<?php echo $appointment_id; ?>" class="btn btn-danger btn-lg px-5 py-3" style="font-size: 18px; font-weight: bold; border-radius: 10px;">
-                            <i class="fa-solid fa-video me-2"></i> Join Video Call
+
+                        <a href="video-call.php?appointment_id=<?php echo $appointment_id; ?>" class="btn btn-danger btn-lg px-5 py-3" id="join-call-btn" style="font-size: 18px; font-weight: bold; border-radius: 10px; display: none;">
+                            <i class="fa-solid fa-video me-2"></i> Join Video Call Now
+                        </a>
+                        <a href="video-call.php?appointment_id=<?php echo $appointment_id; ?>" class="btn btn-outline-secondary btn-sm mt-2" id="join-early-btn">
+                            <i class="fa-solid fa-arrow-right-to-bracket me-1"></i> Enter Waiting Room Early
                         </a>
                     </div>
                 </div>
@@ -114,6 +122,46 @@ include 'header.php';
 
 <script>
 $(document).ready(function() {
+    var appointmentId = <?php echo $appointment_id; ?>;
+    var pollInterval = null;
+    var alreadyRedirecting = false;
+
+    function checkCallStatus() {
+        $.ajax({
+            url: 'php/get-call-status.php',
+            type: 'GET',
+            data: { appointment_id: appointmentId },
+            dataType: 'json',
+            success: function(res) {
+                if (!alreadyRedirecting && res.success && res.call_status === 'in_progress') {
+                    alreadyRedirecting = true;
+                    clearInterval(pollInterval);
+
+                    // Update UI
+                    $('#call-status-text').text('Doctor is Ready!');
+                    $('#call-status-sub').text('Connecting you now...');
+                    $('#waiting-badge').html('<span class="badge bg-success"><i class="fa-solid fa-circle me-1"></i> Doctor Connected</span>');
+                    $('#join-call-btn').fadeIn();
+                    $('#join-early-btn').hide();
+
+                    // Auto-redirect after 2 seconds
+                    setTimeout(function() {
+                        window.location.href = 'video-call.php?appointment_id=' + appointmentId;
+                    }, 2000);
+                }
+            },
+            error: function() {
+                // Silently ignore poll errors
+            }
+        });
+    }
+
+    // Start polling every 5 seconds
+    pollInterval = setInterval(checkCallStatus, 5000);
+    // Initial check after 2 seconds
+    setTimeout(checkCallStatus, 2000);
+
+    // Vitals form handler
     $('#update-vitals-btn').click(function() {
         var btn = $(this);
         btn.prop('disabled', true).text('Updating...');
