@@ -292,7 +292,21 @@ try {
                 <a href="' . htmlspecialchars($pdf_url) . '" target="_blank">Open PDF</a>
             </span>
         </div>
-        <div class="preview-canvas">
+        <div class="preview-canvas">';
+
+        if (!empty($appointment['sticky_note'])) {
+            $sticky_note_html = htmlspecialchars($appointment['sticky_note']);
+            $html .= '
+            <div class="sticky-note-preview-bar" style="width: 210mm; margin: 0 auto 16px; background: linear-gradient(135deg, #fef9c3 0%, #fef08a 100%); border: 1px dashed #eab308; border-radius: 10px; padding: 14px 18px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); font-family: system-ui, sans-serif;">
+                <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px;">
+                    <span style="font-weight: 700; color: #713f12; font-size: 14px;">📌 Doctor\'s Private Sticky Note / Reminder</span>
+                    <small style="color: #854d0e; font-size: 12px;">(Doctor Only — Not printed on PDF)</small>
+                </div>
+                <div style="color: #451a03; font-size: 13.5px; font-style: italic; white-space: pre-wrap; line-height: 1.5;">' . $sticky_note_html . '</div>
+            </div>';
+        }
+
+        $html .= '
             <div class="preview-page">';
     }
 

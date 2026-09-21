@@ -272,6 +272,7 @@ $current_page = basename($_SERVER['PHP_SELF']);
                                     <a class="dropdown-item" href="health-worker-dashboard">Dashboard</a>
                                 <?php elseif($_SESSION['user_type'] == 'patient'): ?>
                                     <a class="dropdown-item" href="patient-dashboard">Dashboard</a>
+                                    <a class="dropdown-item" href="patient-medical-history">Medical History</a>
                                     <a class="dropdown-item" href="patient-profile-settings">Profile Settings</a>
                                 <?php endif; ?>
 

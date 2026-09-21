@@ -138,6 +138,120 @@ if ($appointment_id) {
 		.call-content-wrap {
 			position: relative;
 		}
+		.sticky-floating-notes-btn {
+			position: fixed !important;
+			bottom: 30px !important;
+			right: 30px !important;
+			z-index: 999999 !important;
+			height: 50px !important;
+			padding: 0 22px !important;
+			border-radius: 25px !important;
+			background: linear-gradient(135deg, #fef08a 0%, #f59e0b 100%) !important;
+			border: 2px solid #d97706 !important;
+			color: #451a03 !important;
+			font-weight: 800 !important;
+			font-size: 15px !important;
+			box-shadow: 0 8px 25px rgba(217, 119, 6, 0.5) !important;
+			display: inline-flex !important;
+			align-items: center !important;
+			justify-content: center !important;
+			gap: 8px !important;
+			cursor: pointer !important;
+			transition: transform 0.2s ease, box-shadow 0.2s ease !important;
+		}
+		.sticky-floating-notes-btn:hover {
+			transform: translateY(-3px) scale(1.06) !important;
+			box-shadow: 0 12px 30px rgba(217, 119, 6, 0.7) !important;
+			color: #000 !important;
+		}
+		.sticky-floating-notes-btn .note-badge-dot {
+			position: absolute !important;
+			top: -3px !important;
+			right: -3px !important;
+			width: 14px !important;
+			height: 14px !important;
+			background-color: #ef4444 !important;
+			border: 2px solid #ffffff !important;
+			border-radius: 50% !important;
+		}
+		/* Facebook Web Chat-style Right Side Portrait Sticky Note Modal */
+		#sticky_note_modal {
+			z-index: 1070 !important;
+			overflow: hidden !important;
+			pointer-events: none !important;
+		}
+		#sticky_note_modal .modal-dialog {
+			position: fixed !important;
+			bottom: 20px !important;
+			right: 20px !important;
+			margin: 0 !important;
+			width: 340px !important;
+			max-width: calc(100vw - 25px) !important;
+			height: 280px !important;
+			max-height: calc(100vh - 40px) !important;
+			pointer-events: auto !important;
+			transform: none !important;
+		}
+		#sticky_note_modal .modal-content {
+			height: 100% !important;
+			display: flex !important;
+			flex-direction: column !important;
+			border-radius: 14px !important;
+			border: 2px solid #f59e0b !important;
+			box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25) !important;
+			overflow: hidden !important;
+			background: #ffffff !important;
+		}
+		#sticky_note_modal .modal-header {
+			background: linear-gradient(135deg, #fef08a 0%, #f59e0b 100%) !important;
+			color: #451a03 !important;
+			padding: 10px 14px !important;
+			border-bottom: 1px solid #d97706 !important;
+		}
+		#sticky_note_modal .modal-header .modal-title {
+			font-size: 14px !important;
+			font-weight: 700 !important;
+			color: #451a03 !important;
+		}
+		#sticky_note_modal .modal-body {
+			flex: 1 1 auto !important;
+			padding: 10px 12px !important;
+			display: flex !important;
+			flex-direction: column !important;
+			overflow-y: auto !important;
+			background-color: #fffdf0 !important;
+		}
+		#sticky_note_modal .sticky-note-input-wrapper {
+			display: flex !important;
+			flex-direction: column !important;
+			flex: 1 1 auto !important;
+			height: 100% !important;
+			margin-bottom: 0 !important;
+		}
+		#sticky_note_modal #sticky_modal_text {
+			flex: 1 1 auto !important;
+			height: 100% !important;
+			min-height: 120px !important;
+			background-color: #fefce8 !important;
+			border: 1.5px solid #fde047 !important;
+			border-radius: 8px !important;
+			padding: 10px !important;
+			font-size: 13.5px !important;
+			line-height: 1.4 !important;
+			color: #451a03 !important;
+			resize: none !important;
+			margin-bottom: 0 !important;
+		}
+		#sticky_note_modal #sticky_modal_text:focus {
+			outline: none !important;
+			box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.25) !important;
+			border-color: #f59e0b !important;
+		}
+		#sticky_note_modal .modal-footer {
+			background: #ffffff !important;
+			padding: 8px 12px !important;
+			border-top: 1px solid #e5e7eb !important;
+		}
 
 		.call-window {
 			position: relative;
@@ -613,10 +727,13 @@ if ($appointment_id) {
 					<!-- Prescription Form Section -->
 					<?php if ($_SESSION['user_type'] === 'doctor' && $appointment_id): ?>
 					<div class="patient-details-card mt-4 mb-4">
-						<h4><i class="isax isax-edit-2 me-2"></i>Generate Prescription</h4>
+						<div class="d-flex align-items-center justify-content-between mb-3">
+							<h4 class="mb-0"><i class="isax isax-edit-2 me-2"></i>Generate Prescription</h4>
+						</div>
+
 						<form id="prescription_form">
 							<input type="hidden" name="appointment_id" value="<?php echo (int)$appointment_id; ?>">
-							
+
 							<div class="row">
 								<div class="col-md-6">
 									<div class="form-group mb-3">
@@ -725,12 +842,62 @@ if ($appointment_id) {
 								<textarea class="form-control" name="prescription_footer" rows="2" placeholder="e.g. Free Medical Camp address..."><?php echo htmlspecialchars($appointment['prescription_footer'] ?? ''); ?></textarea>
 							</div>
 
-
-							
 							<div class="text-end">
 								<button type="submit" class="btn btn-primary btn-lg px-5" id="btn_submit_prescription">Generate & Save Prescription PDF</button>
 							</div>
 						</form>
+					</div>
+					<?php endif; ?>
+
+					<!-- Sticky Floating Treatment Template + My Notes Widget -->
+					<?php if ($_SESSION['user_type'] === 'doctor' && $appointment_id): ?>
+					<div id="trx_floating_sticky_widget" style="position: fixed; right: 24px; bottom: 24px; z-index: 1050; width: 330px; max-width: calc(100vw - 32px); display: flex; flex-direction: column;">
+						<!-- Treatment Template Panel (Opens UP above Treatment Template button) -->
+						<div id="tt_panel" class="trx-tool-panel" style="display: none; border: 2px solid #0d6efd; border-radius: 12px; background: #ffffff; padding: 12px; margin-bottom: 8px; box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);">
+							<div class="input-group input-group-sm mb-2">
+								<span class="input-group-text bg-white border-end-0 text-muted" style="border-color: #0d6efd; border-radius: 6px 0 0 6px;"><i class="fa-solid fa-magnifying-glass"></i></span>
+								<input type="text" id="tt_search_input" class="form-control border-start-0" placeholder="Search treatment template" style="border-color: #0d6efd; border-radius: 0 6px 6px 0; font-size: 13px;">
+							</div>
+							<div id="tt_toast_msg"></div>
+							<div id="tt_list_container" class="pe-1" style="max-height: 200px; overflow-y: auto;">
+								<!-- Template Items populated by JS -->
+							</div>
+							<button type="button" id="tt_panel_toggle_btn" class="btn btn-primary w-100 btn-sm text-center fw-semibold mt-2" style="background-color: #0d6efd; border: none; border-radius: 6px; padding: 8px 12px;">
+								Treatment Template
+							</button>
+						</div>
+
+						<!-- Standalone Buttons Container (Middle Anchor) -->
+						<div id="standalone_buttons_container" class="d-flex flex-column gap-2">
+							<button type="button" id="btn_standalone_tt" class="btn btn-primary w-100 py-2.5 fw-bold d-flex align-items-center justify-content-between px-3" style="background-color: #0d6efd; border: none; border-radius: 8px; box-shadow: 0 4px 12px rgba(13, 110, 253, 0.3);">
+								<span>Treatment Template</span>
+								<i class="fa-solid fa-chevron-up fs-6"></i>
+							</button>
+							<button type="button" id="btn_standalone_notes" class="btn btn-primary w-100 py-2.5 fw-bold d-flex align-items-center justify-content-between px-3" style="background-color: #0d6efd; border: none; border-radius: 8px; box-shadow: 0 4px 12px rgba(13, 110, 253, 0.3);">
+								<span>My Notes</span>
+								<i class="fa-solid fa-chevron-down fs-6"></i>
+							</button>
+						</div>
+
+						<!-- My Notes Panel (Opens DOWN below My Notes button) -->
+						<div id="notes_panel" class="trx-tool-panel" style="display: none; border: 2px solid #0d6efd; border-radius: 12px; background: #ffffff; padding: 12px; margin-top: 8px; box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);">
+							<div class="mb-2">
+								<textarea id="notes_textarea" class="form-control" rows="5" placeholder="Write doctor private notes here..." style="border: 2px solid #0d6efd; border-radius: 8px; background-color: #ffffff; padding: 12px; font-size: 14px; width: 100%; resize: vertical; min-height: 140px;"><?php echo htmlspecialchars($appointment['sticky_note'] ?? ''); ?></textarea>
+							</div>
+							<div id="notes_alert_msg"></div>
+							<!-- Visually attached bottom buttons -->
+							<div class="d-flex align-items-center gap-2">
+								<button type="button" id="notes_panel_toggle_btn" class="btn btn-primary btn-sm flex-fill fw-semibold" style="background-color: #0d6efd; border: none; border-radius: 6px; padding: 7px 10px;">
+									My Notes
+								</button>
+								<button type="button" id="btn_save_notes" class="btn btn-success btn-sm flex-fill fw-semibold" style="border-radius: 6px; padding: 7px 10px;">
+									Save
+								</button>
+								<button type="button" id="btn_clear_notes" class="btn btn-outline-danger btn-sm flex-fill fw-semibold" style="border-radius: 6px; padding: 7px 10px;">
+									Clear
+								</button>
+							</div>
+						</div>
 					</div>
 					<?php endif; ?>
 
@@ -889,6 +1056,10 @@ if ($appointment_id) {
 	<!-- Custom JS -->
 	<script>
 		$(document).ready(function () {
+			if ($('#vc_floating_sticky_btn').length > 0) {
+				$('body').append($('#vc_floating_sticky_btn'));
+			}
+
 			const options = {
 				appId: "d4ab628137c74b519e71dec351b83c34",
 				channel: "<?php echo $channel_name; ?>",
@@ -1182,6 +1353,268 @@ if ($appointment_id) {
 				}
 			});
 
+			// --- Right-Side Treatment Template + My Notes Logic ---
+			function escapeHtml(text) {
+				if (!text) return '';
+				return String(text).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
+			}
+
+			const treatmentTemplates = [
+				{
+					name: "Fever",
+					complaints: "High grade fever, body ache, chills (3 days)",
+					diagnosis: "Acute Febrile Illness / Viral Fever",
+					meds: [
+						{ name: "Tab. Paracetamol 500mg", dose: "1+1+1 (After food)", duration: "5 days" },
+						{ name: "Tab. Omeprazole 20mg", dose: "1+0+1 (Before food)", duration: "5 days" }
+					],
+					advice: "Rest, drink plenty of fluids (water, ORS, soups). Sponge with lukewarm water if temp > 101°F."
+				},
+				{
+					name: "Cold",
+					complaints: "Runny nose, sneezing, mild sore throat (2 days)",
+					diagnosis: "Upper Respiratory Tract Infection (URTI) / Common Cold",
+					meds: [
+						{ name: "Tab. Fexofenadine 120mg", dose: "0+0+1 (At night)", duration: "5 days" },
+						{ name: "Tab. Paracetamol 500mg", dose: "1+0+1 (As needed)", duration: "3 days" },
+						{ name: "Nasal Spray Normal Saline", dose: "2 puffs each nostril", duration: "5 days" }
+					],
+					advice: "Steam inhalation twice daily. Avoid cold drinks and ice water."
+				},
+				{
+					name: "Cough",
+					complaints: "Dry cough, throat irritation, chest congestion (4 days)",
+					diagnosis: "Acute Bronchitis / Cough",
+					meds: [
+						{ name: "Syr. Levosalbutamol + Ambroxol", dose: "2 tsp (10ml) 1+1+1", duration: "5 days" },
+						{ name: "Tab. Montelukast 10mg", dose: "0+0+1 (At night)", duration: "7 days" }
+					],
+					advice: "Gargle with warm salt water 3 times a day. Avoid dust and smoke exposure."
+				},
+				{
+					name: "Gastritis / Acidity",
+					complaints: "Upper abdominal burning, bloating, nausea (1 week)",
+					diagnosis: "Acute Gastritis / GERD",
+					meds: [
+						{ name: "Cap. Esomeprazole 40mg", dose: "1+0+1 (30 min before food)", duration: "14 days" },
+						{ name: "Syr. Antacid Gel", dose: "2 tsp (10ml) after meals", duration: "7 days" }
+					],
+					advice: "Avoid spicy, oily, and fried food. Eat small frequent meals."
+				},
+				{
+					name: "Hypertension",
+					complaints: "Occasional headache, dizziness, mild fatigue",
+					diagnosis: "Essential Hypertension",
+					meds: [
+						{ name: "Tab. Amlodipine 5mg", dose: "1+0+0 (Morning)", duration: "30 days" }
+					],
+					advice: "Low salt diet. Regular blood pressure monitoring. Walk 30 mins daily."
+				},
+				{
+					name: "Diabetes Type 2",
+					complaints: "Increased thirst, frequent urination, fatigue",
+					diagnosis: "Type 2 Diabetes Mellitus",
+					meds: [
+						{ name: "Tab. Metformin 500mg", dose: "1+0+1 (With food)", duration: "30 days" }
+					],
+					advice: "Strict diabetic diet. Avoid sugar and refined carbs. Regular physical activity."
+				},
+				{
+					name: "Headache / Migraine",
+					complaints: "Throbbing headache on one side, light sensitivity (1 day)",
+					diagnosis: "Migraine / Tension Headache",
+					meds: [
+						{ name: "Tab. Naproxen 500mg + Domperidone 10mg", dose: "1+0+0 (SOS after food)", duration: "3 days" }
+					],
+					advice: "Rest in a quiet, dark room. Maintain regular sleep pattern."
+				},
+				{
+					name: "Diarrhea",
+					complaints: "Loose watery stools 4-5 times, abdominal cramps (1 day)",
+					diagnosis: "Acute Gastroenteritis",
+					meds: [
+						{ name: "ORS Sachet", dose: "1 sachet in 1L water, drink frequently", duration: "3 days" },
+						{ name: "Tab. Ciprofloxacin 500mg", dose: "1+0+1 (After food)", duration: "5 days" }
+					],
+					advice: "Drink plenty of ORS and coconut water. Eat light food like rice porridge and bananas."
+				},
+				{
+					name: "Skin Allergy",
+					complaints: "Itchy red spots on skin, allergic reaction (2 days)",
+					diagnosis: "Allergic Dermatitis / Urticaria",
+					meds: [
+						{ name: "Tab. Cetirizine 10mg", dose: "0+0+1 (At night)", duration: "7 days" }
+					],
+					advice: "Avoid harsh soaps. Do not scratch the affected area."
+				}
+			];
+
+			let isTtOpen = false;
+			let isNotesOpen = false;
+
+			function updateRightPanelStates() {
+				if (isTtOpen && isNotesOpen) {
+					// State 4: Both open
+					$('#tt_panel').slideDown(200);
+					$('#notes_panel').slideDown(200);
+					$('#btn_standalone_tt').hide();
+					$('#btn_standalone_notes').hide();
+				} else if (isTtOpen && !isNotesOpen) {
+					// State 3: Only Treatment Template open
+					$('#tt_panel').slideDown(200);
+					$('#notes_panel').slideUp(200);
+					$('#btn_standalone_tt').hide();
+					$('#btn_standalone_notes').show();
+				} else if (!isTtOpen && isNotesOpen) {
+					// State 2: Only My Notes open
+					$('#tt_panel').slideUp(200);
+					$('#notes_panel').slideDown(200);
+					$('#btn_standalone_tt').show();
+					$('#btn_standalone_notes').hide();
+				} else {
+					// State 1: Both closed
+					$('#tt_panel').slideUp(200);
+					$('#notes_panel').slideUp(200);
+					$('#btn_standalone_tt').show();
+					$('#btn_standalone_notes').show();
+				}
+			}
+
+			// Render Treatment Template List
+			function renderTemplatesList(filterText = '') {
+				let html = '';
+				const query = filterText.toLowerCase().trim();
+				let count = 0;
+				treatmentTemplates.forEach(function(tpl, idx) {
+					if (!query || tpl.name.toLowerCase().includes(query)) {
+						count++;
+						html += `
+							<div class="tt-item p-2 mb-1 rounded bg-light border text-dark fw-medium" data-idx="${idx}" style="cursor: pointer; font-size: 13.5px; transition: background 0.15s;">
+								<i class="fa-solid fa-file-medical text-primary me-2"></i>${escapeHtml(tpl.name)}
+							</div>
+						`;
+					}
+				});
+				if (count === 0) {
+					html = `<div class="text-muted p-2 text-center" style="font-size: 12.5px;">No templates found</div>`;
+				}
+				$('#tt_list_container').html(html);
+			}
+
+			renderTemplatesList();
+
+			// Real-time Template Search Filter
+			$('#tt_search_input').on('keyup input', function() {
+				renderTemplatesList($(this).val());
+			});
+
+			// Template Hover & Click
+			$(document).on('mouseenter', '.tt-item', function() {
+				$(this).css({'background-color': '#e7f1ff', 'color': '#0d6efd', 'border-color': '#b6d4fe'});
+			}).on('mouseleave', '.tt-item', function() {
+				$(this).css({'background-color': '#f8f9fa', 'color': '#212529', 'border-color': '#dee2e6'});
+			});
+
+			// Select / Apply Template to Prescription Form
+			$(document).on('click', '.tt-item', function() {
+				const idx = $(this).data('idx');
+				const tpl = treatmentTemplates[idx];
+				if (!tpl) return;
+
+				$('textarea[name="chief_complaints"]').val(tpl.complaints);
+				$('input[name="diagnosis"]').val(tpl.diagnosis);
+				$('textarea[name="advice"]').val(tpl.advice);
+
+				if (tpl.meds && tpl.meds.length > 0) {
+					let medsHtml = '';
+					tpl.meds.forEach(function(m) {
+						medsHtml += `
+							<div class="medicine-row mt-2">
+								<div class="row g-2">
+									<div class="col-md-5">
+										<input type="text" class="form-control" name="medicine_name[]" placeholder="Medicine name" value="${escapeHtml(m.name)}" required>
+									</div>
+									<div class="col-md-3">
+										<input type="text" class="form-control" name="medicine_dose[]" placeholder="Dose (e.g. 1+0+1)" value="${escapeHtml(m.dose)}">
+									</div>
+									<div class="col-md-3">
+										<input type="text" class="form-control" name="medicine_duration[]" placeholder="Duration (e.g. 7 days)" value="${escapeHtml(m.duration)}">
+									</div>
+									<div class="col-md-1">
+										<button type="button" class="btn btn-link btn-remove-medicine" style="${tpl.meds.length === 1 ? 'display:none;' : ''}"><i class="fa-solid fa-trash"></i></button>
+									</div>
+								</div>
+							</div>
+						`;
+					});
+					$('#medicine_list').html(medsHtml);
+				}
+
+				$('#tt_toast_msg').html(`<div class="alert alert-success py-1 px-2 mb-2" style="font-size:12px;"><i class="fa-solid fa-circle-check me-1"></i>Loaded "${escapeHtml(tpl.name)}"</div>`);
+				setTimeout(() => { $('#tt_toast_msg').empty(); }, 3000);
+			});
+
+			// Standalone & Panel Toggle Event Handlers
+			$('#btn_standalone_tt, #tt_panel_toggle_btn').click(function() {
+				isTtOpen = !isTtOpen;
+				updateRightPanelStates();
+			});
+
+			$('#btn_standalone_notes, #notes_panel_toggle_btn').click(function() {
+				isNotesOpen = !isNotesOpen;
+				updateRightPanelStates();
+			});
+
+			// Save Doctor Note AJAX
+			$('#btn_save_notes').click(function() {
+				const aptId = $('input[name="appointment_id"]').val();
+				const noteText = $('#notes_textarea').val();
+				const $btn = $(this);
+
+				if (!aptId || aptId <= 0) return;
+
+				$btn.prop('disabled', true).html('<i class="fa-solid fa-spinner fa-spin"></i>');
+
+				$.ajax({
+					url: 'php/manage-sticky-note.php',
+					type: 'POST',
+					data: { action: 'save', appointment_id: aptId, sticky_note: noteText },
+					dataType: 'json',
+					success: function(res) {
+						if (res.success) {
+							$('#notes_alert_msg').html('<div class="alert alert-success py-1 px-2 mb-2" style="font-size:12px;"><i class="fa-solid fa-check me-1"></i>Note saved!</div>');
+							setTimeout(() => { $('#notes_alert_msg').empty(); }, 3000);
+						} else {
+							$('#notes_alert_msg').html('<div class="alert alert-danger py-1 px-2 mb-2" style="font-size:12px;">' + escapeHtml(res.message) + '</div>');
+						}
+					},
+					error: function() {
+						$('#notes_alert_msg').html('<div class="alert alert-danger py-1 px-2 mb-2" style="font-size:12px;">Error saving note.</div>');
+					},
+					complete: function() {
+						$btn.prop('disabled', false).text('Save');
+					}
+				});
+			});
+
+			// Clear Doctor Note AJAX
+			$('#btn_clear_notes').click(function() {
+				const aptId = $('input[name="appointment_id"]').val();
+				$('#notes_textarea').val('');
+				if (!aptId || aptId <= 0) return;
+
+				$.ajax({
+					url: 'php/manage-sticky-note.php',
+					type: 'POST',
+					data: { action: 'delete', appointment_id: aptId },
+					dataType: 'json',
+					success: function(res) {
+						$('#notes_alert_msg').html('<div class="alert alert-info py-1 px-2 mb-2" style="font-size:12px;">Notes cleared.</div>');
+						setTimeout(() => { $('#notes_alert_msg').empty(); }, 3000);
+					}
+				});
+			});
+
 			// If the provider closes the window/tab or navigates away, clear the call status
 			<?php if (in_array($_SESSION['user_type'], ['doctor', 'healthcare', 'special_tid'])): ?>
 			$(window).on('beforeunload', function() {
@@ -1202,9 +1635,9 @@ if ($appointment_id) {
 			<?php endif; ?>
 		});
 	</script>
+
 	<script src="assets/js/script.js"></script>
 
 </body>
 
-</html>
 </html>

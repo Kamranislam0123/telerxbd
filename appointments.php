@@ -92,11 +92,18 @@ try {
     $clinics = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
     $stmt->close();
 
+    // Ensure sticky_note column exists
+    $sticky_col_check = $conn->query("SHOW COLUMNS FROM appointments LIKE 'sticky_note'");
+    if ($sticky_col_check->num_rows === 0) {
+        $conn->query("ALTER TABLE appointments ADD COLUMN sticky_note TEXT NULL");
+    }
+
     // Fetch doctor's appointments (all), then split by status/date
     $upcoming_appointments = [];
     $cancelled_appointments = [];
     $completed_appointments = [];
-    $apt_stmt = $conn->prepare("SELECT id, appointment_number, patient_name, mobile, appointment_date, slot_time, status, notes, created_at, prescription_path FROM appointments WHERE doctor_id = ? ORDER BY appointment_date DESC, slot_time DESC");
+
+    $apt_stmt = $conn->prepare("SELECT id, appointment_number, patient_name, mobile, appointment_date, slot_time, status, notes, created_at, prescription_path, sticky_note FROM appointments WHERE doctor_id = ? ORDER BY appointment_date DESC, slot_time DESC");
     if ($apt_stmt) {
         $apt_stmt->bind_param("i", $doctor_id);
         $apt_stmt->execute();
@@ -435,8 +442,11 @@ include 'header.php';
 														<a href="appointment-detail.php?id=<?php echo (int)$a['id']; ?>"><i class="isax isax-eye4"></i></a>
 													</li>
 													<li>
+													<li>
 														<?php if (!empty($a['prescription_path'])): ?>
-															<a href="<?php echo htmlspecialchars($a['prescription_path']); ?>" target="_blank" class="btn btn-sm btn-outline-success" title="View Prescription"><i class="isax isax-document-text"></i></a>
+															<div class="d-flex gap-1">
+																<a href="<?php echo htmlspecialchars($a['prescription_path']); ?>" target="_blank" class="btn btn-sm btn-outline-success" title="View Prescription"><i class="isax isax-document-text"></i></a>
+															</div>
 														<?php else: ?>
 															<div class="d-flex gap-1">
 																<a href="javascript:void(0);" class="btn btn-sm btn-outline-primary btn-generate-prescription" data-id="<?php echo (int)$a['id']; ?>" data-patient="<?php echo htmlspecialchars($a['patient_name'] ?? 'Patient'); ?>" title="Generate Prescription"><i class="isax isax-edit-2"></i></a>
@@ -619,9 +629,11 @@ include 'header.php';
 		<div class="modal fade custom-modal" id="prescription_modal">
 			<div class="modal-dialog modal-dialog-centered modal-lg">
 				<div class="modal-content">
-					<div class="modal-header">
-						<h5 class="modal-title">Generate Prescription - <span id="modal_patient_name"></span></h5>
-						<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+					<div class="modal-header d-flex align-items-center justify-content-between">
+						<h5 class="modal-title mb-0">Generate Prescription - <span id="modal_patient_name"></span></h5>
+						<div class="d-flex align-items-center gap-2">
+							<button type="button" class="btn-close ms-2" data-bs-dismiss="modal" aria-label="Close"></button>
+						</div>
 					</div>
 					<form id="prescription_form">
 						<div class="modal-body">
@@ -631,19 +643,19 @@ include 'header.php';
 								<div class="col-md-6">
 									<div class="form-group mb-3">
 										<label class="form-label">Chief Complaints</label>
-										<textarea class="form-control" name="chief_complaints" rows="3" placeholder="Symptoms, duration..."></textarea>
+										<textarea class="form-control" name="chief_complaints" id="modal_chief_complaints" rows="3" placeholder="Symptoms, duration..."></textarea>
 									</div>
 								</div>
 								<div class="col-md-6">
 									<div class="form-group mb-3">
 										<label class="form-label">On Examination</label>
-										<textarea class="form-control" name="on_examination" rows="3" placeholder="Vitals, physical findings..."></textarea>
+										<textarea class="form-control" name="on_examination" id="modal_on_examination" rows="3" placeholder="Vitals, physical findings..."></textarea>
 									</div>
 								</div>
 								<div class="col-md-12">
 									<div class="form-group mb-4">
 										<label class="form-label">Diagnosis</label>
-										<input type="text" class="form-control" name="diagnosis" placeholder="Primary diagnosis">
+										<input type="text" class="form-control" name="diagnosis" id="modal_diagnosis" placeholder="Primary diagnosis">
 									</div>
 								</div>
 							</div>
@@ -704,16 +716,16 @@ include 'header.php';
 							</div>
 							<div class="form-group mb-3">
 								<label class="form-label">Note / Reference</label>
-								<textarea class="form-control" name="note_reference" rows="2" placeholder="Additional note or reference..."></textarea>
+								<textarea class="form-control" name="note_reference" id="modal_note_reference" rows="2" placeholder="Additional note or reference..."></textarea>
 							</div>
 							<div class="form-group mb-3">
 								<label class="form-label">Advice / Instructions</label>
-								<textarea class="form-control" name="advice" rows="3" placeholder="Diet, rest, follow-up..."></textarea>
+								<textarea class="form-control" name="advice" id="modal_advice" rows="3" placeholder="Diet, rest, follow-up..."></textarea>
 							</div>
 
 							<div class="form-group mb-0">
 								<label class="form-label">Prescription Footer (Optional)</label>
-								<textarea class="form-control" name="prescription_footer" rows="2" placeholder="e.g. Free Medical Camp address..."></textarea>
+								<textarea class="form-control" name="prescription_footer" id="modal_prescription_footer" rows="2" placeholder="e.g. Free Medical Camp address..."></textarea>
 							</div>
 						</div>
 						<div class="modal-footer">
@@ -783,27 +795,81 @@ include 'header.php';
 				$('#modal_appointment_id').val(aptId);
 				$('#modal_patient_name').text(patientName);
 				$('#prescription_form')[0].reset();
-				$('#medicine_list').html(`
-					<div class="medicine-row mt-2">
-						<div class="row g-2">
-							<div class="col-md-5">
-								<input type="text" class="form-control" name="medicine_name[]" placeholder="Medicine name" required>
-							</div>
-							<div class="col-md-3">
-								<input type="text" class="form-control" name="medicine_dose[]" placeholder="Dose (e.g. 1+0+1)">
-							</div>
-							<div class="col-md-3">
-								<input type="text" class="form-control" name="medicine_duration[]" placeholder="Duration (e.g. 7 days)">
-							</div>
-							<div class="col-md-1">
-								<button type="button" class="btn btn-link btn-remove-medicine" style="display:none;"><i class="fa-solid fa-trash"></i></button>
-							</div>
-						</div>
-					</div>
-				`);
+				$('#modal_sticky_note_card').hide();
+
+				// Fetch existing prescription data & sticky note
+				$.ajax({
+					url: 'php/get-prescription-data.php',
+					type: 'GET',
+					data: { appointment_id: aptId },
+					dataType: 'json',
+					success: function(res) {
+						if (res.success && res.data) {
+							const d = res.data;
+							$('#modal_chief_complaints').val(d.chief_complaints || '');
+							$('#modal_on_examination').val(d.on_examination || '');
+							$('#modal_diagnosis').val(d.diagnosis || '');
+							$('#modal_note_reference').val(d.note_reference || '');
+							$('#modal_advice').val(d.advice || '');
+							$('#modal_prescription_footer').val(d.prescription_footer || '');
+							$('#modal_sticky_note').val(d.sticky_note || '');
+
+							if (d.sticky_note && d.sticky_note.trim() !== '') {
+								$('#modal_sticky_badge').show();
+							} else {
+								$('#modal_sticky_badge').hide();
+							}
+
+							if (d.follow_up_type) {
+								$('#modal_follow_up_yes').prop('checked', true);
+								$('#modal_follow_up_details_container').show();
+								if (d.follow_up_type === 'with_report') {
+									$('#modal_follow_up_with_report').prop('checked', true);
+								} else {
+									$('#modal_follow_up_without_report').prop('checked', true);
+								}
+								$('#modal_follow_up_date').val(d.follow_up_date || '');
+							} else {
+								$('#modal_follow_up_no').prop('checked', true);
+								$('#modal_follow_up_details_container').hide();
+							}
+
+							// Render Medications
+							if (d.medications && d.medications.length > 0) {
+								let medRowsHtml = '';
+								d.medications.forEach(function(med, index) {
+									medRowsHtml += `
+										<div class="medicine-row mt-2">
+											<div class="row g-2">
+												<div class="col-md-5">
+													<input type="text" class="form-control" name="medicine_name[]" placeholder="Medicine name" value="${escapeHtml(med.name || '')}" required>
+												</div>
+												<div class="col-md-3">
+													<input type="text" class="form-control" name="medicine_dose[]" placeholder="Dose (e.g. 1+0+1)" value="${escapeHtml(med.dose || '')}">
+												</div>
+												<div class="col-md-3">
+													<input type="text" class="form-control" name="medicine_duration[]" placeholder="Duration (e.g. 7 days)" value="${escapeHtml(med.duration || '')}">
+												</div>
+												<div class="col-md-1">
+													<button type="button" class="btn btn-link btn-remove-medicine" style="${d.medications.length === 1 ? 'display:none;' : ''}"><i class="fa-solid fa-trash"></i></button>
+												</div>
+											</div>
+										</div>
+									`;
+								});
+								$('#medicine_list').html(medRowsHtml);
+							}
+						}
+					}
+				});
 				
 				$('#prescription_modal').modal('show');
 			});
+
+			function escapeHtml(text) {
+				if (!text) return '';
+				return text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
+			}
 
 			$('#btn_add_medicine').click(function() {
 				const newRow = `

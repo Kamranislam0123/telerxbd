@@ -31,6 +31,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $has_follow_up = $_POST['has_follow_up'] ?? 'no';
     $follow_up_type = $_POST['follow_up_type'] ?? '';
     $follow_up_date = $_POST['follow_up_date'] ?? '';
+    $sticky_note = $_POST['sticky_note'] ?? null;
 
     if ($has_follow_up === 'yes') {
         $allowed_follow_up = ['with_report', 'without_report'];
@@ -65,7 +66,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         echo json_encode(['success' => false, 'message' => 'Invalid Appointment ID']);
         exit;
     }
- 
+
     try {
         $conn = getDBConnection();
         
@@ -110,6 +111,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 $conn->query("ALTER TABLE appointments MODIFY COLUMN follow_up_date VARCHAR(50) NULL");
             }
         }
+
+        // Ensure sticky_note column exists
+        $sticky_col_check = $conn->query("SHOW COLUMNS FROM appointments LIKE 'sticky_note'");
+        if ($sticky_col_check->num_rows === 0) {
+            $conn->query("ALTER TABLE appointments ADD COLUMN sticky_note TEXT NULL");
+        }
  
         // Update appointment with prescription details
         $update_sql = "UPDATE appointments SET 
@@ -121,11 +128,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                         note_reference = ?,
                         prescription_footer = ?,
                         follow_up_type = ?,
-                        follow_up_date = ?
+                        follow_up_date = ?,
+                        sticky_note = ?
                        WHERE id = ?";
         
         $update_stmt = $conn->prepare($update_sql);
-        $update_stmt->bind_param("sssssssssi", $chief_complaints, $on_examination, $diagnosis, $meds_json, $advice, $note_reference, $prescription_footer, $follow_up_type, $follow_up_date, $appointment_id);
+        $update_stmt->bind_param("ssssssssssi", $chief_complaints, $on_examination, $diagnosis, $meds_json, $advice, $note_reference, $prescription_footer, $follow_up_type, $follow_up_date, $sticky_note, $appointment_id);
         
         if ($update_stmt->execute()) {
             ob_clean();

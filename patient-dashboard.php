@@ -256,7 +256,7 @@ include 'header.php';
 															</div>
 														</div>
 														<span class="health-percentage">Your health is 95% Normal</span>
-														<a href="medical-details.html" class="btn btn-dark w-100 rounded-pill">View Details<i class="fa-solid fa-chevron-right ms-2"></i></a>
+														<a href="patient-medical-history" class="btn btn-dark w-100 rounded-pill">View Details<i class="fa-solid fa-chevron-right ms-2"></i></a>
 													</div>													
 												</div>
 											</div>
