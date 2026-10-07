@@ -429,32 +429,6 @@ if ($appointment_id) {
 		</nav>
 	</div>
 	</header>
-	<!-- /Header -->
-
-	<!-- Breadcrumb -->
-	<div class="breadcrumb-bar">
-		<div class="container">
-			<div class="row align-items-center inner-banner">
-				<div class="col-md-12 col-12 text-center">
-					<nav aria-label="breadcrumb" class="page-breadcrumb">
-						<ol class="breadcrumb">
-							<li class="breadcrumb-item"><a href="index.html"><i class="isax isax-home-15"></i></a></li>
-							<li class="breadcrumb-item active">Video Call</li>
-						</ol>
-						<h2 class="breadcrumb-title">Video Call</h2>
-					</nav>
-				</div>
-			</div>
-		</div>
-		<div class="breadcrumb-bg">
-			<img src="assets/img/bg/breadcrumb-bg-01.png" alt="img" class="breadcrumb-bg-01">
-			<img src="assets/img/bg/breadcrumb-bg-02.png" alt="img" class="breadcrumb-bg-02">
-			<img src="assets/img/bg/breadcrumb-icon.png" alt="img" class="breadcrumb-bg-03">
-			<img src="assets/img/bg/breadcrumb-icon.png" alt="img" class="breadcrumb-bg-04">
-		</div>
-	</div>
-	<!-- /Breadcrumb -->
-
 	<!-- Page Content -->
 	<div class="content">
 		<div class="container">
@@ -1361,91 +1335,286 @@ if ($appointment_id) {
 
 			const treatmentTemplates = [
 				{
+					name: "Acute viral fever",
+					complaints: "Fever for   --- days\nCough and cold for --- days",
+					diagnosis: "Acute viral fever",
+					meds: [
+						{ name: "Tab. Napa One (1 gm)", dose: "১+১+১(জ্বর >১০০F হলে/ শরীর ব্যথা হলে)", duration: "" },
+						{ name: "Tab. Fexo (120mg)", dose: "০+০+১", duration: "৭দিন" },
+						{ name: "Tab. Monas(10mg)", dose: "০+০+১", duration: "৭দিন" }
+					],
+					advice: "১। গরম পানি এবং খাবার খাবেন।\n২। ঠান্ডা পরিহার করবেন।\n৩। পর্যাপ্ত পরিমানে বিশ্রাম নিবেন।"
+				},
+				{
 					name: "Fever",
-					complaints: "High grade fever, body ache, chills (3 days)",
-					diagnosis: "Acute Febrile Illness / Viral Fever",
+					complaints: "Fever for--- days",
+					diagnosis: "Fever",
 					meds: [
-						{ name: "Tab. Paracetamol 500mg", dose: "1+1+1 (After food)", duration: "5 days" },
-						{ name: "Tab. Omeprazole 20mg", dose: "1+0+1 (Before food)", duration: "5 days" }
+						{ name: "Tab. Napa (500mg)", dose: "১+১+১(জ্বর >১০০F হলে/ শরীর ব্যথা হলে)", duration: "" },
+						{ name: "Tab. Napa Extend (665mg)", dose: "১+১+১(জ্বর >১০০F হলে/ শরীর ব্যথা হলে)", duration: "" },
+						{ name: "Tab. Napa One (1mg)", dose: "১+১+১(জ্বর >১০০F হলে/ শরীর ব্যথা হলে)", duration: "" },
+						{ name: "Supp. Napa (500mg)", dose: "১ টি শলাকা পায়ুপথে (জ্বর >১০২ F হলে/ শরীর ব্যথা হলে)", duration: "" }
 					],
-					advice: "Rest, drink plenty of fluids (water, ORS, soups). Sponge with lukewarm water if temp > 101°F."
+					advice: ""
 				},
 				{
-					name: "Cold",
-					complaints: "Runny nose, sneezing, mild sore throat (2 days)",
-					diagnosis: "Upper Respiratory Tract Infection (URTI) / Common Cold",
+					name: "Common Cold",
+					complaints: "Runny nose for---- days",
+					diagnosis: "Common Cold",
 					meds: [
-						{ name: "Tab. Fexofenadine 120mg", dose: "0+0+1 (At night)", duration: "5 days" },
-						{ name: "Tab. Paracetamol 500mg", dose: "1+0+1 (As needed)", duration: "3 days" },
-						{ name: "Nasal Spray Normal Saline", dose: "2 puffs each nostril", duration: "5 days" }
+						{ name: "Tab. Fexo (120mg)", dose: "০+০+১", duration: "৭দিন" },
+						{ name: "Cap. Cetisoft (10mg)", dose: "০+০+১", duration: "৭দিন" },
+						{ name: "Tab. Rupa (10mg)", dose: "০+০+১", duration: "৭দিন" },
+						{ name: "Tab. Bilista (20mg)", dose: "০+০+১", duration: "৭দিন" }
 					],
-					advice: "Steam inhalation twice daily. Avoid cold drinks and ice water."
+					advice: ""
 				},
 				{
-					name: "Cough",
-					complaints: "Dry cough, throat irritation, chest congestion (4 days)",
-					diagnosis: "Acute Bronchitis / Cough",
+					name: "Productive Cough",
+					complaints: "Productive Cough for--- days",
+					diagnosis: "Productive Cough",
 					meds: [
-						{ name: "Syr. Levosalbutamol + Ambroxol", dose: "2 tsp (10ml) 1+1+1", duration: "5 days" },
-						{ name: "Tab. Montelukast 10mg", dose: "0+0+1 (At night)", duration: "7 days" }
+						{ name: "Tab. Monas(10mg)", dose: "০+০+১", duration: "৭দিন" },
+						{ name: "Syp. Ambrox", dose: "২চামচ করে ৩ বেলা", duration: "৭দিন" }
 					],
-					advice: "Gargle with warm salt water 3 times a day. Avoid dust and smoke exposure."
+					advice: ""
 				},
 				{
-					name: "Gastritis / Acidity",
-					complaints: "Upper abdominal burning, bloating, nausea (1 week)",
-					diagnosis: "Acute Gastritis / GERD",
+					name: "Non-Productive Cough",
+					complaints: "Non-Productive Cough for--- days",
+					diagnosis: "Non-Productive Cough",
 					meds: [
-						{ name: "Cap. Esomeprazole 40mg", dose: "1+0+1 (30 min before food)", duration: "14 days" },
-						{ name: "Syr. Antacid Gel", dose: "2 tsp (10ml) after meals", duration: "7 days" }
+						{ name: "Tab. Monas(10mg)", dose: "০+০+১", duration: "৭দিন" },
+						{ name: "Syp. Bukof", dose: "২চামচ করে ৩ বেলা", duration: "৭দিন" }
 					],
-					advice: "Avoid spicy, oily, and fried food. Eat small frequent meals."
+					advice: ""
 				},
 				{
-					name: "Hypertension",
-					complaints: "Occasional headache, dizziness, mild fatigue",
-					diagnosis: "Essential Hypertension",
+					name: "Nasal Blockage",
+					complaints: "Nasal Blockage for---- days",
+					diagnosis: "Nasal Blockage",
 					meds: [
-						{ name: "Tab. Amlodipine 5mg", dose: "1+0+0 (Morning)", duration: "30 days" }
+						{ name: "Rynex Nasal Drop (0.05%)", dose: "১ ফোটা করে ২ নাকে ২ বেলা (নাক বন্দ থাকলে)", duration: "" },
+						{ name: "Avaspray", dose: "১ চাপ করে ২ নাকে (নাক বন্দ থাকলে)", duration: "" },
+						{ name: "Momelo Nasal Spray", dose: "১ চাপ করে ২ নাকে (নাক বন্দ থাকলে)", duration: "" }
 					],
-					advice: "Low salt diet. Regular blood pressure monitoring. Walk 30 mins daily."
+					advice: ""
 				},
 				{
-					name: "Diabetes Type 2",
-					complaints: "Increased thirst, frequent urination, fatigue",
-					diagnosis: "Type 2 Diabetes Mellitus",
+					name: "Acute Gastritis",
+					complaints: "Acute abdominal discomfort for--- days/hours",
+					diagnosis: "Acute Gastritis",
 					meds: [
-						{ name: "Tab. Metformin 500mg", dose: "1+0+1 (With food)", duration: "30 days" }
+						{ name: "Cap. Sergel (20mg)", dose: "১+০+১(খাবার ১/২ ঘন্টা আগে)", duration: "৭ দিন" },
+						{ name: "Cap. Sergel (40mg)", dose: "১+০+১(খাবার ১/২ ঘন্টা আগে)", duration: "৭ দিন" }
 					],
-					advice: "Strict diabetic diet. Avoid sugar and refined carbs. Regular physical activity."
+					advice: "·  ঝাল, মসলা, ভাজাপোড়া ও অতিরিক্ত তেলযুক্ত খাবার এড়িয়ে চলুন।\n·  চা, কফি, কোমল পানীয় ও অতিরিক্ত টক খাবার কমিয়ে দিন।\n·  ধূমপান ও অ্যালকোহল এড়িয়ে চলুন।\n·  একসাথে বেশি খাবার না খেয়ে অল্প অল্প করে বারবার খাবার খান।\n·  খালি পেটে দীর্ঘ সময় থাকবেন না।\n·  পর্যাপ্ত পানি পান করুন।"
 				},
 				{
-					name: "Headache / Migraine",
-					complaints: "Throbbing headache on one side, light sensitivity (1 day)",
-					diagnosis: "Migraine / Tension Headache",
+					name: "Vomiting / Nausea",
+					complaints: "Vomiting / Nausea for---- days/ hours",
+					diagnosis: "Vomiting / Nausea",
 					meds: [
-						{ name: "Tab. Naproxen 500mg + Domperidone 10mg", dose: "1+0+0 (SOS after food)", duration: "3 days" }
+						{ name: "Tab. Motigut (10mg)", dose: "১+১+১(খাবার ১/২ ঘন্টা আগে)", duration: "৫ দিন" },
+						{ name: "Tab.Emistat (8mg)", dose: "১+১+১(খাবার ১/২ ঘন্টা আগে)", duration: "বমি হলে" }
 					],
-					advice: "Rest in a quiet, dark room. Maintain regular sleep pattern."
+					advice: ""
 				},
 				{
-					name: "Diarrhea",
-					complaints: "Loose watery stools 4-5 times, abdominal cramps (1 day)",
-					diagnosis: "Acute Gastroenteritis",
+					name: "GERD",
+					complaints: "",
+					diagnosis: "GERD",
 					meds: [
-						{ name: "ORS Sachet", dose: "1 sachet in 1L water, drink frequently", duration: "3 days" },
-						{ name: "Tab. Ciprofloxacin 500mg", dose: "1+0+1 (After food)", duration: "5 days" }
+						{ name: "Cap. Sergel (20mg)", dose: "১+০+১(খাবার ১/২ ঘন্টা আগে)", duration: "১৪  দিন" },
+						{ name: "Tab. Motigut (10mg)", dose: "১+১+১(খাবার ১/২ ঘন্টা আগে)", duration: "৫ দিন" },
+						{ name: "Syp. Gavilac", dose: "২চামচ করে ৩ বেলা (খাবার পর)", duration: "১৪ দিন" }
 					],
-					advice: "Drink plenty of ORS and coconut water. Eat light food like rice porridge and bananas."
+					advice: "·  অল্প অল্প করে খাবার খান এবং একসাথে অতিরিক্ত খাবেন না।\n·  খাবার খাওয়ার পর অন্তত ২–৩ ঘণ্টা শোবেন না।\n·  রাতে ঘুমানোর আগে ভারী খাবার এড়িয়ে চলুন।\n·  যেসব খাবারে আপনার বুকজ্বালা বাড়ে সেগুলো এড়িয়ে চলুন—বিশেষ করে ঝাল, ভাজাপোড়া ও অতিরিক্ত চর্বিযুক্ত খাবার।\n·  অতিরিক্ত চা, কফি, কোমল পানীয় ও চকলেট কমিয়ে দিন।\n·  ধূমপান ও অ্যালকোহল এড়িয়ে চলুন।\n·  অতিরিক্ত ওজন থাকলে ধীরে ধীরে ওজন কমানোর চেষ্টা করুন।"
 				},
 				{
-					name: "Skin Allergy",
-					complaints: "Itchy red spots on skin, allergic reaction (2 days)",
-					diagnosis: "Allergic Dermatitis / Urticaria",
+					name: "Abdominal Pain",
+					complaints: "Abdominal pain for---- days/ hours",
+					diagnosis: "Abdominal Pain",
 					meds: [
-						{ name: "Tab. Cetirizine 10mg", dose: "0+0+1 (At night)", duration: "7 days" }
+						{ name: "Tab. Algin(50mg)", dose: "১+১+১(পেটে ব্যথা হলে)", duration: "" }
 					],
-					advice: "Avoid harsh soaps. Do not scratch the affected area."
+					advice: ""
+				},
+				{
+					name: "Acute Watery Diarrhea",
+					complaints: "Passage of loose watery stool for--- days /hours---- times",
+					diagnosis: "Acute Watery Diarrhea",
+					meds: [
+						{ name: "Tab. Zimax (500mg)", dose: "০+১+০", duration: "৫ দিন" },
+						{ name: "Tab. Xinc (20mg)", dose: "১+০+১", duration: "১০ দিন" },
+						{ name: "ORS", dose: "প্রয়োজন মত", duration: "" }
+					],
+					advice: "·       বারবার অল্প অল্প করে ORS পান করুন, বিশেষ করে প্রতিবার পাতলা পায়খানার পর।\n·       পর্যাপ্ত পানি ও অন্যান্য তরল পান করুন, যাতে শরীরে পানিশূন্যতা না হয়।\n·       খাওয়া বন্ধ করবেন না; সহজপাচ্য খাবার অল্প অল্প করে বারবার খান।\n·       ভাত, খিচুড়ি, কলা, আলু, স্যুপ ইত্যাদি খেতে পারেন।\n·       অতিরিক্ত তেল-মসলা, ভাজাপোড়া ও খুব মিষ্টি খাবার এড়িয়ে চলুন।\n·       কাঁচা বা অপরিষ্কার খাবার এবং অপরিশোধিত পানি এড়িয়ে চলুন।\n·       প্রস্রাব কমে যাওয়া, অতিরিক্ত তৃষ্ণা, মুখ শুকিয়ে যাওয়া, মাথা ঘোরা বা খুব দুর্বল লাগা হলে দ্রুত চিকিৎসকের পরামর্শ নিন।"
+				},
+				{
+					name: "Constipation",
+					complaints: "Constipation for--- days",
+					diagnosis: "Constipation",
+					meds: [
+						{ name: "Syp. Avolac", dose: "২ চামচ করে ৩ বেলা (পায়খানা পাতলা হলে বন্ধ)", duration: "" },
+						{ name: "Tab. Lubilax (24mcg)", dose: "১+০+১", duration: "৭ দিন" }
+					],
+					advice: "·  প্রতিদিন পর্যাপ্ত পানি পান করুন।\n·  শাকসবজি, ফলমূল, ডাল, ভুসি ও অন্যান্য আঁশযুক্ত খাবার নিয়মিত খান।\n·  প্রতিদিন নিয়মিত হাঁটা বা হালকা ব্যায়াম করুন।\n·  প্রতিদিন একই সময়ে টয়লেটে যাওয়ার অভ্যাস করুন এবং পায়খানার চাপ এলে দেরি করবেন না।\n·  টয়লেটে অতিরিক্ত জোরে চাপ প্রয়োগ করবেন না।"
+				},
+				{
+					name: "Helminthiasis",
+					complaints: "Anal itching",
+					diagnosis: "Helminthiasis",
+					meds: [
+						{ name: "Tab. Alben Ds", dose: "১+০+০(খালি পেটে )", duration: "৩ দিন" }
+					],
+					advice: ""
+				},
+				{
+					name: "Haemorrhoids/ Anal Fissure",
+					complaints: "Pain during passing stool / bleeding during passing stool",
+					diagnosis: "Haemorrhoids/ Anal fissure",
+					meds: [
+						{ name: "Anustat ointment", dose: "সকালে, রাতে এবং প্রতি বার পায়খানার পর ব্যবহার করবেন", duration: "" },
+						{ name: "Syp. Avolac", dose: "২ চামচ করে ৩ বেলা (পায়খানা পাতলা হলে বন্ধ)", duration: "" },
+						{ name: "Radigel Sachet", dose: "সকালে ও রাতে ১ গ্লাস পানিতে গুলিয়ে খাবেন(খালি পেটে)", duration: "১০দিন" }
+					],
+					advice: "●	প্রতিদিন পর্যাপ্ত পানি পান করুন।\n●	শাকসবজি, ফলমূল, ডাল, ভুসি ও অন্যান্য আঁশযুক্ত খাবার বেশি খান।\n●	পায়খানা নরম রাখার চেষ্টা করুন এবং পায়খানার সময় অতিরিক্ত চাপ প্রয়োগ করবেন না।\n●	পায়খানার চাপ এলে দেরি করবেন না।"
+				},
+				{
+					name: "Oral Candidiasis",
+					complaints: "Oral thrus for … days",
+					diagnosis: "Oral candidiasis",
+					meds: [
+						{ name: "Micoral gel", dose: "দিনে ২বার লাগাবেন", duration: "৭ দিন" }
+					],
+					advice: ""
+				},
+				{
+					name: "B/L Tonsilitis",
+					complaints: "Throat pain for …. Days\nDifficulty in swallowing for … days",
+					diagnosis: "B/L Tonsilitis",
+					meds: [
+						{ name: "Tab. Moxaclav 625mg", dose: "১+১+১", duration: "৭দিন" },
+						{ name: "Tab. Bilista 20mg", dose: "০+০+১", duration: "৭দিন" },
+						{ name: "Viodin mouth wash", dose: "১০মিলি সলিউশন দিয়ে ৩০ সেকেন্ড কুলকুচি করবেন ২ বেলা", duration: "৭দিন" }
+					],
+					advice: "১. হালকা কুসুম গরম পানিতে লবণ দিয়ে গারগিল করবেন ৩ বেলা।"
+				},
+				{
+					name: "Apthous Ulcer",
+					complaints: "Painful Oral Ulcer in mouth",
+					diagnosis: "Apthous Ulcer",
+					meds: [
+						{ name: "Tab. Riboson 5mg", dose: "১+০+১", duration: "৭দিন" },
+						{ name: "Apsole oral paste", dose: "দিনে ২ বার ক্ষত স্থানে লাগাবেন", duration: "" }
+					],
+					advice: ""
+				},
+				{
+					name: "Burping",
+					complaints: "",
+					diagnosis: "Burping",
+					meds: [
+						{ name: "Tab. Beklo 10mg", dose: "১+১+১", duration: "৫ দিন" },
+						{ name: "Tab. Maxpro 20mg", dose: "১+০+১(খাবার ১/২ ঘন্টা আগে)", duration: "৫ দিন" }
+					],
+					advice: ""
+				},
+				{
+					name: "Dental Pain",
+					complaints: "Dental pain for … days",
+					diagnosis: "Dental pain",
+					meds: [
+						{ name: "Tab. Etorix 90mg", dose: "১+০+০", duration: "৫ দিন" },
+						{ name: "Cap. Seclo 20mg", dose: "১+০+০( খাবার ১/২ ঘন্টা আগে)", duration: "" }
+					],
+					advice: "১. একজন দন্ত চিকিৎসকের সাথে সাক্ষাৎ করুন।"
+				},
+				{
+					name: "Migraine",
+					complaints: "Headache for …7 days",
+					diagnosis: "Migraine",
+					meds: [
+						{ name: "Tab. Ace Power (1gm)", dose: "১+১+১+১…মাথা ব্যথা হলে", duration: "" },
+						{ name: "Tab. Norium (5mg)", dose: "০+০+১", duration: "৫ দিন" }
+					],
+					advice: "●	পর্যাপ্ত পানি পান করুন এবং দীর্ঘসময় না খেয়ে থাকবেন না।\n●	প্রতিদিন নিয়মিত সময়ে খাবার ও ঘুমের অভ্যাস বজায় রাখুন।\n●	অতিরিক্ত মানসিক চাপ, ঘুমের ঘাটতি ও অতিরিক্ত পরিশ্রম এড়িয়ে চলুন।\n●	অতিরিক্ত চা, কফি, এনার্জি ড্রিংক ও কোমল পানীয় কমিয়ে দিন।\n●	অতিরিক্ত উজ্জ্বল আলো, তীব্র শব্দ বা যেসব কারণে আপনার migraine শুরু হয় সেগুলো এড়িয়ে চলুন।"
+				},
+				{
+					name: "Vertigo",
+					complaints: "Vertigo for — days",
+					diagnosis: "vertigo",
+					meds: [
+						{ name: "Tab. Revert 20mg+40mg", dose: "১+০+১", duration: "৫ দিন" },
+						{ name: "Tab. Menaril 16mg", dose: "১+১+০+১", duration: "৫দিন" }
+					],
+					advice: ""
+				},
+				{
+					name: "Motion Sickness",
+					complaints: "H/O motion sickness",
+					diagnosis: "Motion sickness",
+					meds: [
+						{ name: "Tab. Acliz 50mg", dose: "যাত্রার ১ ঘন্টা আগে খাবেন", duration: "দিনে ১ বার" }
+					],
+					advice: ""
+				},
+				{
+					name: "Insomnia / Sleep Disturbances",
+					complaints: "Lack of sleep for — days",
+					diagnosis: "Insomnia / sleep disturbances",
+					meds: [
+						{ name: "Tab. Disopen (0.5mg)", dose: "০+০+১(ঘুমানোর আগে)", duration: "৭ দিন" },
+						{ name: "Tab. Lexotanil (3mg)", dose: "০+০+১ (ঘুমানোর আগে)", duration: "৭ দিন" }
+					],
+					advice: ""
+				},
+				{
+					name: "Dengue Fever",
+					complaints: "Fever for — days\nSevere bodyache for — days",
+					diagnosis: "Dengue Fever",
+					meds: [
+						{ name: "Tab. Napa one (1gm)", dose: "১+১+১+১(জ্ব্রর/ ব্যথা হলে)", duration: "" },
+						{ name: "Tab. Pantonix 20mg", dose: "১+০+১ (খাবার ১/২ ঘন্টা আগে)", duration: "৭ দিন" },
+						{ name: "Tab. Xinc B", dose: "১+০+১", duration: "৭দিন" },
+						{ name: "ORS", dose: "প্রয়োজন মত", duration: "" }
+					],
+					advice: "●	পর্যাপ্ত পানি, ORS, ডাবের পানি ও অন্যান্য তরল বারবার পান করুন।\n●	হালকা ও পুষ্টিকর খাবার অল্প অল্প করে বারবার খান।"
+				},
+				{
+					name: "Urticaria",
+					complaints: "Single /multiple wheel on skin",
+					diagnosis: "Urticaria",
+					meds: [
+						{ name: "Tab. Alatrol 10mg", dose: "০+০+১", duration: "৭ দিন" },
+						{ name: "Tab. Famotack 20mg", dose: "১+০+১(খাবার আগে )", duration: "৭ দিন" },
+						{ name: "Tab. Cortan 20mg", dose: "১+১+০….৩ দিন, তারপর ,১+০+০…৩দিন", duration: "" }
+					],
+					advice: ""
+				},
+				{
+					name: "Fungal Infection",
+					complaints: "Itching and ring infection on… for —-  days",
+					diagnosis: "Fungal infection",
+					meds: [
+						{ name: "Tab. Cetisoft 10mg", dose: "০+০+১", duration: "১৫ দিন" },
+						{ name: "Cap. Flugal 150mg", dose: "০+১+০", duration: "১৪ দিন" },
+						{ name: "Cap. Itra 100mg", dose: "১+০+১", duration: "১ মাস" },
+						{ name: "Lucazol cream", dose: "ক্ষত স্থানে দিনে ২বার লাগাবেন", duration: "১ মাস" }
+					],
+					advice: "●	আক্রান্ত স্থান পরিষ্কার ও শুকনো রাখুন।\n●	ঘাম হলে দ্রুত কাপড় পরিবর্তন করুন এবং ঢিলেঢালা, বাতাস চলাচল করে এমন পোশাক পরুন।\n●	আক্রান্ত স্থান চুলকানো বা ঘষাঘষি করবেন না।\n●	তোয়ালে, কাপড়, মোজা, জুতা বা ব্যক্তিগত সামগ্রী অন্যের সঙ্গে শেয়ার করবেন না।\n●	প্রতিদিন পরিষ্কার কাপড় ও অন্তর্বাস ব্যবহার করুন।\n●	পায়ের ফাঙ্গাল ইনফেকশন হলে পা, বিশেষ করে আঙুলের ফাঁক ভালোভাবে শুকিয়ে রাখুন এবং প্রয়োজন হলে জুতা-মোজা নিয়মিত পরিষ্কার/পরিবর্তন করুন।"
+				},
+				{
+					name: "Scabies",
+					complaints: "Itching at whole body for — days specially at interdigital space / at glans penis",
+					diagnosis: "Scabies",
+					meds: [
+						{ name: "Tab. Alatrol 10mg", dose: "০+০+১", duration: "১৪ দিন" },
+						{ name: "Tab. Scabo 12mg", dose: "১ টি ট্যাবলেট খাবেন , তারপর , ১ টি ট্যাবলেট খাবেন ১৪ দিন পর", duration: "" },
+						{ name: "Lorix cream", dose: "১ টি টউব সারা শরিরে (গলার নিচ থেকে পা পর্যন্ত মাথা ছাড়া ) মেখে ১২ ঘন্টা পর গোসল করে ফেলবেন। —--১ সপ্তাহ ব্যবধানে ২ টি টিউব ব্যবহার করবেন।", duration: "" }
+					],
+					advice: "●	ব্যবহৃত কাপড়, বিছানার চাদর ও তোয়ালে গরম পানিতে ধুয়ে ভালোভাবে শুকিয়ে ব্যবহার করুন।\n●	চিকিৎসার পর চুলকানি কিছুদিন থাকতে পারে; শুধু চুলকানি থাকলেই চিকিৎসা ব্যর্থ হয়েছে ধরে নেবেন না।\n●	চিকিৎসার পরও নতুন নতুন দানা/সুরঙ্গ তৈরি হলে, পুঁজ বা ত্বকে সংক্রমণ হলে চিকিৎসকের পরামর্শ নিন।"
 				}
 			];
 
