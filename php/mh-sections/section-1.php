@@ -71,7 +71,7 @@ if ($mh_mode === 'form') {
         <div class="mhf-error" data-error-for="marital_status"></div>
     </div>
 
-    <!-- Shown only when Sex = Female -->
+    <!-- Shown only when Sex = Female AND Marital Status = Yes -->
     <div class="mhf-field mhf-hidden" id="mh_pregnancy_field" data-field="pregnancy_status">
         <label class="mhf-label" for="mh_pregnancy_status">Pregnancy status</label>
         <select id="mh_pregnancy_status" name="pregnancy_status" class="mhf-control mhf-select">
@@ -327,8 +327,8 @@ if ($mh_mode === 'save') {
         $e['marital_status'] = 'Select an option.';
     }
 
-    // Pregnancy status exists only for Female
-    if ($d['sex'] === 'Female') {
+    // Pregnancy status exists only for Female AND Marital Status = Yes
+    if ($d['sex'] === 'Female' && $d['marital_status'] === 'Yes') {
         $d['pregnancy_status'] = mh_pick(isset($in['pregnancy_status']) ? $in['pregnancy_status'] : '', array('No', 'Yes', 'Possibly'), 'No');
     } else {
         $d['pregnancy_status'] = '';
@@ -483,7 +483,7 @@ if ($mh_mode === 'pdf') {
     echo '<tr>' . mh_pdf_pair('Patient Name', $g('patient_name')) . mh_pdf_pair('Date of Birth', mh_format_date($g('dob'))) . '</tr>';
     echo '<tr>' . mh_pdf_pair('Age', $age_label) . mh_pdf_pair('Age Group', $age_group) . '</tr>';
     echo '<tr>' . mh_pdf_pair('Sex', $g('sex')) . mh_pdf_pair('Marital Status', $g('marital_status')) . '</tr>';
-    if ($g('sex') === 'Female') {
+    if ($g('sex') === 'Female' && $g('marital_status') === 'Yes') {
         echo '<tr>' . mh_pdf_pair('Religious Status', $g('religion')) . mh_pdf_pair('Pregnancy Status', $g('pregnancy_status')) . '</tr>';
     } else {
         echo '<tr>' . mh_pdf_pair('Religious Status', $g('religion'), 3) . '</tr>';

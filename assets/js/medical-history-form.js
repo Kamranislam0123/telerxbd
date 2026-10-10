@@ -277,7 +277,7 @@ if (typeof window !== 'undefined') { window.MHCalc = MHCalc; }
     function refreshFormHeader() {
         var id = String(S.formId);
         while (id.length < 6) { id = '0' + id; }
-        $('#mhf-subtitle').text('Form MH-' + id);
+        $('#mhf-formno').text('Form MH-' + id);
         var complete = S.status === 'completed';
         $('#mhf-status').text(complete ? 'Completed' : 'Draft').toggleClass('is-complete', complete).toggleClass('is-draft', !complete);
         $('#mhf-head-pdf').attr('href', pdfUrl()).toggleClass('mhf-hidden', !complete);
@@ -302,6 +302,7 @@ if (typeof window !== 'undefined') { window.MHCalc = MHCalc; }
         var fd = new FormData($form(n)[0]);
         fd.append('section', n);
         fd.append('form_id', S.formId || 0);
+        fd.append('person', S.person || 'self');   // whose form (used only when the form is created)
         fd.append('csrf', S.csrf);
 
         setLoading($btn, true);
@@ -352,8 +353,10 @@ if (typeof window !== 'undefined') { window.MHCalc = MHCalc; }
             }
         }
 
+        // Pregnancy status: only when Sex = Female AND Marital Status = Yes
         function applySex(reset) {
-            setVisible($('#mh_pregnancy_field'), $sex.val() === 'Female', reset ? 'No' : undefined);
+            var show = ($sex.val() === 'Female' && $('#mh_marital_status').val() === 'Yes');
+            setVisible($('#mh_pregnancy_field'), show, reset ? 'No' : undefined);
         }
         function applyOccupation(reset) {
             var others = $('#mh_occupation').val() === 'Others';
@@ -453,7 +456,7 @@ if (typeof window !== 'undefined') { window.MHCalc = MHCalc; }
                 initDob();
                 initComplaint();
 
-                $sex.on('change', function () { applySex(true); });
+                $sex.add('#mh_marital_status').on('change', function () { applySex(true); });
                 $('#mh_occupation').on('change', function () { applyOccupation(true); });
                 $('#mh_occupational_hazard').on('change', function () { applyHazard(true); });
                 $weight.add($ft).add($inch).on('input change', updateAgeAndBmi);
@@ -538,6 +541,8 @@ if (typeof window !== 'undefined') { window.MHCalc = MHCalc; }
 
         // fill saved answers
         $.each(S.data || {}, function (n, data) { hydrate(+n, data); });
+        // brand-new form: suggest the person's name (and sex / date of birth when known)
+        if (!S.formId && S.prefill && !$.isEmptyObject(S.prefill)) { hydrate(1, S.prefill); }
         hydrating = false;
         dirty = false;
 

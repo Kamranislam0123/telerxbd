@@ -59,7 +59,7 @@ try {
         mh_pdf_fail('The medical history form is available for Premium subscribers.', 403);
     }
     if (!mh_tables_ready($conn)) {
-        mh_pdf_fail('Database tables are missing. Import database/mh_tables.sql in phpMyAdmin first.', 500);
+        mh_pdf_fail(mh_setup_message(), 500);
     }
 
     $form = mh_get_form($conn, $form_id, $patient_id);   // only the owner can open it
@@ -82,6 +82,9 @@ try {
     $patient_name = isset($tab1['patient_name']) ? (string)$tab1['patient_name'] : '';
     $form_no      = 'MH-' . str_pad((string)$form_id, 6, '0', STR_PAD_LEFT);
     $patient_code = 'PT' . str_pad((string)$patient_id, 6, '0', STR_PAD_LEFT);
+    $relationship = isset($form['relationship']) ? (string)$form['relationship'] : 'Self';
+    // Own form -> "PT000053";  family member's form -> "Spouse of PT000053"
+    $id_text      = ($relationship === 'Self' || $relationship === '') ? $patient_code : ($relationship . ' of ' . $patient_code);
     $generated_at = date('d M Y, h:i A');
 
     $logo_html = '<span style="font-size:14pt;font-weight:bold;color:#15558d;">TeleRx Bangladesh</span>';
@@ -98,7 +101,7 @@ try {
         . '<td width="35%" style="vertical-align:middle;padding-bottom:5px;">' . $logo_html . '</td>'
         . '<td width="65%" style="text-align:right;vertical-align:middle;padding-bottom:5px;">'
         . '<div style="font-size:14pt;font-weight:bold;color:#15558d;">Patient Medical History</div>'
-        . '<div style="font-size:10pt;color:#475569;">' . mh_h($patient_name) . ' &nbsp;|&nbsp; ' . mh_h($form_no) . ' &nbsp;|&nbsp; ' . mh_h($patient_code) . '</div>'
+        . '<div style="font-size:10pt;color:#475569;">' . mh_h($patient_name) . ' &nbsp;|&nbsp; ' . mh_h($form_no) . ' &nbsp;|&nbsp; ' . mh_h($id_text) . '</div>'
         . '</td></tr></table>';
 
     $footer_html =

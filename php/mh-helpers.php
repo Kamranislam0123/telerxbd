@@ -7,7 +7,6 @@
  */
 
 require_once __DIR__ . '/config.php';
-require_once __DIR__ . '/subscription-helper.php';
 
 /* ---------------------------------------------------------------------
  * SETTINGS  (the only two things you may want to change)
@@ -17,6 +16,12 @@ require_once __DIR__ . '/subscription-helper.php';
 // false = every logged-in patient can use it
 if (!defined('MH_REQUIRE_PREMIUM')) {
     define('MH_REQUIRE_PREMIUM', true);
+}
+
+// Total number of medical history forms ONE Premium member can have,
+// counting the member himself/herself.  4 = the member + 3 family members.
+if (!defined('MH_MAX_PEOPLE')) {
+    define('MH_MAX_PEOPLE', 4);
 }
 
 // true  = show the real error text on screen (good while testing)
@@ -162,23 +167,132 @@ function mh_current_patient_id()
     return 0;
 }
 
-function mh_is_premium($conn, $patient_id)
+/**
+ * The patient's OWN active Premium subscription (or null).
+ * Strict on purpose: only a patient who bought a Premium package gets it.
+ * (It does not use getActiveSubscription(), which can return another patient's package.)
+ */
+function mh_get_premium_subscription($conn, $patient_id)
 {
-    $sub = getActiveSubscription((int)$patient_id, $conn);
-    if (!$sub) {
-        return false;
-    }
-    $code = strtolower(isset($sub['plan_code']) ? (string)$sub['plan_code'] : '');
-    $name = strtolower(isset($sub['plan_name']) ? (string)$sub['plan_name'] : '');
-    return (strpos($code, 'premium') !== false || strpos($name, 'premium') !== false);
+    $sql = "SELECT ps.id, ps.end_date, sp.plan_code, sp.name AS plan_name, sp.family_member_quota
+            FROM patient_subscriptions ps
+            JOIN subscription_plans sp ON sp.id = ps.plan_id
+            WHERE ps.patient_id = ?
+              AND ps.status = 'active'
+              AND ps.end_date >= NOW()
+              AND (LOWER(sp.plan_code) LIKE '%premium%' OR LOWER(sp.name) LIKE '%premium%')
+            ORDER BY ps.id DESC
+            LIMIT 1";
+    $stmt = $conn->prepare($sql);
+    $patient_id = (int)$patient_id;
+    $stmt->bind_param('i', $patient_id);
+    $stmt->execute();
+    $row = $stmt->get_result()->fetch_assoc();
+    $stmt->close();
+    return $row ? $row : null;
 }
 
+/** May this patient use the form? (Premium buyers only, unless switched off at the top of this file) */
 function mh_has_access($conn, $patient_id)
 {
     if (!MH_REQUIRE_PREMIUM) {
         return true;
     }
-    return mh_is_premium($conn, $patient_id);
+    return mh_get_premium_subscription($conn, $patient_id) !== null;
+}
+
+/**
+ * How many FAMILY members (not counting the member) can have a form:
+ * the package allows family_member_quota, but the total is capped by MH_MAX_PEOPLE.
+ */
+function mh_family_limit($sub)
+{
+    if (!$sub) {
+        return 0;
+    }
+    return max(0, min((int)$sub['family_member_quota'], MH_MAX_PEOPLE - 1));
+}
+
+/** "Male" / "female" / "OTHER" -> one of the form's Sex options, or '' when unknown */
+function mh_map_sex($value)
+{
+    $v = ucfirst(strtolower(trim((string)$value)));
+    return in_array($v, array('Male', 'Female', 'Intersex', 'Other'), true) ? $v : '';
+}
+
+/**
+ * The people this Premium member can fill a form for:
+ * the member himself/herself + the family members registered on the My Subscription page
+ * (up to the package's family_member_quota, 4 for Premium).
+ *
+ * @return array list of array('key','family_id','name','relationship','sex','dob')
+ */
+function mh_get_people($conn, $patient_id, $sub)
+{
+    $patient_id = (int)$patient_id;
+    $people = array();
+
+    $stmt = $conn->prepare('SELECT name, gender, date_of_birth FROM patients WHERE id = ? LIMIT 1');
+    $stmt->bind_param('i', $patient_id);
+    $stmt->execute();
+    $me = $stmt->get_result()->fetch_assoc();
+    $stmt->close();
+
+    $dob = '';
+    if ($me && !empty($me['date_of_birth']) && $me['date_of_birth'] !== '0000-00-00') {
+        $dob = substr((string)$me['date_of_birth'], 0, 10);
+    }
+    $people[] = array(
+        'key'          => 'self',
+        'family_id'    => 0,
+        'name'         => ($me && trim((string)$me['name']) !== '') ? trim((string)$me['name']) : 'Myself',
+        'relationship' => 'Self',
+        'sex'          => $me ? mh_map_sex($me['gender']) : '',
+        'dob'          => $dob,
+    );
+
+    if ($sub) {
+        $quota = mh_family_limit($sub);
+        if ($quota > 0) {
+            $sub_id = (int)$sub['id'];
+            $stmt = $conn->prepare('SELECT id, member_name, relationship, gender FROM subscription_family_members
+                                    WHERE subscription_id = ? AND patient_id = ? ORDER BY id ASC LIMIT ?');
+            $stmt->bind_param('iii', $sub_id, $patient_id, $quota);
+            $stmt->execute();
+            $res = $stmt->get_result();
+            while ($row = $res->fetch_assoc()) {
+                $people[] = array(
+                    'key'          => 'fm-' . (int)$row['id'],
+                    'family_id'    => (int)$row['id'],
+                    'name'         => trim((string)$row['member_name']),
+                    'relationship' => trim((string)$row['relationship']) !== '' ? trim((string)$row['relationship']) : 'Family',
+                    'sex'          => mh_map_sex($row['gender']),
+                    'dob'          => '',
+                );
+            }
+            $stmt->close();
+        }
+    }
+    return $people;
+}
+
+function mh_find_person($people, $key)
+{
+    foreach ($people as $p) {
+        if ($p['key'] === $key) {
+            return $p;
+        }
+    }
+    return null;
+}
+
+/** "Myself" or "Rahim (Spouse)" */
+function mh_person_label($name, $relationship)
+{
+    if ($relationship === 'Self' || $relationship === '' || $relationship === null) {
+        return 'Myself';
+    }
+    return trim((string)$name) . ' (' . $relationship . ')';
 }
 
 function mh_csrf_token()
@@ -208,6 +322,13 @@ function mh_tables_ready($conn)
             $ok = false;
         }
     }
+    if ($ok) {
+        // Version 2 column (whose form is it). Missing = mh_tables_update_v2.sql was not imported yet.
+        $col = $conn->query("SHOW COLUMNS FROM mh_forms LIKE 'person_key'");
+        if (!$col || $col->num_rows === 0) {
+            $ok = false;
+        }
+    }
     return $ok;
 }
 
@@ -224,12 +345,12 @@ function mh_get_form($conn, $form_id, $patient_id)
     return $row ? $row : null;
 }
 
-/** The patient's most recently edited unfinished form (or null). */
-function mh_latest_draft($conn, $patient_id)
+/** The form of one person (self or a family member) of this patient, or null if not started. */
+function mh_get_form_by_person($conn, $patient_id, $person_key)
 {
-    $stmt = $conn->prepare("SELECT * FROM mh_forms WHERE patient_id = ? AND status = 'draft' ORDER BY updated_at DESC, id DESC LIMIT 1");
+    $stmt = $conn->prepare('SELECT * FROM mh_forms WHERE patient_id = ? AND person_key = ? LIMIT 1');
     $patient_id = (int)$patient_id;
-    $stmt->bind_param('i', $patient_id);
+    $stmt->bind_param('is', $patient_id, $person_key);
     $stmt->execute();
     $row = $stmt->get_result()->fetch_assoc();
     $stmt->close();
@@ -436,4 +557,11 @@ function mh_pdf_pair($label, $value, $colspan = 1)
     $v = ($value === '' || $value === null) ? '&mdash;' : mh_h($value);
     $span = ($colspan > 1) ? ' colspan="' . (int)$colspan . '"' : '';
     return '<td class="k">' . mh_h($label) . '</td><td class="v"' . $span . '>' . $v . '</td>';
+}
+
+/** Text shown when the database tables are missing or old */
+function mh_setup_message()
+{
+    return 'The database tables for this form are missing or old. New installation: import database/mh_tables.sql in phpMyAdmin. '
+         . 'If you installed an earlier version before: import database/mh_tables_update_v2.sql once. Then reload this page.';
 }

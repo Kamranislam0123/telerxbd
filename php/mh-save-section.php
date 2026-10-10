@@ -38,11 +38,12 @@ try {
 
     $conn = getDBConnection();
 
-    if (!mh_has_access($conn, $patient_id)) {
+    $sub = mh_get_premium_subscription($conn, $patient_id);
+    if (MH_REQUIRE_PREMIUM && !$sub) {
         mh_json(array('success' => false, 'message' => 'The medical history form is available for Premium subscribers.'), 403);
     }
     if (!mh_tables_ready($conn)) {
-        mh_json(array('success' => false, 'message' => 'Database tables are missing. Import database/mh_tables.sql in phpMyAdmin first.'), 500);
+        mh_json(array('success' => false, 'message' => mh_setup_message()), 500);
     }
 
     // 4) Existing form? (must belong to this patient)
@@ -56,6 +57,16 @@ try {
         $saved = array_keys(mh_get_sections($conn, $form_id));
     } elseif ($section_no !== 1) {
         mh_json(array('success' => false, 'message' => 'Please fill and save the first tab first.'), 409);
+    } else {
+        // New form: it must be for the member himself/herself or a registered family member
+        $person_key = isset($_POST['person']) && is_string($_POST['person']) ? $_POST['person'] : 'self';
+        $person = mh_find_person(mh_get_people($conn, $patient_id, $sub), $person_key);
+        if (!$person) {
+            mh_json(array('success' => false, 'message' => 'This person is not registered in your package. Add the family member on the My Subscription page first.'), 403);
+        }
+        if (mh_get_form_by_person($conn, $patient_id, $person['key'])) {
+            mh_json(array('success' => false, 'message' => 'A form already exists for this person. Please open it from the Medical History page.'), 409);
+        }
     }
 
     // 5) Tabs must be completed in order
@@ -85,8 +96,10 @@ try {
         if (!$form) {
             $name = isset($data['patient_name']) ? $data['patient_name'] : '';
             $dob  = !empty($data['dob']) ? $data['dob'] : null;
-            $stmt = $conn->prepare("INSERT INTO mh_forms (patient_id, patient_name, date_of_birth, status) VALUES (?, ?, ?, 'draft')");
-            $stmt->bind_param('iss', $patient_id, $name, $dob);
+            $pkey = $person['key'];
+            $rel  = $person['relationship'];
+            $stmt = $conn->prepare("INSERT INTO mh_forms (patient_id, person_key, relationship, patient_name, date_of_birth, status) VALUES (?, ?, ?, ?, ?, 'draft')");
+            $stmt->bind_param('issss', $patient_id, $pkey, $rel, $name, $dob);
             $stmt->execute();
             $form_id = (int)$conn->insert_id;
             $stmt->close();

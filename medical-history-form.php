@@ -3,9 +3,10 @@
  * Patient Medical History FORM - TeleRx Bangladesh
  * Multi-tab form: Save and Next -> ... -> Save and Finish -> Generate PDF Now
  *
- *   medical-history-form            -> continues the latest unfinished form (or starts a new one)
- *   medical-history-form?new=1      -> starts a new, empty form
- *   medical-history-form?id=12      -> opens form number 12 (must belong to the logged-in patient)
+ *   medical-history-form?person=self    -> the member's own form  (starts it, or reopens it)
+ *   medical-history-form?person=fm-12    -> the form of registered family member number 12
+ *   medical-history-form?id=7            -> opens form number 7 (must belong to the logged-in member)
+ *   (nothing)                            -> goes back to the Medical History page to choose a person
  */
 
 session_start();
@@ -21,6 +22,8 @@ if ($patient_id <= 0) {
 $base       = (defined('APP_BASE') && APP_BASE) ? APP_BASE : '';
 $patient    = null;
 $form       = null;
+$person     = null;   // whose form this is
+$prefill    = null;   // name / sex / date of birth suggested for a new form
 $tab_data   = array();
 $saved_nos  = array();
 $page_error = '';
@@ -42,25 +45,48 @@ try {
     }
     $patient['profile_image'] = !empty($patient['profile_image']) ? $patient['profile_image'] : 'assets/img/doctors-dashboard/profile-06.jpg';
 
-    // Premium rule (can be switched off in php/mh-helpers.php)
-    if (!mh_has_access($conn, $patient_id)) {
+    // Premium rule: the member must have bought a Premium package (can be switched off in php/mh-helpers.php)
+    $sub = mh_get_premium_subscription($conn, $patient_id);
+    if (MH_REQUIRE_PREMIUM && !$sub) {
         header('Location: ' . $base . '/patient-medical-history');
         exit;
     }
 
     if (!mh_tables_ready($conn)) {
-        $page_error = 'The database tables for this form are not created yet. Import the file database/mh_tables.sql in phpMyAdmin, then reload this page.';
+        $page_error = mh_setup_message();
     } else {
-        $req_id = isset($_GET['id']) ? (int)$_GET['id'] : 0;
+        $people     = mh_get_people($conn, $patient_id, $sub);   // myself + registered family members
+        $req_id     = isset($_GET['id']) ? (int)$_GET['id'] : 0;
+        $req_person = (isset($_GET['person']) && is_string($_GET['person'])) ? $_GET['person'] : '';
+
         if ($req_id > 0) {
             $form = mh_get_form($conn, $req_id, $patient_id);
             if (!$form) {
-                header('Location: ' . $base . '/medical-history-form');
+                header('Location: ' . $base . '/patient-medical-history');
                 exit;
             }
-        } elseif (empty($_GET['new'])) {
-            $form = mh_latest_draft($conn, $patient_id);   // may be null -> blank form
+            $person = array('key' => $form['person_key'], 'name' => (string)$form['patient_name'], 'relationship' => (string)$form['relationship']);
+        } elseif ($req_person !== '') {
+            $person = mh_find_person($people, $req_person);
+            if (!$person) {
+                header('Location: ' . $base . '/patient-medical-history');
+                exit;
+            }
+            $form = mh_get_form_by_person($conn, $patient_id, $person['key']);   // one form per person
+            if (!$form) {
+                $prefill = array('patient_name' => $person['name']);
+                if ($person['sex'] !== '') {
+                    $prefill['sex'] = $person['sex'];
+                }
+                if ($person['dob'] !== '') {
+                    $prefill['dob'] = $person['dob'];
+                }
+            }
+        } else {
+            header('Location: ' . $base . '/patient-medical-history');   // choose a person first
+            exit;
         }
+
         if ($form) {
             $tab_data  = mh_get_sections($conn, (int)$form['id']);
             $saved_nos = array_keys($tab_data);
@@ -77,6 +103,7 @@ mh_db_strict(false);   // back to normal for header.php / footer.php
 $sections    = mh_sections();
 $total_tabs  = count($sections);
 $is_complete = ($form && $form['status'] === 'completed');
+$person_label = $person ? mh_person_label($person['name'], $person['relationship']) : 'Myself';
 
 // Which tab opens first?
 $first_unsaved = 1;
@@ -99,6 +126,8 @@ foreach ($sections as $no => $meta) {
 }
 $state = array(
     'formId'    => $form ? (int)$form['id'] : 0,
+    'person'    => $person ? $person['key'] : 'self',
+    'prefill'   => $prefill ? $prefill : new stdClass(),
     'status'    => $form ? $form['status'] : 'new',
     'csrf'      => mh_csrf_token(),
     'tabs'      => $tabs_meta,
@@ -170,12 +199,9 @@ include 'header.php';
                         <div class="mhf-head">
                             <div class="mhf-head-text">
                                 <h3 class="mhf-title">Patient Medical History</h3>
-                                <p class="mhf-subtitle" id="mhf-subtitle">
-                                    <?php if ($form): ?>
-                                        Form MH-<?php echo str_pad((string)(int)$form['id'], 6, '0', STR_PAD_LEFT); ?>
-                                    <?php else: ?>
-                                        New form
-                                    <?php endif; ?>
+                                <p class="mhf-subtitle">
+                                    <span id="mhf-formno"><?php echo $form ? 'Form MH-' . str_pad((string)(int)$form['id'], 6, '0', STR_PAD_LEFT) : 'New form'; ?></span>
+                                    <span class="mhf-person"><i class="fa-regular fa-user" aria-hidden="true"></i> For: <?php echo mh_h($person_label); ?></span>
                                 </p>
                             </div>
                             <div class="mhf-head-side">

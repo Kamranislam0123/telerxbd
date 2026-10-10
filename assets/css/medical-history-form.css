@@ -481,3 +481,18 @@ select.mhf-control,
 @media (prefers-reduced-motion: reduce) {
     .mhf *, .mhf *::before, .mhf *::after { transition: none !important; animation: none !important; }
 }
+
+/* ---------- "For: <person>" label in the card header ---------- */
+.mhf-person {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin-left: 10px;
+    padding: 1px 10px;
+    border-radius: 999px;
+    background: var(--mhf-primary-soft);
+    color: var(--mhf-primary-dark);
+    font-size: 10pt;
+    font-weight: 500;
+}
+.mhf-person i { font-size: 9pt; }
