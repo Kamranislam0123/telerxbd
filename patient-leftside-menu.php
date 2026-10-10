@@ -53,7 +53,7 @@ if (!empty($patient['gender']) || !empty($patient['date_of_birth'])) {
                                 <span>My Subscription</span>
                             </a>
                         </li>
-                        <li <?php echo (basename($_SERVER['PHP_SELF']) == 'patient-medical-history.php') ? 'class="active"' : ''; ?>>
+                        <li <?php echo (in_array(basename($_SERVER['PHP_SELF']), ['patient-medical-history.php', 'medical-history-form.php'])) ? 'class="active"' : ''; ?>>
                             <a href="<?php echo (defined('APP_BASE') && APP_BASE) ? APP_BASE . '/patient-medical-history' : 'patient-medical-history'; ?>">
                                 <i class="isax isax-document-text"></i>
                                 <span>Medical History</span>
