@@ -2,6 +2,15 @@
 require_once __DIR__ . '/php/config.php';
 
 $current_page = basename($_SERVER['PHP_SELF']);
+
+// ---- helpers for the new header (highlight the page the visitor is on) ----
+$hf_v = '1';   // change this number after editing site-chrome.css / site-chrome.js if the browser shows the old design
+$hf_page = strtolower(pathinfo($current_page, PATHINFO_FILENAME));                 // index, doctors, products ...
+$hf_path = strtolower(str_replace('\\', '/', $_SERVER['PHP_SELF']));               // /HomeService/home-service.php
+$hf_in_homecare = (strpos($hf_path, '/homeservice/') !== false);
+$hf_in_shop     = (strpos($hf_path, '/products/') !== false);
+$hf_on = function ($yes) { return $yes ? 'is-active' : ''; };
+$hf_logged_in = (isset($_SESSION['logged_in']) && $_SESSION['logged_in'] === true);
 ?>
 
 <!DOCTYPE html>
@@ -80,6 +89,10 @@ $current_page = basename($_SERVER['PHP_SELF']);
     <!-- Registration CSS -->
     <link rel="stylesheet" href="assets/css/registration.css">
 
+    <!-- Modern header & footer -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="assets/css/site-chrome.css?v=<?php echo $hf_v; ?>">
+
     <!-- Rangeslider CSS -->
     <link rel="stylesheet" href="assets/plugins/ion-rangeslider/css/ion.rangeSlider.css">
     <link rel="stylesheet" href="assets/plugins/ion-rangeslider/css/ion.rangeSlider.min.css">
@@ -93,166 +106,155 @@ $current_page = basename($_SERVER['PHP_SELF']);
     <div class="main-wrapper home-one">
 
     <!-- Header -->
-    <header class="header header-custom header-fixed header-one home-head-one">
-        <div class="telerx-header-top d-none d-lg-block">
-            <div class="container telerx-header-top-inner">
-                <div class="telerx-top-left">
-                    <span class="telerx-top-label">Follow us :</span>
-                    <a href="https://www.facebook.com/telerxbd" aria-label="Facebook" target="_blank"><i class="fa-brands fa-facebook-f" aria-hidden="true"></i></a>
-                    <a href="https://www.youtube.com/@TeleRxBD" aria-label="YouTube" target="_blank"><i class="fa-brands fa-youtube" aria-hidden="true"></i></a>
-                    <a href="https://www.instagram.com/telerxbd" aria-label="Instagram" target="_blank"><i class="fa-brands fa-instagram" aria-hidden="true"></i></a>
-                    <a href="https://bd.linkedin.com/company/telerxbd" aria-label="LinkedIn" target="_blank"><i class="fa-brands fa-linkedin-in" aria-hidden="true"></i></a>
+    <header class="hf-header" id="hf-header">
+        <!-- top strip (desktop) -->
+        <div class="hf-top">
+            <div class="hf-wrap hf-top-inner">
+                <div class="hf-follow">
+                    <span>Follow us :</span>
+                    <a href="https://www.facebook.com/telerxbd" aria-label="Facebook" target="_blank" rel="noopener"><i class="fa-brands fa-facebook-f" aria-hidden="true"></i></a>
+                    <a href="https://www.youtube.com/@TeleRxBD" aria-label="YouTube" target="_blank" rel="noopener"><i class="fa-brands fa-youtube" aria-hidden="true"></i></a>
+                    <a href="https://www.instagram.com/telerxbd" aria-label="Instagram" target="_blank" rel="noopener"><i class="fa-brands fa-instagram" aria-hidden="true"></i></a>
+                    <a href="https://bd.linkedin.com/company/telerxbd" aria-label="LinkedIn" target="_blank" rel="noopener"><i class="fa-brands fa-linkedin-in" aria-hidden="true"></i></a>
                 </div>
-                <!-- <div>
-                    <marquee width="100%" behavior="scroll" direction="left">TeleRx website in under maintenance.</marquee>
-                </div>
-                -->
-                <div class="telerx-top-right">
-                    <a href="https://wa.me/8801836838888" target="_blank" rel="noopener noreferrer" class="telerx-helpline">
-                        <span class="helpline-icon"><i class="fa-brands fa-whatsapp" aria-hidden="true"></i></span>
-                        <span class="helpline-content">24/7 Helpline:<strong>01836-838888</strong></span>
-                    </a>
-                </div>
+                <a href="https://wa.me/8801836838888" target="_blank" rel="noopener noreferrer" class="hf-helpline">
+                    <i class="fa-brands fa-whatsapp" aria-hidden="true"></i>
+                    <span>24/7 Helpline: <strong>01836-838888</strong></span>
+                </a>
             </div>
         </div>
-        <div class="container">
-            <nav class="navbar navbar-expand-lg header-nav">
-                <div class="navbar-header">
-                    <a id="mobile_btn" href="javascript:void(0);">
-                        <span class="bar-icon">
-                            <span></span>
-                            <span></span>
-                            <span></span>
-                        </span>
-                    </a>
-                    <a href="/" class="navbar-brand logo">
-                        <img src="assets/img/logo.svg" class="img-fluid" alt="Logo">
-                    </a>
-                </div>
-                <div class="main-menu-wrapper">
-                    <div class="menu-header">
-                        <a href="/" class="menu-logo">
-                            <img src="assets/img/logo.svg" class="img-fluid" alt="Logo">
+
+        <!-- main bar -->
+        <div class="hf-bar">
+            <div class="hf-wrap hf-bar-inner">
+                <button type="button" class="hf-burger" id="hf_burger" aria-label="Open menu" aria-expanded="false" aria-controls="hf_menu">
+                    <span></span><span></span><span></span>
+                </button>
+
+                <a href="/" class="hf-logo" aria-label="TeleRx Bangladesh - Home">
+                    <img src="assets/img/logo.svg" alt="TeleRx Bangladesh">
+                </a>
+
+                <div class="hf-menu" id="hf_menu">
+                    <div class="hf-menu-head">
+                        <a href="/" class="hf-logo" aria-label="TeleRx Bangladesh - Home">
+                            <img src="assets/img/logo.svg" alt="TeleRx Bangladesh">
                         </a>
-                        <a id="menu_close" class="menu-close" href="javascript:void(0);">
-                            <i class="fas fa-times"></i>
-                        </a>
+                        <button type="button" class="hf-close" id="hf_close" aria-label="Close menu"><i class="fas fa-times" aria-hidden="true"></i></button>
                     </div>
-                    <ul class="main-nav">
-                        <li class="<?php echo ($current_page == 'index') ? 'active' : ''; ?>">
-                            <a href="/">Home</a>
+
+                    <ul class="hf-nav">
+                        <li class="<?php echo $hf_on($hf_page === 'index' && !$hf_in_homecare && !$hf_in_shop); ?>">
+                            <a class="hf-link" href="/">Home</a>
                         </li>
-                        <li class="<?php echo ($current_page == 'doctors') ? 'active' : ''; ?>">
-                            <a href="doctors">Our Doctors</a>
+                        <li class="<?php echo $hf_on(in_array($hf_page, ['doctors', 'doctor-profile'], true)); ?>">
+                            <a class="hf-link" href="doctors">Our Doctors</a>
                         </li>
-                        <li class="<?php echo ($current_page == 'welfare') ? 'active' : ''; ?>">
-                            <a href="welfare">Welfare</a>
+                        <li class="<?php echo $hf_on($hf_page === 'welfare'); ?>">
+                            <a class="hf-link" href="welfare">Welfare</a>
                         </li>
-                        <li class="<?php echo ($current_page == 'HomeService/home-service') ? 'active' : ''; ?>">
-                           <a href="HomeService/home-service">Home Care</a>
+                        <li class="<?php echo $hf_on($hf_in_homecare); ?>">
+                            <a class="hf-link" href="HomeService/home-service">Home Care</a>
                         </li>
-                        <li class="<?php echo ($current_page == 'Products/products') ? 'active' : ''; ?>">
-                            <a href="Products/products">Products</a>
+                        <li class="<?php echo $hf_on($hf_in_shop); ?>">
+                            <a class="hf-link" href="Products/products">Products</a>
                         </li>
-                        <li class="<?php echo ($current_page == 'subscription') ? 'active' : ''; ?>">
-                            <a href="subscription">Subscription</a>
+                        <li class="<?php echo $hf_on(in_array($hf_page, ['subscription', 'subscription-checkout'], true)); ?>">
+                            <a class="hf-link" href="subscription">Subscription</a>
                         </li>
-                        <li class="has-submenu trx-more-menu <?php echo in_array($current_page, ['about-us', 'contact']) ? 'active' : ''; ?>">
-                            <a href="javascript:void(0);">
-                                More <i class="fas fa-chevron-down"></i>
-                            </a>
-                            <ul class="submenu trx-more-dropdown">
-                                <li class="<?php echo ($current_page == 'medical-camp') ? 'active' : ''; ?>">
-                                <a href="medical-camp">Medical Camp</a>
+                        <li class="hf-dd <?php echo $hf_on(in_array($hf_page, ['medical-camp', 'corporate', 'training', 'about-us', 'contact', 'global-care'], true)); ?>">
+                            <button type="button" class="hf-link" aria-haspopup="true" aria-expanded="false">
+                                More <i class="fas fa-chevron-down hf-caret" aria-hidden="true"></i>
+                            </button>
+                            <ul class="hf-dd-menu">
+                                <li class="<?php echo $hf_on($hf_page === 'medical-camp'); ?>">
+                                    <a href="medical-camp"><i class="fa-solid fa-house-medical" aria-hidden="true"></i>Medical Camp</a>
                                 </li>
-                                <li class="<?php echo ($current_page == 'corporate') ? 'active' : ''; ?>">
-                                    <a href="corporate">Corporate/NGO</a>
+                                <li class="<?php echo $hf_on($hf_page === 'corporate'); ?>">
+                                    <a href="corporate"><i class="fa-solid fa-building" aria-hidden="true"></i>Corporate/NGO</a>
                                 </li>
-                                <li class="<?php echo ($current_page == 'training') ? 'active' : ''; ?>">
-                                <a href="training">Training</a>
+                                <li class="<?php echo $hf_on($hf_page === 'training'); ?>">
+                                    <a href="training"><i class="fa-solid fa-graduation-cap" aria-hidden="true"></i>Training</a>
                                 </li>
-                                <li class="<?php echo ($current_page == 'about-us.php') ? 'active' : ''; ?>">
-                                    <a href="about-us">About Us</a>
+                                <li class="<?php echo $hf_on($hf_page === 'about-us'); ?>">
+                                    <a href="about-us"><i class="fa-solid fa-circle-info" aria-hidden="true"></i>About Us</a>
                                 </li>
-                                <li class="<?php echo ($current_page == 'contact.php') ? 'active' : ''; ?>">
-                                    <a href="contact">Contact Us</a>
+                                <li class="<?php echo $hf_on($hf_page === 'contact'); ?>">
+                                    <a href="contact"><i class="fa-solid fa-headset" aria-hidden="true"></i>Contact Us</a>
                                 </li>
-                                <li class="<?php echo ($current_page == 'global-care') ? 'active' : ''; ?>">
-                                    <a href="global-care">Global Care</a>
+                                <li class="<?php echo $hf_on($hf_page === 'global-care'); ?>">
+                                    <a href="global-care"><i class="fa-solid fa-earth-asia" aria-hidden="true"></i>Global Care</a>
                                 </li>
                             </ul>
                         </li>
-                        <!-- Mobile view login/signup link -->
-                        <li class="login-link">
-                            <?php if(isset($_SESSION['logged_in']) && $_SESSION['logged_in'] === true): ?>
-                                <a href="php/logout.php">Logout</a>
-                            <?php else: ?>
-                                <a href="login">Login / Signup</a>
-                            <?php endif; ?>
-                        </li>
                     </ul>
+
+                    <!-- Phone menu: buttons at the bottom -->
+                    <div class="hf-menu-foot">
+                        <a href="emergency-booking" class="hf-btn is-emergency is-block"><i class="fa-solid fa-truck-medical" aria-hidden="true"></i>Emergency</a>
+                        <?php if ($hf_logged_in): ?>
+                            <a href="php/logout.php" class="hf-btn is-ghost is-block"><i class="fa-solid fa-right-from-bracket" aria-hidden="true"></i>Logout</a>
+                        <?php else: ?>
+                            <a href="registration" class="hf-btn is-ghost is-block"><i class="isax isax-user" aria-hidden="true"></i>Register</a>
+                            <a href="login" class="hf-btn is-primary is-block"><i class="isax isax-lock" aria-hidden="true"></i>Login / Signup</a>
+                        <?php endif; ?>
+                    </div>
                 </div>
 
-                <!-- Right side navigation -->
-                <ul class="nav header-navbar-rht align-items-center">
-                    <li class="nav-item me-3 d-none d-sm-block">
-                        <a href="emergency-booking" class="btn btn-danger reg-btn">
-                            <i class="fa-solid fa-truck-medical me-2"></i>Emergency
-                        </a>
-                    </li>
-                    <?php if(isset($_SESSION['logged_in']) && $_SESSION['logged_in'] === true): ?>
+                <!-- Right side -->
+                <div class="hf-actions">
+                    <a href="emergency-booking" class="hf-btn is-emergency hf-hide-sm">
+                        <i class="fa-solid fa-truck-medical" aria-hidden="true"></i>Emergency
+                    </a>
+                    <?php if ($hf_logged_in): ?>
                         <!-- Logged in user menu -->
-                        <?php if(isset($_SESSION['user_type']) && $_SESSION['user_type'] == 'doctor'): ?>
+                        <?php if (isset($_SESSION['user_type']) && $_SESSION['user_type'] == 'doctor'): ?>
                             <!-- Doctor specific menu -->
-                            <li class="nav-item dropdown noti-nav me-3 pe-0">
-                                <a href="#" class="dropdown-toggle active-dot active-dot-danger nav-link p-0" data-bs-toggle="dropdown">
-                                    <i class="isax isax-notification-bing"></i>
+                            <div class="dropdown hf-hide-sm">
+                                <a href="#" class="hf-icon-btn" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Notifications">
+                                    <i class="isax isax-notification-bing" aria-hidden="true"></i><span class="hf-dot"></span>
                                 </a>
                                 <!-- Notification dropdown -->
-                                <div class="dropdown-menu notifications dropdown-menu-end">
+                                <div class="dropdown-menu notifications dropdown-menu-end hf-notify">
                                     <!-- ... notification content ... -->
+                                    <p>No new notifications</p>
                                 </div>
-                            </li>
-                            <li class="nav-item noti-nav me-3 pe-0">
-                                <a href="chat-doctor.html" class="nav-link active-dot active-dot-success p-0">
-                                    <i class="isax isax-message-2"></i>
-                                </a>
-                            </li>
+                            </div>
+                            <a href="chat-doctor.html" class="hf-icon-btn hf-hide-sm" aria-label="Messages">
+                                <i class="isax isax-message-2" aria-hidden="true"></i><span class="hf-dot is-green"></span>
+                            </a>
                         <?php endif; ?>
 
                         <!-- User dropdown menu -->
-                        <li class="nav-item dropdown has-arrow logged-item">
-                            <a href="#" class="nav-link ps-0" data-bs-toggle="dropdown">
-                                <span class="user-img">
-                                    <?php
-                                    $profile_image = 'assets/img/doctors-dashboard/doctor-profile-img.jpg';
-                                    $user_name = 'User';
+                        <div class="dropdown hf-user">
+                            <?php
+                            $profile_image = 'assets/img/doctors-dashboard/doctor-profile-img.jpg';
+                            $user_name = 'User';
 
-                                    if($_SESSION['user_type'] == 'doctor') {
-                                        $profile_image = $_SESSION['profile_image'] ?? $profile_image;
-                                        $user_name = $_SESSION['doctor_name'] ?? 'Doctor';
-                                    } elseif($_SESSION['user_type'] == 'healthcare') {
-                                        $profile_image = $_SESSION['profile_image'] ?? $profile_image;
-                                        $user_name = $_SESSION['healthcare_name'] ?? 'Healthcare';
-                                    } elseif($_SESSION['user_type'] == 'special_tid') {
-                                        $profile_image = $_SESSION['profile_image'] ?? $profile_image;
-                                        $user_name = $_SESSION['special_tid_name'] ?? 'Special TID User';
-                                    } elseif($_SESSION['user_type'] == 'patient') {
-                                        $profile_image = $_SESSION['profile_image'] ?? $profile_image;
-                                        $user_name = $_SESSION['patient_name'] ?? 'Patient';
-                                    }
-                                    ?>
-                                    <img class="rounded-circle" src="<?php echo htmlspecialchars($profile_image); ?>" width="31" alt="<?php echo htmlspecialchars($user_name); ?>">
-                                </span>
+                            if($_SESSION['user_type'] == 'doctor') {
+                                $profile_image = $_SESSION['profile_image'] ?? $profile_image;
+                                $user_name = $_SESSION['doctor_name'] ?? 'Doctor';
+                            } elseif($_SESSION['user_type'] == 'healthcare') {
+                                $profile_image = $_SESSION['profile_image'] ?? $profile_image;
+                                $user_name = $_SESSION['healthcare_name'] ?? 'Healthcare';
+                            } elseif($_SESSION['user_type'] == 'special_tid') {
+                                $profile_image = $_SESSION['profile_image'] ?? $profile_image;
+                                $user_name = $_SESSION['special_tid_name'] ?? 'Special TID User';
+                            } elseif($_SESSION['user_type'] == 'patient') {
+                                $profile_image = $_SESSION['profile_image'] ?? $profile_image;
+                                $user_name = $_SESSION['patient_name'] ?? 'Patient';
+                            }
+                            ?>
+                            <a href="#" class="hf-user-btn" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Account menu">
+                                <img src="<?php echo htmlspecialchars($profile_image); ?>" alt="<?php echo htmlspecialchars($user_name); ?>">
+                                <i class="fas fa-chevron-down" aria-hidden="true"></i>
                             </a>
                             <div class="dropdown-menu dropdown-menu-end">
-                                <div class="user-header">
-                                    <div class="avatar avatar-sm">
-                                        <img src="<?php echo htmlspecialchars($profile_image); ?>" alt="User Image" class="avatar-img rounded-circle">
-                                    </div>
-                                    <div class="user-text">
+                                <div class="hf-user-head">
+                                    <img src="<?php echo htmlspecialchars($profile_image); ?>" alt="User Image">
+                                    <div>
                                         <h6><?php echo htmlspecialchars($user_name); ?></h6>
-                                        <p class="text-muted mb-0">
+                                        <p>
                                             <?php
                                             echo $_SESSION['user_type'] == 'doctor' ? 'Doctor' :
                                                     ($_SESSION['user_type'] == 'healthcare' ? 'Healthcare Provider' :
@@ -263,39 +265,38 @@ $current_page = basename($_SERVER['PHP_SELF']);
                                 </div>
 
                                 <?php if($_SESSION['user_type'] == 'doctor'): ?>
-                                    <a class="dropdown-item" href="doctor-dashboard">Dashboard</a>
-                                    <a class="dropdown-item" href="doctor-profile-settings">Profile Settings</a>
+                                    <a class="dropdown-item" href="doctor-dashboard"><i class="fa-solid fa-gauge" aria-hidden="true"></i>Dashboard</a>
+                                    <a class="dropdown-item" href="doctor-profile-settings"><i class="fa-solid fa-user-gear" aria-hidden="true"></i>Profile Settings</a>
                                 <?php elseif($_SESSION['user_type'] == 'healthcare'): ?>
-                                    <a class="dropdown-item" href="health-worker-dashboard">Dashboard</a>
-                                    <a class="dropdown-item" href="health-worker-profile-settings">Profile Settings</a>
+                                    <a class="dropdown-item" href="health-worker-dashboard"><i class="fa-solid fa-gauge" aria-hidden="true"></i>Dashboard</a>
+                                    <a class="dropdown-item" href="health-worker-profile-settings"><i class="fa-solid fa-user-gear" aria-hidden="true"></i>Profile Settings</a>
                                 <?php elseif($_SESSION['user_type'] == 'special_tid'): ?>
-                                    <a class="dropdown-item" href="health-worker-dashboard">Dashboard</a>
+                                    <a class="dropdown-item" href="health-worker-dashboard"><i class="fa-solid fa-gauge" aria-hidden="true"></i>Dashboard</a>
                                 <?php elseif($_SESSION['user_type'] == 'patient'): ?>
-                                    <a class="dropdown-item" href="patient-dashboard">Dashboard</a>
-                                    <a class="dropdown-item" href="patient-medical-history">Medical History</a>
-                                    <a class="dropdown-item" href="patient-profile-settings">Profile Settings</a>
+                                    <a class="dropdown-item" href="patient-dashboard"><i class="fa-solid fa-gauge" aria-hidden="true"></i>Dashboard</a>
+                                    <a class="dropdown-item" href="patient-medical-history"><i class="fa-solid fa-notes-medical" aria-hidden="true"></i>Medical History</a>
+                                    <a class="dropdown-item" href="patient-profile-settings"><i class="fa-solid fa-user-gear" aria-hidden="true"></i>Profile Settings</a>
                                 <?php endif; ?>
 
-                                <a class="dropdown-item" href="php/logout.php">Logout</a>
+                                <a class="dropdown-item is-logout" href="php/logout.php"><i class="fa-solid fa-right-from-bracket" aria-hidden="true"></i>Logout</a>
                             </div>
-                        </li>
+                        </div>
                     <?php else: ?>
                         <!-- Guest/Non-logged in menu -->
-                        <li class="register-btn">
-                            <a href="registration" class="btn btn-dark reg-btn">
-                                <i class="isax isax-user"></i>Register
-                            </a>
-                        </li>
-                        <li class="register-btn">
-                            <a href="login" class="btn btn-primary log-btn">
-                                <i class="isax isax-lock"></i>Login
-                            </a>
-                        </li>
+                        <a href="registration" class="hf-btn is-ghost hf-hide-sm">
+                            <i class="isax isax-user" aria-hidden="true"></i>Register
+                        </a>
+                        <a href="login" class="hf-btn is-primary">
+                            <i class="isax isax-lock" aria-hidden="true"></i>Login
+                        </a>
                     <?php endif; ?>
-                </ul>
-            </nav>
+                </div>
+            </div>
         </div>
+
+        <!-- dark layer behind the phone menu -->
+        <div class="hf-backdrop" id="hf_backdrop"></div>
     </header>
-    <div class="header-margin"></div>
+    <div class="hf-spacer"></div>
 
     <!-- /Header -->
