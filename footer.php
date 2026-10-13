@@ -1,83 +1,63 @@
     <!-- Footer -->
-    <footer class="footer-twelve">
-        <div class="footer-top-sec">
-            <div class="container">
-                <div class="footer-top">
-                    <div class="logo-footer">
-                        <img src="assets/img/logo-03.png" alt="Img">
-                    </div>
-                    <div class="footer-buy-btn">
-                        <h6>Get started with TeleRx Bangladesh?</h6>
-                        <a href="doctors" class="btn btn-primary">Book Now</a>
-                    </div>
+    <footer class="hf-footer">
+        <div class="hf-wrap">
+            <!-- Call to action -->
+            <div class="hf-cta">
+                <div class="hf-cta-brand">
+                    <img src="assets/img/logo-03.png" alt="TeleRx Bangladesh">
                 </div>
-                <div class="footer-middle">
-                    <div class="row">
-                        <div class="col-lg-3 col-md-5 col-sm-6">
-                            <div class="footer-links-middle">
-                                <h4>Contact Us</h4>
-                                <ul>
-                                    <li><span><i class="feather-map-pin"></i></span>Badda, Dhaka, Bangladesh</li>
-                                    <li><span><i class="feather-phone"></i></span>+880 1836 838888</li>
-                                    <li><span><i class="feather-mail"></i></span>care@telerxbd.com</li>
-                                </ul>
-                            </div>
-                        </div>
-                        <div class="col-lg-2 col-md-3 col-sm-6">
-                            <div class="footer-links-middle">
-                                <h4>TeleRx</h4>
-                                <ul>
-                                    <li><a href="about-us">About Us</a></li>
-                                    <li><a href="blog">Blogs</a></li>
-                                    <li><a href="javascript:void(0);">Careers</a></li>
-                                    <li><a href="javascript:void(0);">Success Stories</a></li>
-                                </ul>
-                            </div>
-                        </div>
-                        <div class="col-lg-3 col-md-4 col-sm-6">
-                            <div class="footer-links-middle">
-                                <h4>Specialities</h4>
-                                <ul>
-                                    <li><a href="javascript:void(0);">Pregnancy Test</a></li>
-                                    <li><a href="javascript:void(0);">Vitamin D & B12 Combo</a></li>
-                                    <li><a href="javascript:void(0);">Cancer Screening - Male</a></li>
-                                    <li><a href="javascript:void(0);">Advanced Renal Package</a></li>
-                                </ul>
-                            </div>
-                        </div>
-                        <div class="col-lg-4 col-sm-6">
-                            <div class="footer-links-middle">
-                                <h4>Our Activities on Social Media</h4>
-                                <ul class="social-icons">
-                                    <li><a href="https://www.facebook.com/telerxbd" class="social-media"  target="_blank"><i class="fa-brands fa-facebook-f"></i></a></li>
-                                    <li><a href="https://www.youtube.com/@TeleRxBD" class="social-media"  target="_blank"><i class="fa-brands fa-youtube"></i></a></li>
-                                    <li><a href="https://www.instagram.com/telerxbd" class="social-media"  target="_blank"><i class="fa-brands fa-instagram"></i></a></li>
-                                    <li><a href="https://bd.linkedin.com/company/telerxbd" class="social-media"  target="_blank"><i class="fa-brands fa-linkedin-in"></i></a></li>
-                                </ul>
-                            </div>
-                        </div>
+                <div class="hf-cta-act">
+                    <h2>Get started with TeleRx Bangladesh?</h2>
+                    <a href="doctors">Book Now <i class="fa-solid fa-arrow-right-long" aria-hidden="true"></i></a>
+                </div>
+            </div>
+
+            <div class="hf-grid">
+                <div class="hf-col">
+                    <h4>Contact Us</h4>
+                    <ul class="hf-contact">
+                        <li><span class="hf-ic"><i class="feather-map-pin" aria-hidden="true"></i></span><span class="hf-txt">Badda, Dhaka, Bangladesh</span></li>
+                        <li><span class="hf-ic"><i class="feather-phone" aria-hidden="true"></i></span><span class="hf-txt"><a href="tel:+8801836838888">+880 1836 838888</a></span></li>
+                        <li><span class="hf-ic"><i class="feather-mail" aria-hidden="true"></i></span><span class="hf-txt"><a href="mailto:care@telerxbd.com">care@telerxbd.com</a></span></li>
+                    </ul>
+                </div>
+
+                <div class="hf-col">
+                    <h4>TeleRx</h4>
+                    <ul class="hf-links">
+                        <li><a href="about-us">About Us</a></li>
+                        <li><a href="blog">Blogs</a></li>
+                        <li><a href="javascript:void(0);">Careers</a></li>
+                        <li><a href="javascript:void(0);">Success Stories</a></li>
+                    </ul>
+                </div>
+
+                <div class="hf-col">
+                    <h4>Specialities</h4>
+                    <ul class="hf-links">
+                        <li><a href="javascript:void(0);">Pregnancy Test</a></li>
+                        <li><a href="javascript:void(0);">Vitamin D &amp; B12 Combo</a></li>
+                        <li><a href="javascript:void(0);">Cancer Screening - Male</a></li>
+                        <li><a href="javascript:void(0);">Advanced Renal Package</a></li>
+                    </ul>
+                </div>
+
+                <div class="hf-col">
+                    <h4>Our Activities on Social Media</h4>
+                    <div class="hf-social">
+                        <a href="https://www.facebook.com/telerxbd" aria-label="Facebook" target="_blank" rel="noopener"><i class="fa-brands fa-facebook-f" aria-hidden="true"></i></a>
+                        <a href="https://www.youtube.com/@TeleRxBD" aria-label="YouTube" target="_blank" rel="noopener"><i class="fa-brands fa-youtube" aria-hidden="true"></i></a>
+                        <a href="https://www.instagram.com/telerxbd" aria-label="Instagram" target="_blank" rel="noopener"><i class="fa-brands fa-instagram" aria-hidden="true"></i></a>
+                        <a href="https://bd.linkedin.com/company/telerxbd" aria-label="LinkedIn" target="_blank" rel="noopener"><i class="fa-brands fa-linkedin-in" aria-hidden="true"></i></a>
                     </div>
                 </div>
             </div>
         </div>
-    </footer>
-    <!-- /Footer -->
 
-    <!-- Footer -->
-    <footer class="footer footer-thirteen">
-         <div class="footer-bottom">
-            <div class="container">
-                <!-- Copyright -->
-                <div class="copyright">
-                    <div class="row">
-                        <div class="col-md-12">
-                            <div class="copyright-text">
-                                <p class="mb-0">Copyright &copy; <script>document.write(new Date().getFullYear());</script> TeleRx Bangladesh | All Rights Reserved</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <!-- /Copyright -->
+        <!-- Copyright -->
+        <div class="hf-bottom">
+            <div class="hf-wrap">
+                <p>Copyright &copy; <script>document.write(new Date().getFullYear());</script> TeleRx Bangladesh | All Rights Reserved</p>
             </div>
         </div>
     </footer>
@@ -124,6 +104,9 @@
 
     <!-- Custom JS -->
     <script src="assets/js/script.js"></script>
+
+    <!-- Header behaviour (menu, dropdown) -->
+    <script src="assets/js/site-chrome.js?v=<?php echo isset($hf_v) ? $hf_v : '1'; ?>"></script>
 
     <!-- Sticky Sidebar JS -->
     <script src="assets/plugins/theia-sticky-sidebar/ResizeSensor.js"></script>
