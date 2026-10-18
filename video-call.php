@@ -724,9 +724,76 @@ if ($appointment_id) {
 									</div>
 								</div>
 								<div class="col-md-12">
-									<div class="form-group mb-4">
+									<div class="form-group mb-3">
 										<label class="form-label">Diagnosis</label>
 										<input type="text" class="form-control" name="diagnosis" placeholder="Primary diagnosis" value="<?php echo htmlspecialchars($appointment['diagnosis'] ?? ''); ?>">
+									</div>
+								</div>
+
+								<!-- Investigation Section -->
+								<div class="col-md-12">
+									<div class="form-group mb-4">
+										<label class="form-label d-flex justify-content-between align-items-center">
+											<span>Investigation</span>
+											<span class="text-muted small">Clinical / Diagnostic tests</span>
+										</label>
+										<div id="investigation_list">
+											<?php 
+											$saved_investigations = [];
+											if (!empty($appointment['investigation'])) {
+												$decoded_inv = json_decode($appointment['investigation'], true);
+												if (is_array($decoded_inv)) {
+													$saved_investigations = $decoded_inv;
+												} else {
+													$inv_lines = explode("\n", str_replace("\r", "", $appointment['investigation']));
+													foreach ($inv_lines as $il) {
+														$il = trim($il);
+														if ($il !== '') $saved_investigations[] = $il;
+													}
+												}
+											}
+											if (empty($saved_investigations)) {
+												$saved_investigations = [''];
+											}
+											foreach ($saved_investigations as $inv_idx => $inv_item): 
+												$inv_val = is_array($inv_item) ? ($inv_item['name'] ?? '') : (string)$inv_item;
+											?>
+											<div class="investigation-row mt-2">
+												<div class="input-group">
+													<span class="input-group-text bg-light text-muted"><i class="fa-solid fa-flask-vial"></i></span>
+													<input type="text" class="form-control" name="investigation_name[]" placeholder="e.g. CBC, USG of whole abdomen, Chest X-Ray..." value="<?php echo htmlspecialchars($inv_val); ?>" list="investigation_suggestions">
+													<button type="button" class="btn btn-outline-danger btn-remove-investigation" title="Remove" style="<?php echo (count($saved_investigations) === 1 && empty($inv_val)) ? 'display:none;' : ''; ?>"><i class="fa-solid fa-trash"></i></button>
+												</div>
+											</div>
+											<?php endforeach; ?>
+										</div>
+										<button type="button" class="btn btn-sm btn-outline-info mt-2" id="btn_add_investigation">
+											<i class="fa-solid fa-plus me-1"></i>Add Investigation
+										</button>
+										<datalist id="investigation_suggestions">
+											<option value="Complete Blood Count (CBC)">
+											<option value="Urine R/M/E">
+											<option value="Random Blood Sugar (RBS)">
+											<option value="Fasting Blood Sugar (FBS)">
+											<option value="HbA1c">
+											<option value="Serum Creatinine">
+											<option value="Serum Uric Acid">
+											<option value="Lipid Profile">
+											<option value="SGPT / ALT">
+											<option value="SGOT / AST">
+											<option value="Serum Bilirubin">
+											<option value="Serum Electrolytes">
+											<option value="Thyroid Function Test (TSH)">
+											<option value="Chest X-Ray P/A View">
+											<option value="ECG (12 Leads)">
+											<option value="Echocardiography">
+											<option value="USG of Whole Abdomen">
+											<option value="USG of Lower Abdomen">
+											<option value="Dengue NS1 Antigen">
+											<option value="Dengue Antibody (IgM & IgG)">
+											<option value="Widal Test">
+											<option value="Stool R/M/E">
+										</datalist>
 									</div>
 								</div>
 							</div>
@@ -1318,6 +1385,49 @@ if ($appointment_id) {
 				$(this).closest('.medicine-row').remove();
 			});
 
+			// Add Investigation Row
+			$('#btn_add_investigation').click(function () {
+				const row = `
+                    <div class="investigation-row mt-2">
+                        <div class="input-group">
+                            <span class="input-group-text bg-light text-muted"><i class="fa-solid fa-flask-vial"></i></span>
+                            <input type="text" class="form-control" name="investigation_name[]" placeholder="e.g. CBC, USG of whole abdomen, Chest X-Ray..." list="investigation_suggestions">
+                            <button type="button" class="btn btn-outline-danger btn-remove-investigation" title="Remove"><i class="fa-solid fa-trash"></i></button>
+                        </div>
+                    </div>`;
+				$('#investigation_list').append(row);
+				$('#investigation_list .investigation-row:last input').focus();
+				$('#investigation_list .btn-remove-investigation').show();
+			});
+
+			// Remove Investigation Row
+			$(document).on('click', '.btn-remove-investigation', function () {
+				const rows = $('#investigation_list .investigation-row');
+				if (rows.length > 1) {
+					$(this).closest('.investigation-row').remove();
+					if ($('#investigation_list .investigation-row').length === 1 && !$('#investigation_list .investigation-row input').val()) {
+						$('#investigation_list .btn-remove-investigation').hide();
+					}
+				} else {
+					$(this).closest('.investigation-row').find('input').val('');
+					$(this).hide();
+				}
+			});
+
+			$(document).on('input', '#investigation_list input[name="investigation_name[]"]', function () {
+				if ($(this).val().trim() !== '') {
+					$(this).closest('.investigation-row').find('.btn-remove-investigation').show();
+				}
+			});
+
+			// Pressing Enter in investigation input adds another row
+			$(document).on('keydown', '#investigation_list input[name="investigation_name[]"]', function (e) {
+				if (e.key === 'Enter') {
+					e.preventDefault();
+					$('#btn_add_investigation').click();
+				}
+			});
+
 			// Toggle follow-up details visibility
 			$('input[name="has_follow_up"]').change(function() {
 				if ($(this).val() === 'yes') {
@@ -1574,6 +1684,10 @@ if ($appointment_id) {
 					name: "Dengue Fever",
 					complaints: "Fever for — days\nSevere bodyache for — days",
 					diagnosis: "Dengue Fever",
+					investigations: [
+						"Complete Blood Count (CBC)",
+						"Dengue NS1 Antigen"
+					],
 					meds: [
 						{ name: "Tab. Napa one (1gm)", dose: "১+১+১+১(জ্ব্রর/ ব্যথা হলে)", duration: "" },
 						{ name: "Tab. Pantonix 20mg", dose: "১+০+১ (খাবার ১/২ ঘন্টা আগে)", duration: "৭ দিন" },
@@ -1693,6 +1807,22 @@ if ($appointment_id) {
 				$('textarea[name="chief_complaints"]').val(tpl.complaints);
 				$('input[name="diagnosis"]').val(tpl.diagnosis);
 				$('textarea[name="advice"]').val(tpl.advice);
+
+				if (tpl.investigations && tpl.investigations.length > 0) {
+					let invHtml = '';
+					tpl.investigations.forEach(function(inv) {
+						invHtml += `
+							<div class="investigation-row mt-2">
+								<div class="input-group">
+									<span class="input-group-text bg-light text-muted"><i class="fa-solid fa-flask-vial"></i></span>
+									<input type="text" class="form-control" name="investigation_name[]" placeholder="e.g. CBC, USG of whole abdomen, Chest X-Ray..." value="${escapeHtml(inv)}" list="investigation_suggestions">
+									<button type="button" class="btn btn-outline-danger btn-remove-investigation" title="Remove"><i class="fa-solid fa-trash"></i></button>
+								</div>
+							</div>
+						`;
+					});
+					$('#investigation_list').html(invHtml);
+				}
 
 				if (tpl.meds && tpl.meds.length > 0) {
 					let medsHtml = '';

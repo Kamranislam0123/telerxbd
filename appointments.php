@@ -653,9 +653,55 @@ include 'header.php';
 									</div>
 								</div>
 								<div class="col-md-12">
-									<div class="form-group mb-4">
+									<div class="form-group mb-3">
 										<label class="form-label">Diagnosis</label>
 										<input type="text" class="form-control" name="diagnosis" id="modal_diagnosis" placeholder="Primary diagnosis">
+									</div>
+								</div>
+
+								<!-- Investigation Section -->
+								<div class="col-md-12">
+									<div class="form-group mb-4">
+										<label class="form-label d-flex justify-content-between align-items-center">
+											<span>Investigation</span>
+											<span class="text-muted small">Diagnostic tests / Lab investigations</span>
+										</label>
+										<div id="modal_investigation_list">
+											<div class="investigation-row mt-2">
+												<div class="input-group">
+													<span class="input-group-text bg-light text-muted"><i class="fa-solid fa-flask-vial"></i></span>
+													<input type="text" class="form-control" name="investigation_name[]" placeholder="e.g. CBC, USG of whole abdomen, Chest X-Ray..." list="modal_investigation_suggestions">
+													<button type="button" class="btn btn-outline-danger btn-remove-investigation" title="Remove" style="display:none;"><i class="fa-solid fa-trash"></i></button>
+												</div>
+											</div>
+										</div>
+										<button type="button" class="btn btn-sm btn-outline-info mt-2" id="modal_btn_add_investigation">
+											<i class="fa-solid fa-plus me-1"></i>Add Investigation
+										</button>
+										<datalist id="modal_investigation_suggestions">
+											<option value="Complete Blood Count (CBC)">
+											<option value="Urine R/M/E">
+											<option value="Random Blood Sugar (RBS)">
+											<option value="Fasting Blood Sugar (FBS)">
+											<option value="HbA1c">
+											<option value="Serum Creatinine">
+											<option value="Serum Uric Acid">
+											<option value="Lipid Profile">
+											<option value="SGPT / ALT">
+											<option value="SGOT / AST">
+											<option value="Serum Bilirubin">
+											<option value="Serum Electrolytes">
+											<option value="Thyroid Function Test (TSH)">
+											<option value="Chest X-Ray P/A View">
+											<option value="ECG (12 Leads)">
+											<option value="Echocardiography">
+											<option value="USG of Whole Abdomen">
+											<option value="USG of Lower Abdomen">
+											<option value="Dengue NS1 Antigen">
+											<option value="Dengue Antibody (IgM & IgG)">
+											<option value="Widal Test">
+											<option value="Stool R/M/E">
+										</datalist>
 									</div>
 								</div>
 							</div>
@@ -834,6 +880,34 @@ include 'header.php';
 								$('#modal_follow_up_details_container').hide();
 							}
 
+							// Render Investigations
+							if (d.investigations && d.investigations.length > 0) {
+								let invRowsHtml = '';
+								d.investigations.forEach(function(inv) {
+									const invName = typeof inv === 'object' && inv !== null ? (inv.name || '') : String(inv || '');
+									invRowsHtml += `
+										<div class="investigation-row mt-2">
+											<div class="input-group">
+												<span class="input-group-text bg-light text-muted"><i class="fa-solid fa-flask-vial"></i></span>
+												<input type="text" class="form-control" name="investigation_name[]" placeholder="e.g. CBC, USG of whole abdomen, Chest X-Ray..." value="${escapeHtml(invName)}" list="modal_investigation_suggestions">
+												<button type="button" class="btn btn-outline-danger btn-remove-investigation" title="Remove"><i class="fa-solid fa-trash"></i></button>
+											</div>
+										</div>
+									`;
+								});
+								$('#modal_investigation_list').html(invRowsHtml);
+							} else {
+								$('#modal_investigation_list').html(`
+									<div class="investigation-row mt-2">
+										<div class="input-group">
+											<span class="input-group-text bg-light text-muted"><i class="fa-solid fa-flask-vial"></i></span>
+											<input type="text" class="form-control" name="investigation_name[]" placeholder="e.g. CBC, USG of whole abdomen, Chest X-Ray..." list="modal_investigation_suggestions">
+											<button type="button" class="btn btn-outline-danger btn-remove-investigation" title="Remove" style="display:none;"><i class="fa-solid fa-trash"></i></button>
+										</div>
+									</div>
+								`);
+							}
+
 							// Render Medications
 							if (d.medications && d.medications.length > 0) {
 								let medRowsHtml = '';
@@ -895,6 +969,50 @@ include 'header.php';
 
 			$(document).on('click', '.btn-remove-medicine', function() {
 				$(this).closest('.medicine-row').remove();
+			});
+
+			// Add Investigation Row in Modal
+			$('#modal_btn_add_investigation').click(function () {
+				const row = `
+                    <div class="investigation-row mt-2">
+                        <div class="input-group">
+                            <span class="input-group-text bg-light text-muted"><i class="fa-solid fa-flask-vial"></i></span>
+                            <input type="text" class="form-control" name="investigation_name[]" placeholder="e.g. CBC, USG of whole abdomen, Chest X-Ray..." list="modal_investigation_suggestions">
+                            <button type="button" class="btn btn-outline-danger btn-remove-investigation" title="Remove"><i class="fa-solid fa-trash"></i></button>
+                        </div>
+                    </div>`;
+				$('#modal_investigation_list').append(row);
+				$('#modal_investigation_list .investigation-row:last input').focus();
+				$('#modal_investigation_list .btn-remove-investigation').show();
+			});
+
+			// Remove Investigation Row
+			$(document).on('click', '.btn-remove-investigation', function () {
+				const $list = $(this).closest('#modal_investigation_list, #investigation_list');
+				const rows = $list.find('.investigation-row');
+				if (rows.length > 1) {
+					$(this).closest('.investigation-row').remove();
+					if ($list.find('.investigation-row').length === 1 && !$list.find('.investigation-row input').val()) {
+						$list.find('.btn-remove-investigation').hide();
+					}
+				} else {
+					$(this).closest('.investigation-row').find('input').val('');
+					$(this).hide();
+				}
+			});
+
+			$(document).on('input', '#modal_investigation_list input[name="investigation_name[]"]', function () {
+				if ($(this).val().trim() !== '') {
+					$(this).closest('.investigation-row').find('.btn-remove-investigation').show();
+				}
+			});
+
+			// Pressing Enter in investigation input adds another row
+			$(document).on('keydown', '#modal_investigation_list input[name="investigation_name[]"]', function (e) {
+				if (e.key === 'Enter') {
+					e.preventDefault();
+					$('#modal_btn_add_investigation').click();
+				}
 			});
 
 			$('#prescription_form').submit(function(e) {

@@ -390,6 +390,40 @@ try {
                 <div class="section-header">Diagnosis:</div>
                 <div class="section-content">' . nl2br(htmlspecialchars($diagnosis)) . '<br><br></div>';
                 }
+
+                $investigation_raw = isset($appointment['investigation']) ? trim((string)$appointment['investigation']) : '';
+                $investigations = [];
+                if ($investigation_raw !== '' && $investigation_raw !== '-') {
+                    $decoded_inv = json_decode($investigation_raw, true);
+                    if (is_array($decoded_inv)) {
+                        $investigations = $decoded_inv;
+                    } else {
+                        $inv_lines = explode("\n", str_replace("\r", "", $investigation_raw));
+                        foreach ($inv_lines as $iline) {
+                            $iline = trim($iline);
+                            if ($iline !== '') {
+                                $investigations[] = $iline;
+                            }
+                        }
+                    }
+                }
+                
+                if (!empty($investigations)) {
+                    $inv_content = '';
+                    $inv_count = 1;
+                    foreach ($investigations as $inv_item) {
+                        $inv_name = is_array($inv_item) ? trim($inv_item['name'] ?? '') : trim((string)$inv_item);
+                        if ($inv_name !== '' && $inv_name !== '-') {
+                            $inv_content .= '<div style="margin-bottom: 3px;">' . $inv_count . '. ' . htmlspecialchars($inv_name) . '</div>';
+                            $inv_count++;
+                        }
+                    }
+                    if ($inv_content !== '') {
+                        $html .= '
+                <div class="section-header">Investigation:</div>
+                <div class="section-content">' . $inv_content . '<br></div>';
+                    }
+                }
                 
                 $advice = isset($appointment['advice']) ? trim((string)$appointment['advice']) : '';
                 if ($advice !== '' && $advice !== '-') {

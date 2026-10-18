@@ -9,6 +9,7 @@ $columns = [
     'chief_complaints' => 'TEXT NULL',
     'on_examination' => 'TEXT NULL',
     'diagnosis' => 'TEXT NULL',
+    'investigation' => 'TEXT NULL',
     'medications' => 'TEXT NULL', // Will store JSON or text
     'advice' => 'TEXT NULL',
     'follow_up_type' => 'VARCHAR(32) NULL',

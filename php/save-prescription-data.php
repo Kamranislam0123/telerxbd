@@ -46,6 +46,35 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $follow_up_date = null;
     }
     
+    // Process investigations into JSON
+    $investigations = [];
+    if (isset($_POST['investigation_name']) && is_array($_POST['investigation_name'])) {
+        foreach ($_POST['investigation_name'] as $inv) {
+            $inv_trim = trim((string)$inv);
+            if ($inv_trim !== '') {
+                $investigations[] = $inv_trim;
+            }
+        }
+    } elseif (isset($_POST['investigations']) && is_array($_POST['investigations'])) {
+        foreach ($_POST['investigations'] as $inv) {
+            $inv_trim = trim((string)$inv);
+            if ($inv_trim !== '') {
+                $investigations[] = $inv_trim;
+            }
+        }
+    } elseif (isset($_POST['investigation']) && is_string($_POST['investigation'])) {
+        $inv_str = trim($_POST['investigation']);
+        if ($inv_str !== '') {
+            $decoded = json_decode($inv_str, true);
+            if (is_array($decoded)) {
+                $investigations = array_values(array_filter(array_map('trim', $decoded)));
+            } else {
+                $investigations = array_values(array_filter(array_map('trim', explode("\n", str_replace("\r", "", $inv_str)))));
+            }
+        }
+    }
+    $investigation_json = !empty($investigations) ? json_encode(array_values($investigations), JSON_UNESCAPED_UNICODE) : null;
+
     // Process medications into JSON
     $medications = [];
     if (isset($_POST['medicine_name']) && is_array($_POST['medicine_name'])) {
@@ -117,12 +146,19 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         if ($sticky_col_check->num_rows === 0) {
             $conn->query("ALTER TABLE appointments ADD COLUMN sticky_note TEXT NULL");
         }
+
+        // Ensure investigation column exists
+        $inv_col_check = $conn->query("SHOW COLUMNS FROM appointments LIKE 'investigation'");
+        if ($inv_col_check->num_rows === 0) {
+            $conn->query("ALTER TABLE appointments ADD COLUMN investigation TEXT NULL");
+        }
  
         // Update appointment with prescription details
         $update_sql = "UPDATE appointments SET 
                         chief_complaints = ?, 
                         on_examination = ?, 
                         diagnosis = ?, 
+                        investigation = ?,
                         medications = ?, 
                         advice = ?,
                         note_reference = ?,
@@ -133,7 +169,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                        WHERE id = ?";
         
         $update_stmt = $conn->prepare($update_sql);
-        $update_stmt->bind_param("ssssssssssi", $chief_complaints, $on_examination, $diagnosis, $meds_json, $advice, $note_reference, $prescription_footer, $follow_up_type, $follow_up_date, $sticky_note, $appointment_id);
+        $update_stmt->bind_param("sssssssssssi", $chief_complaints, $on_examination, $diagnosis, $investigation_json, $meds_json, $advice, $note_reference, $prescription_footer, $follow_up_type, $follow_up_date, $sticky_note, $appointment_id);
         
         if ($update_stmt->execute()) {
             ob_clean();

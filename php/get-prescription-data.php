@@ -35,7 +35,13 @@ try {
         $conn->query("ALTER TABLE appointments ADD COLUMN sticky_note TEXT NULL");
     }
 
-    $stmt = $conn->prepare("SELECT id, patient_name, chief_complaints, on_examination, diagnosis, medications, advice, note_reference, prescription_footer, follow_up_type, follow_up_date, sticky_note FROM appointments WHERE id = ? AND doctor_id = ?");
+    // Ensure investigation column exists
+    $inv_col_check = $conn->query("SHOW COLUMNS FROM appointments LIKE 'investigation'");
+    if ($inv_col_check->num_rows === 0) {
+        $conn->query("ALTER TABLE appointments ADD COLUMN investigation TEXT NULL");
+    }
+
+    $stmt = $conn->prepare("SELECT id, patient_name, chief_complaints, on_examination, diagnosis, investigation, medications, advice, note_reference, prescription_footer, follow_up_type, follow_up_date, sticky_note FROM appointments WHERE id = ? AND doctor_id = ?");
     $stmt->bind_param("ii", $appointment_id, $doctor_id);
     $stmt->execute();
     $res = $stmt->get_result();
@@ -54,6 +60,21 @@ try {
 
     $medications = json_decode($data['medications'] ?? '', true) ?: [];
 
+    // Parse investigations
+    $investigations = [];
+    if (!empty($data['investigation'])) {
+        $decoded_inv = json_decode($data['investigation'], true);
+        if (is_array($decoded_inv)) {
+            $investigations = $decoded_inv;
+        } else {
+            $lines = explode("\n", str_replace("\r", "", $data['investigation']));
+            foreach ($lines as $l) {
+                $l = trim($l);
+                if ($l !== '') $investigations[] = $l;
+            }
+        }
+    }
+
     ob_clean();
     echo json_encode([
         'success' => true,
@@ -63,6 +84,8 @@ try {
             'chief_complaints' => $data['chief_complaints'] ?? '',
             'on_examination' => $data['on_examination'] ?? '',
             'diagnosis' => $data['diagnosis'] ?? '',
+            'investigation' => $data['investigation'] ?? '',
+            'investigations' => $investigations,
             'medications' => $medications,
             'advice' => $data['advice'] ?? '',
             'note_reference' => $data['note_reference'] ?? '',
