@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 /**
  * Patient Medical History FORM - TeleRx Bangladesh
  * Multi-tab form: Save and Next -> ... -> Save and Finish -> Generate PDF Now
@@ -143,7 +143,7 @@ $state = array(
 );
 $state_json = json_encode($state, JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT);
 
-$asset_v = '1';   // change this number if you edit the CSS/JS and the browser keeps showing the old one
+$asset_v = '5';   // change this number if you edit the CSS/JS and the browser keeps showing the old one
 
 include 'header.php';
 ?>

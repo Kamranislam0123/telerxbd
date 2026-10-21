@@ -102,80 +102,77 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         }
     }
 }
+
+$hm_asset_v = '1';   // change this number after editing the CSS/JS if the browser keeps showing the old design
 ?>
 
-<style>
-.quote-wrapper{
-    max-width:700px;
-    margin:100px auto;
-    background:#ffffff;
-    padding:40px;
-    border-radius:8px;
-    box-shadow:0 8px 25px rgba(0,0,0,0.08);
-}
-.quote-wrapper h2{
-    margin-bottom:25px;
-    text-align:center;
-}
-.quote-wrapper input,
-.quote-wrapper textarea{
-    width:100%;
-    padding:12px;
-    margin-bottom:15px;
-    border:1px solid #ddd;
-    border-radius:6px;
-}
-.quote-wrapper button{
-    width:100%;
-    padding:14px;
-    background-image: linear-gradient(90.08deg, #15558d 0.09%, #0c77c9 70.28%);
-    color:#fff;
-    border:none;
-    border-radius:6px;
-    cursor:pointer;
-}
-.quote-wrapper button:hover{
-    background:#15558d;
-}
-.success{
-    background:#e6fffa;
-    color:#065f46;
-    padding:10px;
-    margin-bottom:15px;
-}
-.error{
-    background:#fee2e2;
-    color:#991b1b;
-    padding:10px;
-    margin-bottom:15px;
-}
-</style>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/css/home-modern.css?v=<?php echo $hm_asset_v; ?>">
+<link rel="stylesheet" href="assets/css/pages-modern.css?v=<?php echo $hm_asset_v; ?>">
 
-<div class="quote-wrapper">
-    <h2>Tell Us About Your Problem</h2>
+<main class="hm">
+<script>document.documentElement.classList.add('hm-js');</script>
 
-    <?php if($success) echo "<div class='success'>$success</div>"; ?>
-    <?php if($error) echo "<div class='error'>$error</div>"; ?>
+<section class="hm-hero pgx-center pgx-hero-pad" aria-label="Global Care">
+    <div class="hm-wrap hm-hero-grid">
+        <div class="hm-hero-copy">
+            <span class="hm-kicker hm-reveal"><i class="fa-solid fa-earth-asia" aria-hidden="true"></i> Global Care</span>
+            <h1 class="hm-reveal" style="--d:.05s;margin-top:12px">Tell Us About <span class="hm-grad">Your Problem</span></h1>
+        </div>
+    </div>
+</section>
 
-<form method="POST" enctype="multipart/form-data">
+<section class="hm-section" style="padding-top:8px">
+    <div class="hm-wrap" style="max-width:760px">
+        <div class="pgx-card hm-reveal">
+            <div class="pgx-card-head">
+                <span class="pgx-card-ic"><i class="fa-solid fa-file-medical" aria-hidden="true"></i></span>
+                <h2>Tell Us About Your Problem</h2>
+            </div>
 
-<input type="text" name="name" placeholder="Full Name *" required>
-<input type="text" name="phone" placeholder="Mobile Number *" required>
-<input type="email" name="email" placeholder="Email (Optional)">
+            <form class="pgx-form" method="POST" enctype="multipart/form-data">
+                <?php if($success) echo "<div class='pgx-alert is-ok'>$success</div>"; ?>
+                <?php if($error) echo "<div class='pgx-alert is-err'>$error</div>"; ?>
 
-<label style="font-size: 13px;">Attach File (Optional - PDF/JPG/PNG, Max 5MB each)</label>
-<input type="file" name="attachment[]" multiple>
+                <div class="pgx-field">
+                    <label for="gc_name">Full Name <em>*</em></label>
+                    <input type="text" id="gc_name" name="name" class="pgx-control" placeholder="Full Name *" required>
+                </div>
+                <div class="pgx-field">
+                    <label for="gc_phone">Mobile Number <em>*</em></label>
+                    <input type="text" id="gc_phone" name="phone" class="pgx-control" placeholder="Mobile Number *" required>
+                </div>
+                <div class="pgx-field is-full">
+                    <label for="gc_email">Email (Optional)</label>
+                    <input type="email" id="gc_email" name="email" class="pgx-control" placeholder="Email (Optional)">
+                </div>
+                <div class="pgx-field is-full">
+                    <label for="gc_file">Attach File</label>
+                    <input type="file" id="gc_file" name="attachment[]" class="pgx-control" multiple>
+                    <span class="pgx-hint">Optional - PDF/JPG/PNG, Max 5MB each</span>
+                </div>
+                <div class="pgx-field is-full">
+                    <label for="gc_desc">Description <em>*</em></label>
+                    <textarea id="gc_desc" name="description" class="pgx-control" rows="5" placeholder="Description *" required></textarea>
+                </div>
 
-<textarea name="description" rows="5" placeholder="Description *" required></textarea>
+                <div class="pgx-captcha">
+                    <div class="g-recaptcha" data-sitekey="<?php echo $siteKey; ?>"></div>
+                </div>
 
-<div class="g-recaptcha" data-sitekey="<?php echo $siteKey; ?>"></div>
-<br>
+                <div class="pgx-submit">
+                    <button type="submit" class="hm-btn">Send Quote <i class="fa-solid fa-paper-plane" aria-hidden="true"></i></button>
+                </div>
+            </form>
+        </div>
+    </div>
+</section>
 
-<button type="submit">Send Quote</button>
-
-</form>
-</div>
+</main>
 
 <script src="https://www.google.com/recaptcha/api.js" async defer></script>
+<script defer src="assets/js/home-modern.js?v=<?php echo $hm_asset_v; ?>"></script>
 
-<?php include('footer.php'); ?>
+<?php include 'footer.php'; ?>

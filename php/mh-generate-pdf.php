@@ -119,6 +119,16 @@ try {
         table.kv td { border: 1px solid #d3dce8; padding: 5px 7px; font-size: 10pt; vertical-align: top; }
         table.kv td.k { background-color: #eef4fb; color: #334155; font-weight: bold; width: 22%; }
         table.kv td.v { width: 28%; color: #111827; }
+        table.kv td.sk { background-color: #dbe8f6; color: #15558d; width: auto; }
+        .sub { font-size: 10pt; font-weight: bold; color: #334155; margin-top: 8px; margin-bottom: 3px; }
+        table.grid { width: 100%; border-collapse: collapse; }
+        table.grid th { background-color: #15558d; color: #ffffff; font-size: 10pt; font-weight: bold; text-align: left; padding: 5px 6px; border: 1px solid #15558d; }
+        table.grid td { border: 1px solid #d3dce8; padding: 5px 6px; font-size: 10pt; vertical-align: top; color: #111827; }
+        table.grid tr.alt td { background-color: #f6f9fd; }
+        table.grid td.none { text-align: center; color: #64748b; font-style: italic; }
+        .muted { color: #94a3b8; }
+        .callout { margin-top: 10px; border: 1px solid #f3d19c; border-left: 4px solid #d97706; background-color: #fffaf0; padding: 7px 10px; font-size: 10pt; line-height: 1.5; }
+        .callout-title { font-weight: bold; color: #92400e; margin-bottom: 3px; }
         .empty-note { border: 1px dashed #cbd5e1; padding: 18px; text-align: center; color: #64748b; margin-top: 14px; font-size: 10pt; }
     ';
 

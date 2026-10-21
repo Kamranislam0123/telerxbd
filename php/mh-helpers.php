@@ -54,9 +54,9 @@ function mh_sections()
 {
     return array(
         1 => array('title' => 'Patient Information', 'file' => 'section-1.php'),
-        2 => array('title' => 'Tab 2', 'file' => 'section-placeholder.php'),
-        3 => array('title' => 'Tab 3', 'file' => 'section-placeholder.php'),
-        4 => array('title' => 'Tab 4', 'file' => 'section-placeholder.php'),
+        2 => array('title' => 'Complaint & Risk Factors', 'file' => 'section-2.php'),
+        3 => array('title' => 'Illness History', 'file' => 'section-3.php'),
+        4 => array('title' => 'Medication & Family', 'file' => 'section-4.php'),
         5 => array('title' => 'Tab 5', 'file' => 'section-placeholder.php'),
         6 => array('title' => 'Tab 6', 'file' => 'section-placeholder.php'),
     );
@@ -130,6 +130,87 @@ function mh_clean_text($value, $max = 255)
         $clean = substr($clean, 0, $max);
     }
     return $clean;
+}
+
+/** Like mh_clean_text() but keeps line breaks (for big text boxes). */
+function mh_clean_multiline($value, $max = 2000)
+{
+    if (is_array($value) || is_object($value)) {
+        return '';
+    }
+    $v = str_replace(array("\r\n", "\r"), "\n", (string)$value);
+    $lines = array();
+    foreach (explode("\n", $v) as $line) {
+        $line = mh_clean_text($line, $max);
+        if ($line !== '') {
+            $lines[] = $line;
+        }
+    }
+    $clean = implode("\n", $lines);
+    if (function_exists('mb_substr')) {
+        $clean = mb_substr($clean, 0, $max, 'UTF-8');
+    } else {
+        $clean = substr($clean, 0, $max);
+    }
+    return $clean;
+}
+
+/** Keeps only the values of $raw that are in $allowed (in the order of $allowed). */
+function mh_pick_many($raw, $allowed)
+{
+    if (!is_array($raw)) {
+        $raw = ($raw === null || $raw === '') ? array() : array($raw);
+    }
+    $out = array();
+    foreach ($allowed as $a) {
+        if (in_array($a, $raw, true)) {
+            $out[] = $a;
+        }
+    }
+    return $out;
+}
+
+/**
+ * Cleans the rows of a "+ add row" table.
+ * $spec = array( key => array('text', maxLength) | array('pick', allowedList) | array('many', allowedList) | array('bool') )
+ * Rows where every value is empty are dropped.
+ */
+function mh_clean_rows($raw, $spec, $max_rows = 30)
+{
+    $rows = array();
+    if (!is_array($raw)) {
+        return $rows;
+    }
+    foreach ($raw as $item) {
+        if (!is_array($item)) {
+            continue;
+        }
+        $row = array();
+        $filled = false;
+        foreach ($spec as $key => $rule) {
+            $v = isset($item[$key]) ? $item[$key] : null;
+            if ($rule[0] === 'text') {
+                $row[$key] = mh_clean_text($v, $rule[1]);
+                $filled = $filled || $row[$key] !== '';
+            } elseif ($rule[0] === 'pick') {
+                $row[$key] = mh_pick($v, $rule[1], '');
+                $filled = $filled || $row[$key] !== '';
+            } elseif ($rule[0] === 'many') {
+                $row[$key] = mh_pick_many($v, $rule[1]);
+                $filled = $filled || count($row[$key]) > 0;
+            } else {   // bool
+                $row[$key] = ($v === '1' || $v === 1 || $v === true) ? 1 : 0;
+                $filled = $filled || $row[$key] === 1;
+            }
+        }
+        if ($filled) {
+            $rows[] = $row;
+        }
+        if (count($rows) >= $max_rows) {
+            break;
+        }
+    }
+    return $rows;
 }
 
 /** Returns $value only if it is one of $allowed, otherwise $default. */
@@ -557,6 +638,77 @@ function mh_pdf_pair($label, $value, $colspan = 1)
     $v = ($value === '' || $value === null) ? '&mdash;' : mh_h($value);
     $span = ($colspan > 1) ? ' colspan="' . (int)$colspan . '"' : '';
     return '<td class="k">' . mh_h($label) . '</td><td class="v"' . $span . '>' . $v . '</td>';
+}
+
+/** Text with line breaks, or a dash when empty. */
+function mh_pdf_text($text)
+{
+    $text = trim((string)$text);
+    return $text === '' ? '&mdash;' : nl2br(mh_h($text));
+}
+
+/** Label + long value rows (label 25%, value 75%). $rows = list of array(label, ALREADY ESCAPED html) */
+function mh_pdf_wide($rows)
+{
+    $html = '<table class="kv">';
+    foreach ($rows as $r) {
+        $html .= '<tr><td class="k" width="25%">' . mh_h($r[0]) . '</td><td class="v" width="75%">' . $r[1] . '</td></tr>';
+    }
+    return $html . '</table>';
+}
+
+/** "A, B, C" from a list, or a dash when empty. */
+function mh_pdf_list($items, $sep = ', ')
+{
+    if (!is_array($items) || count($items) === 0) {
+        return '&mdash;';
+    }
+    return mh_h(implode($sep, $items));
+}
+
+/**
+ * A table with a header row. $headers = array('Title' => 'width%', ...),
+ * $rows = list of rows, each row a list of ALREADY ESCAPED cell HTML.
+ */
+function mh_pdf_table($headers, $rows, $empty_text = 'Not recorded.')
+{
+    $html = '<table class="grid"><thead><tr>';
+    foreach ($headers as $title => $width) {
+        $html .= '<th width="' . mh_h($width) . '">' . mh_h($title) . '</th>';
+    }
+    $html .= '</tr></thead><tbody>';
+    if (count($rows) === 0) {
+        $html .= '<tr><td colspan="' . count($headers) . '" class="none">' . mh_h($empty_text) . '</td></tr>';
+    }
+    foreach ($rows as $i => $cells) {
+        $html .= '<tr' . ($i % 2 === 1 ? ' class="alt"' : '') . '>';
+        foreach ($cells as $cell) {
+            $html .= '<td>' . ($cell === '' ? '&mdash;' : $cell) . '</td>';
+        }
+        $html .= '</tr>';
+    }
+    return $html . '</tbody></table>';
+}
+
+/* ---------------------------------------------------------------------
+ * FORM HELPERS (tick boxes and choice buttons used by tabs 2, 3, 4)
+ * ------------------------------------------------------------------- */
+/** One tick box / choice button: $type = 'checkbox' or 'radio' */
+function mh_form_check($type, $name, $value, $label, $extra = '')
+{
+    return '<label class="mhf-check"><input type="' . $type . '" name="' . mh_h($name) . '" value="' . mh_h($value) . '"' . ($extra !== '' ? ' ' . $extra : '') . '>'
+         . '<span>' . mh_h($label) . '</span></label>';
+}
+
+/** The "Doctor asks" box. Shown on the website only, never printed in the PDF. */
+function mh_form_ask($questions)
+{
+    $html = '<div class="mhf-ask"><div class="mhf-ask-head"><i class="fa-solid fa-user-doctor" aria-hidden="true"></i> Doctor asks'
+          . '<span class="mhf-ask-note">Not printed in the PDF</span></div><ol class="mhf-ask-list">';
+    foreach ($questions as $q) {
+        $html .= '<li>&ldquo;' . mh_h($q) . '&rdquo;</li>';
+    }
+    return $html . '</ol></div>';
 }
 
 /** Text shown when the database tables are missing or old */
