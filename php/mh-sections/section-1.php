@@ -175,73 +175,7 @@ if ($mh_mode === 'form') {
 <!-- ====== Consultation ====== -->
 <div class="mhf-group">Consultation</div>
 
-<!-- Line 5 (a): main complaint -->
-<div class="mhf-row">
-    <div class="mhf-field mhf-full" data-field="main_complaint" data-required="1">
-        <label class="mhf-label" for="mh_main_complaint">Main complaint <span class="mhf-req">*</span></label>
-        <div class="mhf-complaint" id="mh_complaint_wrap">
-            <select id="mh_main_complaint" name="main_complaint[]" multiple="multiple" class="mhf-complaint-select">
-                <option value="Fever (জ্বর)">Fever (জ্বর)</option>
-                <option value="Cough (কাশি)">Cough (কাশি)</option>
-                <option value="Cold / Runny nose (সর্দি)">Cold / Runny nose (সর্দি)</option>
-                <option value="Sore throat (গলাব্যথা)">Sore throat (গলাব্যথা)</option>
-                <option value="Headache (মাথাব্যথা)">Headache (মাথাব্যথা)</option>
-                <option value="Dizziness (মাথা ঘোরা)">Dizziness (মাথা ঘোরা)</option>
-                <option value="Weakness / Fatigue (দুর্বলতা)">Weakness / Fatigue (দুর্বলতা)</option>
-                <option value="Insomnia (অনিদ্রা)">Insomnia (অনিদ্রা)</option>
-                <option value="Anxiety (দুশ্চিন্তা)">Anxiety (দুশ্চিন্তা)</option>
-                <option value="Depression (বিষণ্নতা)">Depression (বিষণ্নতা)</option>
-                <option value="Chest pain (বুকে ব্যথা)">Chest pain (বুকে ব্যথা)</option>
-                <option value="Breathlessness (শ্বাসকষ্ট)">Breathlessness (শ্বাসকষ্ট)</option>
-                <option value="Palpitation (বুক ধড়ফড়)">Palpitation (বুক ধড়ফড়)</option>
-                <option value="High blood pressure (উচ্চ রক্তচাপ)">High blood pressure (উচ্চ রক্তচাপ)</option>
-                <option value="Low blood pressure (নিম্ন রক্তচাপ)">Low blood pressure (নিম্ন রক্তচাপ)</option>
-                <option value="Heart disease (হৃদরোগ)">Heart disease (হৃদরোগ)</option>
-                <option value="Diabetes (ডায়াবেটিস)">Diabetes (ডায়াবেটিস)</option>
-                <option value="Thyroid problem (থাইরয়েড)">Thyroid problem (থাইরয়েড)</option>
-                <option value="Asthma (হাঁপানি)">Asthma (হাঁপানি)</option>
-                <option value="Tuberculosis - TB (যক্ষা)">Tuberculosis - TB (যক্ষা)</option>
-                <option value="Abdominal pain (পেটে ব্যথা)">Abdominal pain (পেটে ব্যথা)</option>
-                <option value="Vomiting (বমি)">Vomiting (বমি)</option>
-                <option value="Nausea (বমি বমি ভাব)">Nausea (বমি বমি ভাব)</option>
-                <option value="Diarrhoea (ডায়রিয়া)">Diarrhoea (ডায়রিয়া)</option>
-                <option value="Constipation (কোষ্ঠকাঠিন্য)">Constipation (কোষ্ঠকাঠিন্য)</option>
-                <option value="Gastric / Acidity (গ্যাস্ট্রিক)">Gastric / Acidity (গ্যাস্ট্রিক)</option>
-                <option value="Loss of appetite (ক্ষুধামান্দ্য)">Loss of appetite (ক্ষুধামান্দ্য)</option>
-                <option value="Jaundice (জন্ডিস)">Jaundice (জন্ডিস)</option>
-                <option value="Piles (অর্শ)">Piles (অর্শ)</option>
-                <option value="Back pain (কোমরে ব্যথা)">Back pain (কোমরে ব্যথা)</option>
-                <option value="Neck pain (ঘাড়ে ব্যথা)">Neck pain (ঘাড়ে ব্যথা)</option>
-                <option value="Joint pain (জয়েন্টে ব্যথা)">Joint pain (জয়েন্টে ব্যথা)</option>
-                <option value="Muscle pain (মাংসপেশিতে ব্যথা)">Muscle pain (মাংসপেশিতে ব্যথা)</option>
-                <option value="Skin problem / Itching (চর্মরোগ / চুলকানি)">Skin problem / Itching (চর্মরোগ / চুলকানি)</option>
-                <option value="Allergy (অ্যালার্জি)">Allergy (অ্যালার্জি)</option>
-                <option value="Burning urination / UTI (প্রস্রাবে জ্বালাপোড়া)">Burning urination / UTI (প্রস্রাবে জ্বালাপোড়া)</option>
-                <option value="Frequent urination (ঘন ঘন প্রস্রাব)">Frequent urination (ঘন ঘন প্রস্রাব)</option>
-                <option value="Kidney problem (কিডনির সমস্যা)">Kidney problem (কিডনির সমস্যা)</option>
-                <option value="Swelling (ফোলা)">Swelling (ফোলা)</option>
-                <option value="Weight loss (ওজন কমে যাওয়া)">Weight loss (ওজন কমে যাওয়া)</option>
-                <option value="Weight gain (ওজন বেড়ে যাওয়া)">Weight gain (ওজন বেড়ে যাওয়া)</option>
-                <option value="Eye problem (চোখের সমস্যা)">Eye problem (চোখের সমস্যা)</option>
-                <option value="Ear pain (কানে ব্যথা)">Ear pain (কানে ব্যথা)</option>
-                <option value="Toothache (দাঁতে ব্যথা)">Toothache (দাঁতে ব্যথা)</option>
-                <option value="Dengue (ডেঙ্গু)">Dengue (ডেঙ্গু)</option>
-                <option value="Typhoid (টাইফয়েড)">Typhoid (টাইফয়েড)</option>
-                <option value="Seizure / Fits (খিঁচুনি)">Seizure / Fits (খিঁচুনি)</option>
-                <option value="Stroke / Paralysis (স্ট্রোক)">Stroke / Paralysis (স্ট্রোক)</option>
-                <option value="Pregnancy check-up (গর্ভকালীন চেকআপ)">Pregnancy check-up (গর্ভকালীন চেকআপ)</option>
-                <option value="Menstrual problem (মাসিকের সমস্যা)">Menstrual problem (মাসিকের সমস্যা)</option>
-                <option value="Child health / Growth (শিশুর স্বাস্থ্য)">Child health / Growth (শিশুর স্বাস্থ্য)</option>
-                <option value="Injury / Wound (আঘাত)">Injury / Wound (আঘাত)</option>
-                <option value="Cancer (ক্যান্সার)">Cancer (ক্যান্সার)</option>
-            </select>
-        </div>
-        <div class="mhf-hint">Type to search, pick from the list, or type your own and press Enter. You can add more than one.</div>
-        <div class="mhf-error" data-error-for="main_complaint"></div>
-    </div>
-</div>
-
-<!-- Line 5 (b): consultation details -->
+<!-- Line 5: consultation details -->
 <div class="mhf-row">
     <div class="mhf-field" data-field="consultation_type" data-required="1">
         <label class="mhf-label" for="mh_consultation_type">Consultation type <span class="mhf-req">*</span></label>
@@ -394,32 +328,6 @@ if ($mh_mode === 'save') {
     }
 
     // ---- Line 5 ----
-    $raw = isset($in['main_complaint']) ? $in['main_complaint'] : array();
-    if (!is_array($raw)) {
-        $raw = array($raw);
-    }
-    $complaints = array();
-    $seen = array();
-    foreach ($raw as $item) {
-        $c = mh_clean_text($item, 100);
-        if ($c === '') {
-            continue;
-        }
-        $key = function_exists('mb_strtolower') ? mb_strtolower($c, 'UTF-8') : strtolower($c);
-        if (isset($seen[$key])) {
-            continue;
-        }
-        $seen[$key] = true;
-        $complaints[] = $c;
-        if (count($complaints) >= 15) {
-            break;
-        }
-    }
-    $d['main_complaint'] = $complaints;
-    if (count($complaints) === 0) {
-        $e['main_complaint'] = 'Add at least one main complaint.';
-    }
-
     $d['consultation_type'] = mh_pick(isset($in['consultation_type']) ? $in['consultation_type'] : '', array('New', 'Follow-up', 'Emergency'), '');
     if ($d['consultation_type'] === '') {
         $e['consultation_type'] = 'Select an option.';
@@ -473,8 +381,6 @@ if ($mh_mode === 'pdf') {
         $occupation = 'Others (' . $g('occupation_other') . ')';
     }
 
-    $complaints = (isset($d['main_complaint']) && is_array($d['main_complaint'])) ? $d['main_complaint'] : array();
-
     echo '<div class="sec-title">' . (int)$mh_no . '. ' . mh_h($mh_title) . '</div>';
 
     // Patient details
@@ -509,17 +415,6 @@ if ($mh_mode === 'pdf') {
     // Consultation
     echo mh_pdf_group('Consultation');
     echo '<table class="kv">';
-    $complaint_html = '';
-    if (count($complaints) > 0) {
-        $parts = array();
-        foreach ($complaints as $i => $c) {
-            $parts[] = ($i + 1) . '. ' . mh_h($c);
-        }
-        $complaint_html = implode('<br />', $parts);
-    } else {
-        $complaint_html = '&mdash;';
-    }
-    echo '<tr><td class="k">Main Complaint</td><td class="v" colspan="3">' . $complaint_html . '</td></tr>';
     echo '<tr>' . mh_pdf_pair('Consultation Type', $g('consultation_type')) . mh_pdf_pair('Source of History', $g('source_of_history')) . '</tr>';
     echo '<tr>' . mh_pdf_pair('Reliability', $g('reliability')) . mh_pdf_pair('Urgency', $g('urgency')) . '</tr>';
     echo '</table>';

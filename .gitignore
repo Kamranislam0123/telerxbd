@@ -23,3 +23,11 @@ info.php
 # Environment variables
 .env
 .env.*
+.idea/telerx.iml
+.idea/laravel-idea.xml
+.idea/modules.xml
+.idea/phpunit.xml
+.idea/php.xml
+.vscode/settings.json
+.vscode/settings.json
+.vscode/settings.json

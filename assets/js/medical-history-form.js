@@ -1,6 +1,7 @@
 /**
  * TeleRx Bangladesh - Patient Medical History Form
- * Tabs, "Save and Next", Tab 1 behaviour (age, age group, BMI, show/hide fields, complaint search).
+ * Tabs, "Save and Next", Tab 1 behaviour (age, age group, BMI, show/hide fields),
+ * "+ add row" tables, tick-to-text boxes and the risk factor summary of tabs 2-4.
  *
  * Needs (already loaded by footer.php): jQuery, moment, bootstrap-datetimepicker, select2.
  * The page gives us the saved data in window.MH_STATE.
@@ -193,11 +194,12 @@ if (typeof window !== 'undefined') { window.MHCalc = MHCalc; }
             var $field = $msg.closest('.mhf-field');
             $field.addClass('has-error');
             $f.find('[name="' + name + '"], [name="' + name + '[]"]').attr('aria-invalid', 'true');
-            if (!firstField) { firstField = { $field: $field, name: name }; }
+            // errors of a "+ add row" table sit next to the table, not inside a field
+            if (!firstField) { firstField = { $field: $field.length ? $field : $msg.prev().add($msg).first(), name: name }; }
         });
         if (firstField) {
-            var el = firstField.$field.find('input:visible:not([readonly]), select:visible, .select2-search__field').first();
-            if (!el.length) { el = firstField.$field.find('input, select').first(); }
+            var el = firstField.$field.find('input:visible:not([readonly]), select:visible, textarea:visible, .select2-search__field').first();
+            if (!el.length) { el = firstField.$field.find('input, select, textarea').first(); }
             try { el.trigger('focus'); } catch (e) { /* ignore */ }
             var top = firstField.$field.offset().top - 150;
             $('html, body').animate({ scrollTop: Math.max(0, top) }, 200);
@@ -211,6 +213,11 @@ if (typeof window !== 'undefined') { window.MHCalc = MHCalc; }
             $field.removeClass('has-error').find('.mhf-error').text('');
             $field.find('[aria-invalid]').removeAttr('aria-invalid');
         }
+    });
+    // typing in a "+ add row" table clears the table's error message
+    $(document).on('input change', '.mhf-form [data-rows]', function () {
+        var key = $(this).data('rows');
+        $(this).closest('.mhf-form').find('.mhf-error[data-error-for="' + key + '"]').text('');
     });
 
     // Enter key must never submit/reload the page
@@ -232,6 +239,10 @@ if (typeof window !== 'undefined') { window.MHCalc = MHCalc; }
                 var $c = $(this);
                 if ($c.is(':disabled')) { return; }
                 var name = ($c.attr('name') || '').replace('[]', '');
+                if ($c.is(':radio, :checkbox')) {   // a group of choices: one of them must be ticked
+                    if (!$field.find('[name="' + $c.attr('name') + '"]:checked').length) { errs[name] = 'Select an option.'; }
+                    return;
+                }
                 var v = $c.val();
                 var empty = $.isArray(v) ? v.length === 0 : $.trim(v === null || v === undefined ? '' : String(v)) === '';
                 if (empty) {
@@ -246,26 +257,154 @@ if (typeof window !== 'undefined') { window.MHCalc = MHCalc; }
     }
 
     /* ---------- hydrate (fill the fields with saved answers) ---------- */
-    function hydrate(n, data) {
-        var $f = $form(n);
-        $.each(data || {}, function (key, val) {
-            if ($.isArray(val)) {
-                var $multi = $f.find('[name="' + key + '[]"]');
-                if ($multi.length) {
-                    $.each(val, function (i, item) {
-                        var exists = false;
-                        $multi.find('option').each(function () { if (this.value === item) { exists = true; } });
-                        if (!exists) { $multi.append(new Option(item, item, false, false)); }
-                    });
-                    $multi.val(val).trigger('change');
-                }
+    function str(v) { return v === null || v === undefined ? '' : String(v); }
+
+    /** Puts one saved value back into the field(s) called `name` (handles nested names like risk[cardio][]). */
+    function fillNamed($f, name, val) {
+        if ($.isArray(val)) {
+            var $rows = $f.find('[data-rows="' + name + '"]');
+            if ($rows.length) {   // a "+ add row" table
+                $.each(val, function (i, row) { Dyn.addRow($f, name, row); });
                 return;
             }
-            var $el = $f.find('[name="' + key + '"]');
-            if ($el.length) { $el.val(val === null || val === undefined ? '' : String(val)); }
-        });
+            var $many = $f.find('[name="' + name + '[]"]');
+            if ($many.is(':checkbox')) {
+                $many.each(function () { this.checked = val.indexOf(this.value) !== -1; });
+            } else if ($many.is('select')) {
+                $.each(val, function (i, item) {
+                    var exists = false;
+                    $many.find('option').each(function () { if (this.value === item) { exists = true; } });
+                    if (!exists) { $many.append(new Option(item, item, false, false)); }
+                });
+                $many.val(val).trigger('change');
+            }
+            return;
+        }
+        if (val !== null && typeof val === 'object') {
+            $.each(val, function (k, v) { fillNamed($f, name + '[' + k + ']', v); });
+            return;
+        }
+        var $el = $f.find('[name="' + name + '"]');
+        if ($el.is(':radio, :checkbox')) {
+            $el.each(function () { this.checked = this.value === str(val); });
+        } else if ($el.length) {
+            $el.val(str(val));
+        }
+    }
+
+    function hydrate(n, data) {
+        var $f = $form(n);
+        $.each(data || {}, function (key, val) { fillNamed($f, key, val); });
         if (hooks[n] && hooks[n].afterHydrate) { hooks[n].afterHydrate($f); }
     }
+
+    /* ---------------------------------------------------------------------
+     * SHARED BEHAVIOUR FOR TABS 2, 3, 4
+     *   data-rows / data-repeat-add / data-repeat-remove -> "+ add row" tables
+     *   data-show="#id"               -> tick box / choice that shows a part of the form
+     *   data-show-in-row=".class"     -> same, but inside its own row
+     *   data-append-to="#textarea"    -> ticked text is written into the box (one per line)
+     * ------------------------------------------------------------------- */
+    var Dyn = (function () {
+        var counter = 0;
+
+        function fillRow($row, data) {
+            $row.find('[data-k]').each(function () {
+                var k = $(this).data('k');
+                var v = data ? data[k] : undefined;
+                if ($(this).is(':radio, :checkbox')) {
+                    this.checked = $.isArray(v) ? v.indexOf(this.value) !== -1 : this.value === str(v);
+                } else {
+                    $(this).val(str(v));
+                }
+            });
+        }
+
+        function renumber($list) {
+            $list.children('[data-row]').each(function (i) { $(this).find('[data-row-no]').first().text(i + 1); });
+        }
+
+        function addRow($f, key, data) {
+            var tpl = document.getElementById('mh-tpl-' + key);
+            var $list = $f.find('[data-rows="' + key + '"]');
+            if (!tpl || !$list.length) { return null; }
+            var html = $.trim(tpl.innerHTML).replace(/__i__/g, String(counter++));
+            var $row = $($.parseHTML(html));
+            fillRow($row, data || null);
+            $list.append($row);
+            renumber($list);
+            applyShows($f);
+            return $row;
+        }
+
+        function ensureMinRows($f) {
+            $f.find('[data-rows]').each(function () {
+                var $list = $(this);
+                var min = +$list.data('min-rows') || 0;
+                while ($list.children('[data-row]').length < min) { addRow($f, $list.data('rows')); }
+            });
+        }
+
+        function setOpen($target, open) {
+            $target.toggleClass('mhf-hidden', !open);
+            $target.find('input, select, textarea').prop('disabled', !open);
+        }
+
+        // show / hide parts of the form; hidden parts are disabled so they are not sent
+        function applyShows($f) {
+            $f.find('[data-show]').each(function () {
+                setOpen($($(this).data('show')), this.checked && !this.disabled);
+            });
+            $f.find('[data-show-in-row]').each(function () {
+                var $t = $(this).closest('[data-row]').find($(this).data('show-in-row'));
+                setOpen($t, this.checked && !this.disabled);
+            });
+        }
+
+        function lines(text) { return str(text).split(/\r?\n/); }
+
+        // tick -> add the text as a new line;  untick -> remove that line
+        function appendTo(box) {
+            var $box = $(box.getAttribute('data-append-to'));
+            if (!$box.length) { return; }
+            var value = box.value;
+            var list = lines($box.val()).filter(function (l) { return $.trim(l) !== ''; });
+            var pos = -1;
+            $.each(list, function (i, l) { if ($.trim(l).toLowerCase() === value.toLowerCase()) { pos = i; } });
+            if (box.checked && pos === -1) { list.push(value); }
+            if (!box.checked && pos !== -1) { list.splice(pos, 1); }
+            $box.val(list.join('\n')).trigger('input');
+        }
+
+        $(document).on('change', '.mhf-form [data-append-to]', function () { appendTo(this); });
+        $(document).on('change', '.mhf-form [data-show], .mhf-form [data-show-in-row], .mhf-form :radio', function () {
+            applyShows($(this).closest('.mhf-form'));
+        });
+        $(document).on('click', '.mhf-form [data-repeat-add]', function () {
+            var $f = $(this).closest('.mhf-form');
+            var $row = addRow($f, $(this).data('repeat-add'));
+            if ($row) {
+                dirty = true;
+                try { $row.find('input:not(:radio):not(:checkbox), textarea').first().trigger('focus'); } catch (e) { /* ignore */ }
+            }
+        });
+        $(document).on('click', '.mhf-form [data-repeat-remove]', function () {
+            var $row = $(this).closest('[data-row]');
+            var $list = $row.parent();
+            var $f = $row.closest('.mhf-form');
+            if ($list.children('[data-row]').length <= (+$list.data('min-rows') || 0)) {
+                fillRow($row, null);       // the last row is emptied instead of removed
+            } else {
+                $row.remove();
+            }
+            renumber($list);
+            applyShows($f);
+            dirty = true;
+            $f.trigger('change');
+        });
+
+        return { addRow: addRow, ensureMinRows: ensureMinRows, applyShows: applyShows };
+    })();
 
     /* ---------- save ---------- */
     function setLoading($btn, on) {
@@ -423,29 +562,6 @@ if (typeof window !== 'undefined') { window.MHCalc = MHCalc; }
             $('#mh_dob_wrap .mhf-dob-icon').on('click', function () { $dobDisplay.trigger('focus'); });
         }
 
-        function initComplaint() {
-            if (!$.fn.select2) { return; }
-            $('#mh_main_complaint').select2({
-                width: '100%',
-                placeholder: 'Type to search or add (e.g. Fever, Diabetes, যক্ষা)',
-                tags: true,
-                tokenSeparators: [','],
-                closeOnSelect: true,
-                dropdownParent: $('#mh_complaint_wrap'),
-                createTag: function (params) {
-                    var term = $.trim(params.term);
-                    if (term === '') { return null; }
-                    term = term.substring(0, 100);
-                    return { id: term, text: term };
-                },
-                // put "your own text" LAST, so Enter picks the first matching name from the list
-                insertTag: function (data, tag) { data.push(tag); },
-                language: {
-                    noResults: function () { return 'No match. Type the name and press Enter to add it.'; }
-                }
-            });
-        }
-
         return {
             init: function () {
                 $dobDisplay = $('#mh_dob_display'); $dobIso = $('#mh_dob');
@@ -454,7 +570,6 @@ if (typeof window !== 'undefined') { window.MHCalc = MHCalc; }
                 $sex = $('#mh_sex');
 
                 initDob();
-                initComplaint();
 
                 $sex.add('#mh_marital_status').on('change', function () { applySex(true); });
                 $('#mh_occupation').on('change', function () { applyOccupation(true); });
@@ -477,8 +592,7 @@ if (typeof window !== 'undefined') { window.MHCalc = MHCalc; }
                     dob: 'Select the date of birth.',
                     weight_kg: 'Enter the weight in kg.',
                     height_ft: 'Enter the height in feet.',
-                    height_in: 'Enter the height in inches.',
-                    main_complaint: 'Add at least one main complaint.'
+                    height_in: 'Enter the height in inches.'
                 };
                 $.each(friendly, function (name, msg) { if (errs[name]) { errs[name] = msg; } });
 
@@ -507,6 +621,71 @@ if (typeof window !== 'undefined') { window.MHCalc = MHCalc; }
             }
         };
     })();
+
+    /* ---------------------------------------------------------------------
+     * TAB 2 - Chief Complaint & Risk Factors
+     * ticked risk factors are listed automatically under "Important risk factors identified"
+     * ------------------------------------------------------------------- */
+    hooks[2] = (function () {
+        function esc(s) { return $('<div>').text(s).html(); }
+
+        function updateIdentified() {
+            var parts = [];
+            $('.mhf-risk-table tr[data-risk-group]').each(function () {
+                var $tr = $(this);
+                var ticked = $tr.find('[data-risk-factor]:checked').map(function () { return this.value; }).get();
+                var other = $.trim($tr.find('[data-risk-other]').val() || '');
+                if (other !== '') { ticked.push(other); }
+                $tr.toggleClass('has-risk', ticked.length > 0);
+                if (ticked.length) {
+                    parts.push('<div class="mhf-identified-line"><strong>' + esc($tr.data('risk-title')) + ':</strong> ' +
+                        $.map(ticked, function (t) { return '<span class="mhf-chip">' + esc(t) + '</span>'; }).join(' ') + '</div>');
+                }
+            });
+            $('#mh_risk_identified').html(parts.length ? parts.join('') : '<span class="mhf-identified-empty">No risk factor ticked yet.</span>');
+        }
+
+        return {
+            init: function () {
+                $(document).on('change input', '.mhf-risk-table [data-risk-factor], .mhf-risk-table [data-risk-other]', updateIdentified);
+            },
+            afterHydrate: updateIdentified,
+            validate: function ($f, errs) {
+                if (errs.main_problem) { errs.main_problem = 'Write the main problem.'; }
+            }
+        };
+    })();
+
+    /* ---------------------------------------------------------------------
+     * TAB 3 - Illness History
+     * ------------------------------------------------------------------- */
+    hooks[3] = {
+        init: function () {
+            // first time "Previous hospitalization" is ticked, focus the first box
+            $(document).on('change', '#mh_has_hosp', function () {
+                if (this.checked) { $('#mh_hosp_section input[type="text"]').first().trigger('focus'); }
+            });
+        },
+        validate: function ($f, errs) {
+            var ok = false;
+            $f.find('[data-rows="hpi"] [data-k="complaint"]').each(function () { if ($.trim($(this).val()) !== '') { ok = true; } });
+            if (!ok) { errs.hpi = 'Write at least one complaint in the History of Present Illness.'; }
+        }
+    };
+
+    /* ---------------------------------------------------------------------
+     * TAB 4 - Medication & Family
+     * ------------------------------------------------------------------- */
+    hooks[4] = {
+        validate: function ($f, errs) {
+            if (errs.drug_allergy) { errs.drug_allergy = 'Select "No known drug allergy" or "Yes".'; }
+            if ($f.find('[name="drug_allergy"]:checked').val() === 'Yes') {
+                var ok = false;
+                $f.find('[data-rows="drug_allergies"] [data-k="drug"]').each(function () { if ($.trim($(this).val()) !== '') { ok = true; } });
+                if (!ok) { errs.drug_allergies = 'Write the drug the patient is allergic to.'; }
+            }
+        }
+    };
 
     /* ---------------------------------------------------------------------
      * START
@@ -543,6 +722,11 @@ if (typeof window !== 'undefined') { window.MHCalc = MHCalc; }
         $.each(S.data || {}, function (n, data) { hydrate(+n, data); });
         // brand-new form: suggest the person's name (and sex / date of birth when known)
         if (!S.formId && S.prefill && !$.isEmptyObject(S.prefill)) { hydrate(1, S.prefill); }
+        // every "+ add row" table starts with at least one empty row; then show/hide the dependent parts
+        $('.mhf-form').each(function () {
+            Dyn.ensureMinRows($(this));
+            Dyn.applyShows($(this));
+        });
         hydrating = false;
         dirty = false;
 

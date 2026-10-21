@@ -114,7 +114,7 @@
 /* ---- menu (horizontal on desktop, drawer on phones) ---- */
 .hf-menu { display: flex; align-items: center; flex: 1; min-width: 0; }
 .hf-menu-head, .hf-menu-foot { display: none; }
-.hf-nav { display: flex; align-items: center; gap: 2px; }
+.hf-nav { display: flex; align-items: center; justify-content: center; height: 100%; margin: 0 auto; gap: 2px; }
 .hf-nav > li { position: relative; }
 
 .hf-link {
