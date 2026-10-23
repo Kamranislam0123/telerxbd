@@ -29,7 +29,7 @@ $drug_allergy_spec = array(
 
 $family_spec = array(
     'relative'  => array('text', 60),
-    'status'    => array('text', 30),
+    'status'    => array('pick', array('Alive', 'Dead')),
     'age'       => array('text', 30),
     'disease'   => array('text', 200),
     'onset_age' => array('text', 30),
@@ -56,9 +56,6 @@ if ($mh_mode === 'form') {
 <datalist id="mh_dl_relative">
     <option value="Father"><option value="Mother"><option value="Brother"><option value="Sister">
     <option value="Paternal grandfather"><option value="Paternal grandmother"><option value="Maternal grandfather"><option value="Maternal grandmother">
-</datalist>
-<datalist id="mh_dl_alive">
-    <option value="Alive"><option value="Deceased"><option value="Unknown">
 </datalist>
 
 <!-- ====== 1. Medication History ====== -->
@@ -163,11 +160,11 @@ if ($mh_mode === 'form') {
         <thead>
             <tr>
                 <th style="width:16%">Relative</th>
-                <th style="width:13%">Alive / deceased</th>
-                <th style="width:13%">Age now / age at death</th>
-                <th style="width:23%">Disease or cause of death</th>
-                <th style="width:11%">Age at onset</th>
-                <th style="width:19%">Remarks</th>
+                <th style="width:13%">Alive / Death</th>
+                <th style="width:14%">Age</th>
+                <th style="width:22%">Disease / Cause of death</th>
+                <th style="width:13%">Age at Onset Diseases</th>
+                <th style="width:17%">Remarks</th>
                 <th class="mhf-col-del" aria-label="Remove"></th>
             </tr>
         </thead>
@@ -185,10 +182,26 @@ if ($mh_mode === 'form') {
 <template id="mh-tpl-family">
     <tr data-row>
         <td><input type="text" name="family[__i__][relative]" data-k="relative" class="mhf-control" maxlength="60" list="mh_dl_relative" placeholder="e.g. Father" aria-label="Relative"></td>
-        <td><input type="text" name="family[__i__][status]" data-k="status" class="mhf-control" maxlength="30" list="mh_dl_alive" placeholder="Alive" aria-label="Alive or deceased"></td>
-        <td><input type="text" name="family[__i__][age]" data-k="age" class="mhf-control" maxlength="30" placeholder="e.g. 65" aria-label="Age now or age at death"></td>
-        <td><input type="text" name="family[__i__][disease]" data-k="disease" class="mhf-control" maxlength="200" placeholder="e.g. Diabetes" aria-label="Disease or cause of death"></td>
-        <td><input type="text" name="family[__i__][onset_age]" data-k="onset_age" class="mhf-control" maxlength="30" placeholder="e.g. 50" aria-label="Age at onset"></td>
+        <td>
+            <select name="family[__i__][status]" data-k="status" data-family-status class="mhf-control mhf-select" aria-label="Alive or death">
+                <option value="">Select</option>
+                <option value="Alive">Alive</option>
+                <option value="Dead">Dead</option>
+            </select>
+        </td>
+        <!-- the small titles change with Alive / Dead (see assets/js/medical-history-form.js, Tab 4) -->
+        <td>
+            <span class="mhf-cell-cap" data-cap-alive="Age Now" data-cap-dead="Age at death" data-cap-none="Age now / at death">Age now / at death</span>
+            <input type="text" name="family[__i__][age]" data-k="age" class="mhf-control" maxlength="30" placeholder="e.g. 65" aria-label="Age now or age at death">
+        </td>
+        <td>
+            <span class="mhf-cell-cap" data-cap-alive="Disease" data-cap-dead="Cause of death" data-cap-none="Disease / Cause of death">Disease / Cause of death</span>
+            <input type="text" name="family[__i__][disease]" data-k="disease" class="mhf-control" maxlength="200" placeholder="e.g. Diabetes" aria-label="Disease or cause of death">
+        </td>
+        <td>
+            <span class="mhf-cell-cap">Age at Onset Diseases</span>
+            <input type="text" name="family[__i__][onset_age]" data-k="onset_age" class="mhf-control" maxlength="30" placeholder="e.g. 50" aria-label="Age at onset of diseases">
+        </td>
         <td><input type="text" name="family[__i__][remarks]" data-k="remarks" class="mhf-control" maxlength="200" placeholder="Remarks" aria-label="Remarks"></td>
         <td class="mhf-col-del"><button type="button" class="mhf-del-row" data-repeat-remove title="Remove this row" aria-label="Remove this row"><i class="fa-solid fa-xmark"></i></button></td>
     </tr>
@@ -222,7 +235,14 @@ if ($mh_mode === 'save') {
     $d['allergy_selected'] = mh_pick_many(isset($in['allergy_selected']) ? $in['allergy_selected'] : array(), $other_allergies);
     $d['allergy_findings'] = mh_clean_multiline(isset($in['allergy_findings']) ? $in['allergy_findings'] : '', 1500);
 
-    $d['family'] = mh_clean_rows(isset($in['family']) ? $in['family'] : array(), $family_spec, 30);
+    // older forms saved "Deceased" as free text -> now the dropdown value "Dead"
+    $family_in = (isset($in['family']) && is_array($in['family'])) ? $in['family'] : array();
+    foreach ($family_in as $i => $row) {
+        if (is_array($row) && isset($row['status']) && $row['status'] === 'Deceased') {
+            $family_in[$i]['status'] = 'Dead';
+        }
+    }
+    $d['family'] = mh_clean_rows($family_in, $family_spec, 30);
 
     $mh_result = array('data' => $d, 'errors' => $e);
     return;
@@ -265,8 +285,21 @@ if ($mh_mode === 'pdf') {
     echo mh_pdf_group('3. Family History');
     $rows = array();
     foreach ((isset($d['family']) && is_array($d['family'])) ? $d['family'] : array() as $f) {
-        $rows[] = array('<b>' . $cell($f, 'relative') . '</b>', $cell($f, 'status'), $cell($f, 'age'), $cell($f, 'disease'), $cell($f, 'onset_age'), $cell($f, 'remarks'));
+        $status = isset($f['status']) ? (string)$f['status'] : '';
+        if ($status === 'Deceased') {
+            $status = 'Dead';
+        }
+        // the PDF says which kind of age / disease it is, like the website does
+        $age = $cell($f, 'age');
+        $dis = $cell($f, 'disease');
+        if ($status === 'Alive') {
+            $age = $age !== '' ? $age . ' <span class="muted">(now)</span>' : '';
+        } elseif ($status === 'Dead') {
+            $age = $age !== '' ? $age . ' <span class="muted">(at death)</span>' : '';
+            $dis = $dis !== '' ? '<span class="muted">Cause of death:</span> ' . $dis : '';
+        }
+        $rows[] = array('<b>' . $cell($f, 'relative') . '</b>', mh_h($status), $age, $dis, $cell($f, 'onset_age'), $cell($f, 'remarks'));
     }
-    echo mh_pdf_table(array('Relative' => '17%', 'Alive / deceased' => '13%', 'Age now / at death' => '13%', 'Disease or cause of death' => '24%', 'Age at onset' => '11%', 'Remarks' => '22%'), $rows);
+    echo mh_pdf_table(array('Relative' => '16%', 'Alive / Death' => '11%', 'Age now / at death' => '14%', 'Disease / Cause of death' => '24%', 'Age at Onset Diseases' => '13%', 'Remarks' => '22%'), $rows);
     return;
 }

@@ -170,7 +170,7 @@ try {
     // 6) One tab = one page, in order
     $is_first = true;
     foreach ($sections as $no => $meta) {
-        $page = mh_run_section($no, 'pdf', $data[$no]);
+        $page = mh_run_section($no, 'pdf', $data[$no], array(), array('tab1' => $tab1, 'pid' => $id_text));
         if (!$is_first) {
             $mpdf->AddPage();
         }

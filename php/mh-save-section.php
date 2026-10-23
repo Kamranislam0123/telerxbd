@@ -49,12 +49,14 @@ try {
     // 4) Existing form? (must belong to this patient)
     $form  = null;
     $saved = array();
+    $saved_data = array();
     if ($form_id > 0) {
         $form = mh_get_form($conn, $form_id, $patient_id);
         if (!$form) {
             mh_json(array('success' => false, 'message' => 'This form was not found.'), 404);
         }
-        $saved = array_keys(mh_get_sections($conn, $form_id));
+        $saved_data = mh_get_sections($conn, $form_id);
+        $saved = array_keys($saved_data);
     } elseif ($section_no !== 1) {
         mh_json(array('success' => false, 'message' => 'Please fill and save the first tab first.'), 409);
     } else {
@@ -77,7 +79,9 @@ try {
     }
 
     // 6) Check + clean the answers (the tab's own file decides the rules)
-    $run    = mh_run_section($section_no, 'save', array(), $_POST);
+    //    (Tab 5 needs the saved age / sex of Tab 1 to know which questions apply)
+    $ctx    = array('tab1' => isset($saved_data[1]) ? $saved_data[1] : array());
+    $run    = mh_run_section($section_no, 'save', array(), $_POST, $ctx);
     $errors = $run['result']['errors'];
     $data   = $run['result']['data'];
     if (!empty($errors)) {

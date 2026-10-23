@@ -359,6 +359,7 @@ if (typeof window !== 'undefined') { window.MHCalc = MHCalc; }
                 var $t = $(this).closest('[data-row]').find($(this).data('show-in-row'));
                 setOpen($t, this.checked && !this.disabled);
             });
+            $f.trigger('mhf:shows');   // tabs can refresh their own extras (e.g. Tab 4 titles)
         }
 
         function lines(text) { return str(text).split(/\r?\n/); }
@@ -403,7 +404,78 @@ if (typeof window !== 'undefined') { window.MHCalc = MHCalc; }
             $f.trigger('change');
         });
 
-        return { addRow: addRow, ensureMinRows: ensureMinRows, applyShows: applyShows };
+        return { addRow: addRow, ensureMinRows: ensureMinRows, applyShows: applyShows, setOpen: setOpen };
+    })();
+
+    /* ---------------------------------------------------------------------
+     * PATIENT PROFILE (age / sex saved in Tab 1)
+     * Tab 5 shows only the parts that fit the patient:  data-cond="adult | female12 | male12 | child | senior"
+     * and fills the read-only boxes:                    data-auto="name | pid | dob | age_full | age_years | sex | weight | height_cm | bmi"
+     * The server uses the same rules (php/mh-schema.php -> mh_profile_flags).
+     * ------------------------------------------------------------------- */
+    var Profile = (function () {
+        var p = null;   // the SAVED Tab 1 answers
+        var MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+
+        function fromForm1() {
+            p = {};
+            $.each($form(1).serializeArray(), function (i, f) { p[f.name] = f.value; });
+        }
+
+        function num(v) { var x = parseFloat(str(v).replace(',', '.')); return isNaN(x) ? null : x; }
+
+        function fmtDate(iso) {
+            var m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(iso || '');
+            return m ? (+m[3]) + ' ' + MONTHS[+m[2] - 1] + ' ' + m[1] : '';
+        }
+
+        function ageFull(info) {
+            if (!info) { return ''; }
+            var parts = [];
+            $.each([['years', 'year'], ['months', 'month'], ['days', 'day']], function (i, u) {
+                if (info[u[0]] > 0) { parts.push(info[u[0]] + ' ' + u[1] + (info[u[0]] === 1 ? '' : 's')); }
+            });
+            return parts.length ? parts.join(', ') : '0 days';
+        }
+
+        function apply() {
+            if (!p) { return; }
+            var info = MHCalc.ageInfo(p.dob);
+            var y = info ? info.years : null;
+            var sex = p.sex || '';
+            var flags = {
+                adult: y !== null && y >= 18,
+                female12: y !== null && y >= 12 && sex === 'Female',
+                male12: y !== null && y >= 12 && sex === 'Male',
+                child: y !== null && y < 12,
+                senior: y !== null && y >= 60
+            };
+            $('[data-cond]').each(function () { Dyn.setOpen($(this), !!flags[$(this).data('cond')]); });
+
+            var kg = num(p.weight_kg), ft = num(p.height_ft), inch = num(p.height_in);
+            var totalIn = (ft || 0) * 12 + (inch || 0);
+            var values = {
+                name: p.patient_name || '',
+                pid: S.pid || '',
+                dob: fmtDate(p.dob),
+                age_full: ageFull(info),
+                age_years: info ? info.years + ' years' : '',
+                sex: sex,
+                weight: kg !== null ? kg + ' kg' : '',
+                height_cm: totalIn > 0 ? (Math.round(totalIn * 2.54 * 10) / 10) + ' cm' : '',
+                bmi: (kg !== null && totalIn > 0) ? MHCalc.bmiText(kg, ft || 0, inch || 0, y) : ''
+            };
+            $('[data-auto]').each(function () { $(this).val(values[$(this).data('auto')] || ''); });
+
+            $('#mh5_profile_note span').text('Questions are chosen for: ' + (sex || 'Unknown sex') + ', ' + (info ? ageFull(info) : 'unknown age') +
+                ' (from Tab 1). If this is wrong, correct and save Tab 1 first.');
+        }
+
+        return {
+            init: function () { if (S.data && S.data[1]) { p = S.data[1]; } apply(); },
+            fromForm1: fromForm1,
+            apply: apply
+        };
     })();
 
     /* ---------- save ---------- */
@@ -457,6 +529,7 @@ if (typeof window !== 'undefined') { window.MHCalc = MHCalc; }
             $.each(res.saved || [], function (i, no) { saved[no] = true; });
             dirty = false;
             refreshFormHeader();
+            if (n === 1) { Profile.fromForm1(); Profile.apply(); }   // age / sex may have changed
 
             if (n === total && res.completed) {
                 toast('All sections saved.', 'ok');
@@ -677,6 +750,19 @@ if (typeof window !== 'undefined') { window.MHCalc = MHCalc; }
      * TAB 4 - Medication & Family
      * ------------------------------------------------------------------- */
     hooks[4] = {
+        // Family history: the small titles follow the Alive / Dead choice of the same row
+        //   Alive -> "Age Now", "Disease"      Dead -> "Age at death", "Cause of death"
+        init: function () {
+            function familyTitles($scope) {
+                $scope.find('[data-rows="family"] > [data-row]').each(function () {
+                    var st = $(this).find('[data-family-status]').val();
+                    var key = st === 'Alive' ? 'alive' : (st === 'Dead' ? 'dead' : 'none');
+                    $(this).find('.mhf-cell-cap[data-cap-' + key + ']').each(function () { $(this).text($(this).attr('data-cap-' + key)); });
+                });
+            }
+            $(document).on('change', '[data-family-status]', function () { familyTitles($(this).closest('.mhf-form')); });
+            $(document).on('mhf:shows', '.mhf-form[data-section="4"]', function () { familyTitles($(this)); });
+        },
         validate: function ($f, errs) {
             if (errs.drug_allergy) { errs.drug_allergy = 'Select "No known drug allergy" or "Yes".'; }
             if ($f.find('[name="drug_allergy"]:checked').val() === 'Yes') {
@@ -727,6 +813,7 @@ if (typeof window !== 'undefined') { window.MHCalc = MHCalc; }
             Dyn.ensureMinRows($(this));
             Dyn.applyShows($(this));
         });
+        Profile.init();
         hydrating = false;
         dirty = false;
 
