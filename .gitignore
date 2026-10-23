@@ -30,3 +30,6 @@ info.php
 .vscode/settings.json
 .vscode/settings.json
 .vscode/settings.json
+
+# Maintenance page while it is ON (keep only maintenance-off.html in git)
+maintenance.html
