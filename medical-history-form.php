@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 /**
  * Patient Medical History FORM - TeleRx Bangladesh
  * Multi-tab form: Save and Next -> ... -> Save and Finish -> Generate PDF Now
@@ -124,8 +124,14 @@ $tabs_meta = array();
 foreach ($sections as $no => $meta) {
     $tabs_meta[] = array('no' => (int)$no, 'title' => $meta['title']);
 }
+// Patient ID shown in Tab 5 (same text as the PDF header): "PT000053" or "Spouse of PT000053"
+$patient_code = 'PT' . str_pad((string)$patient_id, 6, '0', STR_PAD_LEFT);
+$relationship = $person ? (string)$person['relationship'] : 'Self';
+$pid_text     = ($relationship === 'Self' || $relationship === '') ? $patient_code : ($relationship . ' of ' . $patient_code);
+
 $state = array(
     'formId'    => $form ? (int)$form['id'] : 0,
+    'pid'       => $pid_text,
     'person'    => $person ? $person['key'] : 'self',
     'prefill'   => $prefill ? $prefill : new stdClass(),
     'status'    => $form ? $form['status'] : 'new',
@@ -143,7 +149,7 @@ $state = array(
 );
 $state_json = json_encode($state, JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT);
 
-$asset_v = '5';   // change this number if you edit the CSS/JS and the browser keeps showing the old one
+$asset_v = '6';   // change this number if you edit the CSS/JS and the browser keeps showing the old one
 
 include 'header.php';
 ?>

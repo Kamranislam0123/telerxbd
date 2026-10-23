@@ -698,3 +698,45 @@ select.mhf-control,
 .mhf p, .mhf li, .mhf ol, .mhf ul, .mhf label, .mhf strong, .mhf b, .mhf em,
 .mhf h1, .mhf h2, .mhf h3, .mhf h4, .mhf h5, .mhf h6,
 .mhf th, .mhf td, .mhf legend, .mhf small { font-size: 12px; }
+
+
+/* =====================================================================
+   TAB 5 (Personal & Other History) + Family history titles
+   ===================================================================== */
+/* block numbers (1. 2. 3. ...) count only the blocks shown for this patient */
+.mhf-numbered { counter-reset: mhf-block; }
+.mhf-numbered .mhf-sc-block > .mhf-group::before { counter-increment: mhf-block; content: counter(mhf-block) ". "; }
+.mhf-sc-block { margin-bottom: 8px; }
+.mhf-sc .mhf-sc-block > .mhf-group { margin-top: 22px; }
+.mhf-cond-note { background: #eef7f1; color: #14532d; }
+.mhf-cond-note i { color: var(--mhf-ok); }
+
+.mhf-subhead {
+    margin: 18px 0 10px;
+    padding: 6px 12px;
+    border-radius: 6px;
+    background: var(--mhf-primary-soft);
+    color: var(--mhf-primary-dark);
+    font-weight: 600;
+}
+
+/* one choice question per line: label on the left, choices on the right */
+.mhf-qlist { border: 1px solid var(--mhf-border); border-radius: 10px; margin-bottom: 14px; overflow: hidden; }
+.mhf-q { display: flex; align-items: flex-start; gap: 14px; padding: 9px 14px; border-bottom: 1px solid #e6ecf4; }
+.mhf-q:last-child { border-bottom: 0; }
+.mhf-q:nth-child(even) { background: #fbfcfe; }
+.mhf-q-label { flex: 0 0 34%; padding-top: 4px; font-weight: 500; color: var(--mhf-navy); }
+.mhf-q-body { flex: 1 1 auto; min-width: 0; }
+.mhf-q-other { margin-top: 8px; height: 36px; }
+
+.mhf-hint-top { margin: 0 0 6px; }
+.mhf-sc-table { min-width: 560px; }
+
+/* family history: small title above the box, it changes with Alive / Dead */
+.mhf-cell-cap { display: block; margin: 0 0 4px; font-weight: 600; color: var(--mhf-primary-dark); white-space: nowrap; }
+.mhf-family-table { min-width: 920px; }
+
+@media (max-width: 575.98px) {
+    .mhf-q { flex-direction: column; gap: 6px; }
+    .mhf-q-label { flex: none; padding-top: 0; }
+}

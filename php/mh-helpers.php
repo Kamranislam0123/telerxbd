@@ -57,7 +57,7 @@ function mh_sections()
         2 => array('title' => 'Complaint & Risk Factors', 'file' => 'section-2.php'),
         3 => array('title' => 'Illness History', 'file' => 'section-3.php'),
         4 => array('title' => 'Medication & Family', 'file' => 'section-4.php'),
-        5 => array('title' => 'Tab 5', 'file' => 'section-placeholder.php'),
+        5 => array('title' => 'Personal & Other History', 'file' => 'section-5.php'),
         6 => array('title' => 'Tab 6', 'file' => 'section-placeholder.php'),
     );
 }
@@ -67,9 +67,11 @@ function mh_sections()
  *   'form' -> returns the HTML fields for the tab
  *   'pdf'  -> returns the HTML for that tab's PDF page
  *   'save' -> validates $input, returns cleaned data + errors in ['result']
+ * $ctx = extra facts a tab may need: 'tab1' (saved Tab 1 answers), 'pid' (patient ID text)
  */
-function mh_run_section($no, $mode, $data = array(), $input = array())
+function mh_run_section($no, $mode, $data = array(), $input = array(), $ctx = array())
 {
+    $mh_ctx    = is_array($ctx) ? $ctx : array();
     $sections = mh_sections();
     if (!isset($sections[$no])) {
         throw new Exception('Unknown tab number: ' . (int)$no);
@@ -647,12 +649,13 @@ function mh_pdf_text($text)
     return $text === '' ? '&mdash;' : nl2br(mh_h($text));
 }
 
-/** Label + long value rows (label 25%, value 75%). $rows = list of array(label, ALREADY ESCAPED html) */
+/** Label + long value rows (label 22%, value 78%). $rows = list of array(label, ALREADY ESCAPED html) */
 function mh_pdf_wide($rows)
 {
     $html = '<table class="kv">';
     foreach ($rows as $r) {
-        $html .= '<tr><td class="k" width="25%">' . mh_h($r[0]) . '</td><td class="v" width="75%">' . $r[1] . '</td></tr>';
+        // inline style: the .kv CSS sets td.v to 28% for the 4-column tables, which must not apply here
+        $html .= '<tr><td class="k" style="width:22%">' . mh_h($r[0]) . '</td><td class="v" style="width:78%">' . $r[1] . '</td></tr>';
     }
     return $html . '</table>';
 }
@@ -717,3 +720,6 @@ function mh_setup_message()
     return 'The database tables for this form are missing or old. New installation: import database/mh_tables.sql in phpMyAdmin. '
          . 'If you installed an earlier version before: import database/mh_tables_update_v2.sql once. Then reload this page.';
 }
+
+// Field-list helpers used by Tab 5 (form / save / PDF from one list)
+require_once __DIR__ . '/mh-schema.php';
